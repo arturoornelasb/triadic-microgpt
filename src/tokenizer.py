@@ -260,12 +260,12 @@ class BPETokenizer:
         """
         ids = [self.special_tokens['<BOS>'], self.special_tokens['<USER>']]
         ids.extend(self.encode(user_msg, add_special=False))
+        ids.append(self.special_tokens['<ASSISTANT>'])
 
         if assistant_msg is not None:
-            ids.append(self.special_tokens['<ASSISTANT>'])
             ids.extend(self.encode(assistant_msg, add_special=False))
+            ids.append(self.special_tokens['<EOS>'])
 
-        ids.append(self.special_tokens['<EOS>'])
         return ids
 
     def save(self, filepath):

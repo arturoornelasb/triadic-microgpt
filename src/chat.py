@@ -60,10 +60,6 @@ def generate_response(model, tokenizer, prompt, max_tokens=60, temperature=0.7):
     eos_id = tokenizer.special_tokens['<EOS>']
     generated = []
     
-    # We also want to capture the hidden state of the prompt
-    # and the hidden state of the response for triadic verification
-    prompt_hidden = None
-    
     for step in range(max_tokens):
         # Truncate context to block_size
         ctx = input_ids[-model.config.block_size:]
