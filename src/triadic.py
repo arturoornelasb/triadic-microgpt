@@ -100,7 +100,7 @@ class PrimeMapper:
         """
         composite = 1
         for proj, prime in zip(projections, self.primes):
-            val = proj.data if hasattr(proj, 'data') else proj
+            val = proj.data if hasattr(proj, 'grad') else proj
             if val > 0:
                 composite *= prime
         # Ensure we never return 1 (degenerate case)
@@ -110,7 +110,7 @@ class PrimeMapper:
 
     def get_bits(self, projections):
         """Return the binary bit pattern from projections."""
-        return [1 if (p.data if hasattr(p, 'data') else p) > 0 else 0
+        return [1 if (p.data if hasattr(p, 'grad') else p) > 0 else 0
                 for p in projections]
 
     def explain(self, composite):
