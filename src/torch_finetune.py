@@ -142,9 +142,9 @@ def finetune(args):
     # --- Step 3.5: Gold Primes Distillation Loader ---
     gold_primes_path = os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
-        'data', 'gold_primes.json'
+        'data', f'gold_primes_{config.n_triadic_bits}.json'
     )
-    gold_dict_ids = {}
+    gold_sequences = []
     if os.path.exists(gold_primes_path):
         print("[3.5/4] Loading Gold Primes for Distillation...")
         with open(gold_primes_path, 'r', encoding='utf-8') as f:
@@ -152,13 +152,12 @@ def finetune(args):
             
         for concept, data in gold_data.items():
             ids = tokenizer.encode(' ' + concept, add_special=False)
-            if len(ids) == 1:
-                gold_dict_ids[ids[0]] = data['binary_signature']
             ids_nospace = tokenizer.encode(concept, add_special=False)
-            if len(ids_nospace) == 1:
-                gold_dict_ids[ids_nospace[0]] = data['binary_signature']
+            gold_sequences.append((ids, data['binary_signature']))
+            if ids != ids_nospace:
+                gold_sequences.append((ids_nospace, data['binary_signature']))
                 
-        print(f"  Mapped {len(gold_dict_ids)} single-token concepts for distillation.")
+        print(f"  Mapped {len(gold_sequences)} token sequences for distillation.")
     else:
         print("[3.5/4] No gold_primes.json found. Skipping pure distillation.")
 
@@ -178,16 +177,9 @@ def finetune(args):
     csv_writer = csv.writer(csv_file)
     csv_writer.writerow(['step', 'loss', 'tri_loss', 'dist_loss', 'lr', 'elapsed_s'])
 
-    # Distillation Tensor caching
-    if gold_dict_ids:
-        distill_target_tensor = torch.zeros(tokenizer.vocab_size, config.n_triadic_bits, device=device)
-        distill_mask_tensor = torch.zeros(tokenizer.vocab_size, dtype=torch.bool, device=device)
-        for tok_id, bits in gold_dict_ids.items():
-            distill_target_tensor[tok_id] = torch.tensor(bits, dtype=torch.float32, device=device)
-            distill_mask_tensor[tok_id] = True
-    else:
-        distill_target_tensor = None
-        distill_mask_tensor = None
+    # Distillation Sequence caching
+    if gold_sequences:
+        print(f"  Initialized sequence matching for {len(gold_sequences)} distillation targets.")
 
     model.train()
     start_time = time.time()
@@ -224,17 +216,25 @@ def finetune(args):
             dist_loss_val = 0.0
             
             # Apply Knowledge Distillation
-            if distill_target_tensor is not None:
-                flat_x = x.view(-1)
-                b_mask = distill_mask_tensor[flat_x]
+            if gold_sequences:
+                b_mask = torch.zeros((B, T), dtype=torch.bool, device=device)
+                targets_proj = torch.zeros((B, T, config.n_triadic_bits), dtype=torch.float32, device=device)
                 
-                if b_mask.any():
-                    mask_bt = b_mask.view(B, T)
-                    targets_proj = distill_target_tensor[x]
-                    
-                    dist_loss = model.distillation_loss(triadic_proj, targets_proj, mask_bt)
-                    
-                    # Apply heavy emphasis to distillation during fine-tuning
+                x_list = x.tolist()
+                match_found = False
+                
+                for b_idx in range(B):
+                    seq = x_list[b_idx]
+                    for target_ids, bits in gold_sequences:
+                        n_tokens = len(target_ids)
+                        for i in range(T - n_tokens + 1):
+                            if seq[i:i+n_tokens] == target_ids:
+                                b_mask[b_idx, i + n_tokens - 1] = True
+                                targets_proj[b_idx, i + n_tokens - 1] = torch.tensor(bits, dtype=torch.float32, device=device)
+                                match_found = True
+                
+                if match_found:
+                    dist_loss = model.distillation_loss(triadic_proj, targets_proj, b_mask)
                     dist_alpha = args.alpha * 5.0
                     total_loss = total_loss + dist_alpha * dist_loss
                     dist_loss_val = dist_loss.item()

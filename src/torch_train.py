@@ -200,25 +200,21 @@ def train(args):
     triadic_warmup = int(args.steps * args.triadic_warmup_pct)
 
     # --- Step 3.5: Gold Primes Distillation Loader ---
-    gold_primes_path = os.path.join(project_root, 'data', 'gold_primes.json')
-    gold_dict_ids = {}
+    gold_primes_path = os.path.join(project_root, 'data', f'gold_primes_{args.bits}.json')
+    gold_sequences = []
     if os.path.exists(gold_primes_path):
         print("[4/5] Loading Gold Primes for Distillation...")
         with open(gold_primes_path, 'r', encoding='utf-8') as f:
             gold_data = json.load(f)
             
         for concept, data in gold_data.items():
-            # encode concept to find token ID
-            # add a space prefix to mimic BPE behavior for some words
             ids = tokenizer.encode(' ' + concept, add_special=False)
-            if len(ids) == 1:
-                gold_dict_ids[ids[0]] = data['binary_signature']
-            # Also try without space
             ids_nospace = tokenizer.encode(concept, add_special=False)
-            if len(ids_nospace) == 1:
-                gold_dict_ids[ids_nospace[0]] = data['binary_signature']
+            gold_sequences.append((ids, data['binary_signature']))
+            if ids != ids_nospace:
+                gold_sequences.append((ids_nospace, data['binary_signature']))
                 
-        print(f"  Mapped {len(gold_dict_ids)} single-token concepts for distillation.")
+        print(f"  Mapped {len(gold_sequences)} token sequences for distillation.")
     else:
         print("[4/5] No gold_primes.json found. Skipping pure distillation.")
 
@@ -241,16 +237,9 @@ def train(args):
     csv_writer = csv.writer(csv_file)
     csv_writer.writerow(['step', 'loss', 'tri_loss', 'dist_loss', 'lr', 'elapsed_s'])
 
-    # Distillation Tensor caching (to avoid reallocating every batch)
-    if gold_dict_ids:
-        distill_target_tensor = torch.zeros(tokenizer.vocab_size, args.bits, device=device)
-        distill_mask_tensor = torch.zeros(tokenizer.vocab_size, dtype=torch.bool, device=device)
-        for tok_id, bits in gold_dict_ids.items():
-            distill_target_tensor[tok_id] = torch.tensor(bits, dtype=torch.float32, device=device)
-            distill_mask_tensor[tok_id] = True
-    else:
-        distill_target_tensor = None
-        distill_mask_tensor = None
+    # Distillation Sequence caching
+    if gold_sequences:
+        print(f"  Initialized sequence matching for {len(gold_sequences)} distillation targets.")
 
     while step < args.steps:
         # Get batch (cycle through data)
@@ -294,22 +283,28 @@ def train(args):
                 tri_loss_val = tri_loss.item()
                 
                 # Apply Knowledge Distillation
-                if distill_target_tensor is not None:
-                    # Flatten batch inputs to index vocab metadata
-                    flat_x = x.view(-1)
+                if gold_sequences:
+                    b_mask = torch.zeros((B, T), dtype=torch.bool, device=device)
+                    targets_proj = torch.zeros((B, T, args.bits), dtype=torch.float32, device=device)
                     
-                    # Create batch mask (B*T) identifying tokens that exist in dict
-                    b_mask = distill_mask_tensor[flat_x]
+                    # Convert to CPU list for fast subsequence search
+                    x_list = x.tolist()
+                    match_found = False
                     
-                    if b_mask.any():
-                        # Unflatten mask to (B, T)
-                        mask_bt = b_mask.view(B, T)
-                        
-                        # Get target bits for all tokens (B, T, n_bits) 
-                        # Background will be zeros but mask ignores them
-                        targets_proj = distill_target_tensor[x]
-                        
-                        dist_loss = model.distillation_loss(triadic_proj, targets_proj, mask_bt)
+                    for b_idx in range(B):
+                        seq = x_list[b_idx]
+                        for target_ids, bits in gold_sequences:
+                            n_tokens = len(target_ids)
+                            # Slide over the sequence
+                            for i in range(T - n_tokens + 1):
+                                if seq[i:i+n_tokens] == target_ids:
+                                    # Target is matched! Apply the prime bits to the LAST token of the concept
+                                    b_mask[b_idx, i + n_tokens - 1] = True
+                                    targets_proj[b_idx, i + n_tokens - 1] = torch.tensor(bits, dtype=torch.float32, device=device)
+                                    match_found = True
+                    
+                    if match_found:
+                        dist_loss = model.distillation_loss(triadic_proj, targets_proj, b_mask)
                         
                         # Apply heavy emphasis to distillation vs standard triadic
                         dist_alpha = args.alpha * 5.0 * alpha_factor
@@ -350,7 +345,7 @@ def train(args):
             msg += f" | loss {lang_loss.item():.4f}"
             if step >= triadic_warmup:
                 msg += f" | tri {tri_loss_val:.4f}"
-                if distill_target_tensor is not None:
+                if gold_sequences:
                     msg += f" | dist {dist_loss_val:.4f}"
             msg += f" | {sps:.1f} stp/s"
             msg += f" | ETA {eta_str}"

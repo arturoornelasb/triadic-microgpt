@@ -283,11 +283,13 @@ class TriadicGPT(nn.Module):
         if not mask.any():
             return torch.tensor(0.0, device=triadic_proj.device)
             
-        # Map tanh outputs from [-1, 1] to [0, 1] probability range
-        probs = (triadic_proj + 1.0) / 2.0
+        # Note: Autocast requires BCEWithLogitsLoss for mixed precision stability
+        # triadic_proj is currently tanh[-1, 1]. We need raw logits for BCEWithLogits.
+        # Since we applied tanh in the forward pass, we need the raw projection here,
+        # but to minimize refactoring we can invert tanh (artanh), or better, apply 
+        # MSE on the tanh outputs directly which is mathematically similar and stable.
         
-        # Apply Binary Cross Entropy
-        dist_loss = F.binary_cross_entropy(probs[mask], targets_proj[mask])
+        dist_loss = F.mse_loss(triadic_proj[mask], (targets_proj[mask] * 2.0) - 1.0)
         
         return dist_loss
 
