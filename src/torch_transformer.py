@@ -144,6 +144,42 @@ class TriadicGPT(nn.Module):
         elif isinstance(module, nn.Embedding):
             torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
 
+    @torch.no_grad()
+    def initialize_triadic_pca(self, hidden_states):
+        """
+        Initialize triadic_head weights using PCA of the provided hidden states.
+        This follows the 'pca' projection mode of the Triadic Engine.
+        
+        Args:
+            hidden_states: (N, n_embd) tensor of hidden representations.
+        """
+        # Center the data
+        X = hidden_states.float()
+        n_bits = self.config.n_triadic_bits
+        
+        print(f"Computing PCA for {X.shape[0]} hidden states to extract {n_bits} semantic bits...")
+        
+        # torch.pca_lowrank is efficient for extracting top-k components
+        # it returns (U, S, V) where X approx U @ diag(S) @ V.T
+        _, _, V = torch.pca_lowrank(X, q=n_bits)
+        
+        # The principal components are the columns of V
+        # triadic_head.weight expects (n_bits, n_embd)
+        pca_weights = V.T  # (n_bits, n_embd)
+        
+        # Ensure it fits
+        if pca_weights.shape[0] < n_bits:
+            # Pad with random if we have fewer components than bits (rare if N is large)
+            num_extra = n_bits - pca_weights.shape[0]
+            extra = torch.randn(num_extra, self.config.n_embd, device=X.device) * 0.02
+            pca_weights = torch.cat([pca_weights, extra], dim=0)
+        elif pca_weights.shape[0] > n_bits:
+            pca_weights = pca_weights[:n_bits]
+            
+        # Update weights
+        self.triadic_head.weight.copy_(pca_weights)
+        print("Triadic head initialized with PCA components.")
+
     def forward(self, input_ids, targets=None):
         """
         Forward pass.
@@ -231,6 +267,29 @@ class TriadicGPT(nn.Module):
         # Combined: coherence + diversity + contrastive
         loss = coherence_loss + 0.5 * diversity_loss + 0.3 * contrastive_loss
         return loss
+
+    def distillation_loss(self, triadic_proj, targets_proj, mask):
+        """
+        Compute Binary Cross Entropy loss to align triadic projections with gold standard bits.
+
+        Args:
+            triadic_proj: (B, T, n_bits) — current model projections in [-1, 1] range via tanh
+            targets_proj: (B, T, n_bits) — target bits [0, 1] 
+            mask:         (B, T) — boolean mask, True for tokens that exist in the gold dictionary
+
+        Returns:
+            loss: scalar representing the BCE across masked tokens
+        """
+        if not mask.any():
+            return torch.tensor(0.0, device=triadic_proj.device)
+            
+        # Map tanh outputs from [-1, 1] to [0, 1] probability range
+        probs = (triadic_proj + 1.0) / 2.0
+        
+        # Apply Binary Cross Entropy
+        dist_loss = F.binary_cross_entropy(probs[mask], targets_proj[mask])
+        
+        return dist_loss
 
     @torch.no_grad()
     def generate(self, input_ids, max_new_tokens=100, temperature=0.7, top_k=50):

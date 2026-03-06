@@ -15,6 +15,7 @@ import csv
 import time
 import random
 import argparse
+import json
 import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
@@ -198,9 +199,32 @@ def train(args):
 
     triadic_warmup = int(args.steps * args.triadic_warmup_pct)
 
+    # --- Step 3.5: Gold Primes Distillation Loader ---
+    gold_primes_path = os.path.join(project_root, 'data', 'gold_primes.json')
+    gold_dict_ids = {}
+    if os.path.exists(gold_primes_path):
+        print("[4/5] Loading Gold Primes for Distillation...")
+        with open(gold_primes_path, 'r', encoding='utf-8') as f:
+            gold_data = json.load(f)
+            
+        for concept, data in gold_data.items():
+            # encode concept to find token ID
+            # add a space prefix to mimic BPE behavior for some words
+            ids = tokenizer.encode(' ' + concept, add_special=False)
+            if len(ids) == 1:
+                gold_dict_ids[ids[0]] = data['binary_signature']
+            # Also try without space
+            ids_nospace = tokenizer.encode(concept, add_special=False)
+            if len(ids_nospace) == 1:
+                gold_dict_ids[ids_nospace[0]] = data['binary_signature']
+                
+        print(f"  Mapped {len(gold_dict_ids)} single-token concepts for distillation.")
+    else:
+        print("[4/5] No gold_primes.json found. Skipping pure distillation.")
+
     # --- Step 4: Training loop ---
     print()
-    print(f"[4/4] Training for {args.steps} steps...")
+    print(f"[5/5] Training for {args.steps} steps...")
     print(f"  Batch size: {args.batch_size}")
     print(f"  Triadic activation: step {triadic_warmup}")
     print("-" * 64)
@@ -215,7 +239,18 @@ def train(args):
     csv_path = os.path.join(checkpoint_dir, 'training_log.csv')
     csv_file = open(csv_path, 'w', newline='')
     csv_writer = csv.writer(csv_file)
-    csv_writer.writerow(['step', 'loss', 'tri_loss', 'lr', 'elapsed_s'])
+    csv_writer.writerow(['step', 'loss', 'tri_loss', 'dist_loss', 'lr', 'elapsed_s'])
+
+    # Distillation Tensor caching (to avoid reallocating every batch)
+    if gold_dict_ids:
+        distill_target_tensor = torch.zeros(tokenizer.vocab_size, args.bits, device=device)
+        distill_mask_tensor = torch.zeros(tokenizer.vocab_size, dtype=torch.bool, device=device)
+        for tok_id, bits in gold_dict_ids.items():
+            distill_target_tensor[tok_id] = torch.tensor(bits, dtype=torch.float32, device=device)
+            distill_mask_tensor[tok_id] = True
+    else:
+        distill_target_tensor = None
+        distill_mask_tensor = None
 
     while step < args.steps:
         # Get batch (cycle through data)
@@ -226,6 +261,7 @@ def train(args):
             x, y = next(data_iter)
 
         x, y = x.to(device), y.to(device)
+        B, T = x.shape
 
         # Cosine learning rate with warmup
         warmup_steps = min(500, args.steps // 10)
@@ -244,11 +280,41 @@ def train(args):
             # Triadic loss
             total_loss = lang_loss
             tri_loss_val = 0.0
+            dist_loss_val = 0.0
 
             if step >= triadic_warmup:
+                # Dynamic alpha scaling: linear warmup from warmup step to end of training
+                # or a fixed window. Let's do linear from warmup to (warmup + 20% of steps)
+                alpha_warmup_steps = int(args.steps * 0.2)
+                alpha_factor = min(1.0, (step - triadic_warmup + 1) / alpha_warmup_steps)
+                current_alpha = args.alpha * alpha_factor
+                
                 tri_loss = model.triadic_loss(triadic_proj)
-                total_loss = lang_loss + args.alpha * tri_loss
+                total_loss = lang_loss + current_alpha * tri_loss
                 tri_loss_val = tri_loss.item()
+                
+                # Apply Knowledge Distillation
+                if distill_target_tensor is not None:
+                    # Flatten batch inputs to index vocab metadata
+                    flat_x = x.view(-1)
+                    
+                    # Create batch mask (B*T) identifying tokens that exist in dict
+                    b_mask = distill_mask_tensor[flat_x]
+                    
+                    if b_mask.any():
+                        # Unflatten mask to (B, T)
+                        mask_bt = b_mask.view(B, T)
+                        
+                        # Get target bits for all tokens (B, T, n_bits) 
+                        # Background will be zeros but mask ignores them
+                        targets_proj = distill_target_tensor[x]
+                        
+                        dist_loss = model.distillation_loss(triadic_proj, targets_proj, mask_bt)
+                        
+                        # Apply heavy emphasis to distillation vs standard triadic
+                        dist_alpha = args.alpha * 5.0 * alpha_factor
+                        total_loss = total_loss + dist_alpha * dist_loss
+                        dist_loss_val = dist_loss.item()
 
         # Backward + step
         optimizer.zero_grad(set_to_none=True)
@@ -260,7 +326,7 @@ def train(args):
 
         # Log every step to CSV
         elapsed = time.time() - start_time
-        csv_writer.writerow([step + 1, f'{lang_loss.item():.6f}', f'{tri_loss_val:.6f}', f'{lr_t:.8f}', f'{elapsed:.1f}'])
+        csv_writer.writerow([step + 1, f'{lang_loss.item():.6f}', f'{tri_loss_val:.6f}', f'{dist_loss_val:.6f}', f'{lr_t:.8f}', f'{elapsed:.1f}'])
 
         # Print logging with progress bar and ETA
         if step % args.print_every == 0 or step == args.steps - 1:
@@ -284,13 +350,16 @@ def train(args):
             msg += f" | loss {lang_loss.item():.4f}"
             if step >= triadic_warmup:
                 msg += f" | tri {tri_loss_val:.4f}"
+                if distill_target_tensor is not None:
+                    msg += f" | dist {dist_loss_val:.4f}"
             msg += f" | {sps:.1f} stp/s"
             msg += f" | ETA {eta_str}"
             print(msg)
 
         # Checkpoint
         if (step + 1) % args.save_every == 0 or step == args.steps - 1:
-            ckpt_path = os.path.join(checkpoint_dir, f'model_step{step+1}.pt')
+            model_tag = f"L{args.layers}_D{args.dim}_B{args.bits}"
+            ckpt_path = os.path.join(checkpoint_dir, f'model_{model_tag}_step{step+1}.pt')
             torch.save({
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
@@ -301,7 +370,7 @@ def train(args):
 
             if lang_loss.item() < best_loss:
                 best_loss = lang_loss.item()
-                best_path = os.path.join(checkpoint_dir, 'model_best.pt')
+                best_path = os.path.join(checkpoint_dir, f'model_{model_tag}_best.pt')
                 torch.save({
                     'model_state_dict': model.state_dict(),
                     'config': vars(config),
@@ -354,9 +423,9 @@ import math
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='GPU Train Triadic MicroGPT (PyTorch)')
     parser.add_argument('--data', type=str, default=None, help='Training data path')
-    parser.add_argument('--stories', type=int, default=20000, help='Max stories to use')
+    parser.add_argument('--stories', type=int, default=50000, help='Max stories to use')
     parser.add_argument('--vocab', type=int, default=4096, help='BPE vocab size')
-    parser.add_argument('--steps', type=int, default=5000, help='Training steps')
+    parser.add_argument('--steps', type=int, default=50000, help='Training steps')
     parser.add_argument('--batch-size', type=int, default=32, help='Batch size')
     parser.add_argument('--lr', type=float, default=3e-4, help='Learning rate')
     parser.add_argument('--layers', type=int, default=6, help='Transformer layers')
@@ -372,6 +441,13 @@ if __name__ == '__main__':
     parser.add_argument('--checkpoint-dir', type=str, default=None, help='Checkpoint dir')
     parser.add_argument('--tokenizer', type=str, default=None, help='Pre-trained tokenizer path (skip BPE training)')
     parser.add_argument('--tokens', type=str, default=None, help='Pre-tokenized .npy cache (skip encoding)')
+    parser.add_argument('--scale', type=str, choices=['base', 'xl'], default='base', help='Model scale preset')
     args = parser.parse_args()
+
+    if args.scale == 'xl':
+        args.layers = 12
+        args.dim = 512
+        args.heads = 8
+        args.bits = 64
 
     train(args)

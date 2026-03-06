@@ -145,6 +145,8 @@ class FastBPETokenizer:
         if not token_ids:
             return ""
         text = self._tokenizer.decode(token_ids, skip_special_tokens=skip_special)
+        # Clean up any lingering ByteLevel artifacts
+        text = text.replace('Ġ', ' ').replace('Ä', '').replace('Ċ', '\n')
         return text
 
     @property

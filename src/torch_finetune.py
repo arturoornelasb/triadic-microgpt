@@ -139,6 +139,29 @@ def finetune(args):
     dataset = InstructionDataset(examples, tokenizer, config.block_size)
     dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, drop_last=True)
 
+    # --- Step 3.5: Gold Primes Distillation Loader ---
+    gold_primes_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
+        'data', 'gold_primes.json'
+    )
+    gold_dict_ids = {}
+    if os.path.exists(gold_primes_path):
+        print("[3.5/4] Loading Gold Primes for Distillation...")
+        with open(gold_primes_path, 'r', encoding='utf-8') as f:
+            gold_data = json.load(f)
+            
+        for concept, data in gold_data.items():
+            ids = tokenizer.encode(' ' + concept, add_special=False)
+            if len(ids) == 1:
+                gold_dict_ids[ids[0]] = data['binary_signature']
+            ids_nospace = tokenizer.encode(concept, add_special=False)
+            if len(ids_nospace) == 1:
+                gold_dict_ids[ids_nospace[0]] = data['binary_signature']
+                
+        print(f"  Mapped {len(gold_dict_ids)} single-token concepts for distillation.")
+    else:
+        print("[3.5/4] No gold_primes.json found. Skipping pure distillation.")
+
     # --- Fine-tune ---
     print()
     print(f"[4/4] Fine-tuning for {args.steps} steps...")
@@ -153,7 +176,18 @@ def finetune(args):
     csv_path = os.path.join(checkpoint_dir, 'finetune_log.csv')
     csv_file = open(csv_path, 'w', newline='')
     csv_writer = csv.writer(csv_file)
-    csv_writer.writerow(['step', 'loss', 'tri_loss', 'lr', 'elapsed_s'])
+    csv_writer.writerow(['step', 'loss', 'tri_loss', 'dist_loss', 'lr', 'elapsed_s'])
+
+    # Distillation Tensor caching
+    if gold_dict_ids:
+        distill_target_tensor = torch.zeros(tokenizer.vocab_size, config.n_triadic_bits, device=device)
+        distill_mask_tensor = torch.zeros(tokenizer.vocab_size, dtype=torch.bool, device=device)
+        for tok_id, bits in gold_dict_ids.items():
+            distill_target_tensor[tok_id] = torch.tensor(bits, dtype=torch.float32, device=device)
+            distill_mask_tensor[tok_id] = True
+    else:
+        distill_target_tensor = None
+        distill_mask_tensor = None
 
     model.train()
     start_time = time.time()
@@ -169,6 +203,7 @@ def finetune(args):
             x, y = next(data_iter)
 
         x, y = x.to(device), y.to(device)
+        B, T = x.shape
 
         # Cosine LR with warmup
         warmup = min(100, args.steps // 10)
@@ -185,6 +220,24 @@ def finetune(args):
             logits, triadic_proj, lang_loss = model(x, targets=y)
             tri_loss = model.triadic_loss(triadic_proj)
             total_loss = lang_loss + args.alpha * tri_loss
+            
+            dist_loss_val = 0.0
+            
+            # Apply Knowledge Distillation
+            if distill_target_tensor is not None:
+                flat_x = x.view(-1)
+                b_mask = distill_mask_tensor[flat_x]
+                
+                if b_mask.any():
+                    mask_bt = b_mask.view(B, T)
+                    targets_proj = distill_target_tensor[x]
+                    
+                    dist_loss = model.distillation_loss(triadic_proj, targets_proj, mask_bt)
+                    
+                    # Apply heavy emphasis to distillation during fine-tuning
+                    dist_alpha = args.alpha * 5.0
+                    total_loss = total_loss + dist_alpha * dist_loss
+                    dist_loss_val = dist_loss.item()
 
         # Backward
         optimizer.zero_grad(set_to_none=True)
@@ -198,7 +251,7 @@ def finetune(args):
         elapsed = time.time() - start_time
 
         # CSV log
-        csv_writer.writerow([step + 1, f'{lang_loss.item():.6f}', f'{tri_loss_val:.6f}', f'{lr_t:.8f}', f'{elapsed:.1f}'])
+        csv_writer.writerow([step + 1, f'{lang_loss.item():.6f}', f'{tri_loss_val:.6f}', f'{dist_loss_val:.6f}', f'{lr_t:.8f}', f'{elapsed:.1f}'])
 
         # Progress bar
         if step % args.print_every == 0 or step == args.steps - 1:
@@ -214,6 +267,8 @@ def finetune(args):
             msg += f" | step {step+1}/{args.steps}"
             msg += f" | loss {lang_loss.item():.4f}"
             msg += f" | tri {tri_loss_val:.4f}"
+            if distill_target_tensor is not None:
+                msg += f" | dist {dist_loss_val:.4f}"
             msg += f" | {sps:.1f} stp/s"
             msg += f" | ETA {eta}"
             print(msg)

@@ -9,100 +9,114 @@ between the user's prompt and the AI's answer.
 
 import os
 import sys
-import numpy as np
+import torch
 import traceback
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.fast_transformer import FastGPT, FastGPTConfig
-from src.tensor_ops import softmax_forward
-from src.tokenizer import BPETokenizer
+from src.torch_transformer import TriadicGPT, TriadicGPTConfig
+try:
+    from src.fast_tokenizer import FastBPETokenizer as BPETokenizer
+except ImportError:
+    from src.tokenizer import BPETokenizer
 from src.triadic import PrimeMapper, TriadicValidator
 
-
-def load_chat_model(checkpoint_path, tokenizer_path):
+def load_chat_model(checkpoint_path):
     """Load the trained model and tokenizer."""
-    print("Loading tokenizer...")
-    tokenizer = BPETokenizer.load(tokenizer_path)
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print(f"Loading model to {device}...")
     
-    # Configure model to match Phase 3/4 settings
-    config = FastGPTConfig(
-        vocab_size=tokenizer.vocab_size,
-        block_size=128,
-        n_layer=4,
-        n_embd=128,
-        n_head=4,
-        n_triadic_bits=16,
+    checkpoint = torch.load(checkpoint_path, map_location=device)
+    config_dict = checkpoint['config']
+    
+    config = TriadicGPTConfig(
+        vocab_size=config_dict.get('vocab_size', 4096),
+        block_size=config_dict.get('block_size', 256),
+        n_layer=config_dict.get('n_layer', 6),
+        n_embd=config_dict.get('n_embd', 256),
+        n_head=config_dict.get('n_head', 8),
+        n_triadic_bits=config_dict.get('n_triadic_bits', 32),
+        dropout=config_dict.get('dropout', 0.1)
     )
     
-    print("Loading model weights...")
-    model = FastGPT(config)
-    try:
-        model.load_checkpoint(checkpoint_path)
-    except Exception as e:
-        print(f"Error loading checkpoint: {e}")
-        sys.exit(1)
-        
+    model = TriadicGPT(config).to(device)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    model.eval()
+    
+    tokenizer_path = os.path.join(os.path.dirname(checkpoint_path), 'tokenizer.json')
+    tokenizer = BPETokenizer.load(tokenizer_path)
+    
     mapper = PrimeMapper(config.n_triadic_bits)
     validator = TriadicValidator()
     
-    return model, tokenizer, mapper, validator, config
+    return model, tokenizer, mapper, validator, device
 
-
-def generate_response(model, tokenizer, prompt, max_tokens=60, temperature=0.7):
+def generate_response(model, tokenizer, prompt, device, max_tokens=100, temperature=0.7):
     """Generate a response iteratively, stopping at <EOS>."""
-    # Encode prompt in chat format
-    input_ids = tokenizer.encode_chat(prompt)
-    # Remove the trailing <EOS> so the model can generate the assistant response
-    if input_ids[-1] == tokenizer.special_tokens['<EOS>']:
-        input_ids = input_ids[:-1]
-        
-    eos_id = tokenizer.special_tokens['<EOS>']
+    # Simple prompt formatting (no special chat template for now, just endoftext)
+    input_ids = torch.tensor([tokenizer.encode(prompt)], device=device)
+    
+    eos_id = tokenizer.special_tokens.get('<EOS>', tokenizer.special_tokens.get('<|endoftext|>', 0))
     generated = []
     
-    for step in range(max_tokens):
-        # Truncate context to block_size
-        ctx = input_ids[-model.config.block_size:]
-        logits, hidden, _ = model.forward(ctx)
+    # Capture prompt hidden state
+    with torch.no_grad():
+        # Get hidden state from ln_f for the prompt
+        # We re-implement a partial forward pass here to capture internal states
+        T = input_ids.shape[1]
+        pos = torch.arange(0, T, dtype=torch.long, device=device)
+        tok_emb = model.wte(input_ids)
+        pos_emb = model.wpe(pos)
+        x = model.drop(tok_emb + pos_emb)
+        for block in model.blocks:
+            x = block(x)
+        h_prompt_full = model.ln_f(x)
+        h_prompt = h_prompt_full.mean(dim=1) # (1, n_embd)
+    
+    # Generation loop
+    curr_ids = input_ids
+    for _ in range(max_tokens):
+        idx_cond = curr_ids[:, -model.config.block_size:]
+        with torch.no_grad():
+            logits, _, _ = model(idx_cond)
         
-        # Save the prompt's hidden state (mean over prompt tokens)
-        if step == 0:
-            prompt_hidden = np.mean(hidden, axis=0)
-            
-        last_logits = logits[-1]
+        logits = logits[:, -1, :] / max(temperature, 1e-5)
+        probs = torch.softmax(logits, dim=-1)
+        next_id = torch.multinomial(probs, num_samples=1)
         
-        # Temperature sampling
-        scaled = last_logits / max(temperature, 1e-5)
-        probs = softmax_forward(scaled.reshape(1, -1))[0]
-        
-        next_id = np.random.choice(len(probs), p=probs)
-        
-        if next_id == eos_id:
+        if next_id.item() == eos_id:
             break
             
-        input_ids.append(next_id)
-        generated.append(next_id)
+        curr_ids = torch.cat([curr_ids, next_id], dim=1)
+        generated.append(next_id.item())
         
     response_text = tokenizer.decode(generated, skip_special=True)
     
-    # Get final hidden state for the response
-    # Re-run forward with just the generated tokens to get clean response state
+    # Get response hidden state
     if generated:
-        _, resp_hidden_seq, _ = model.forward(generated)
-        resp_hidden = np.mean(resp_hidden_seq, axis=0)
+        resp_ids = torch.tensor([generated], device=device)
+        with torch.no_grad():
+            T_r = resp_ids.shape[1]
+            pos_r = torch.arange(0, T_r, dtype=torch.long, device=device)
+            t_emb = model.wte(resp_ids)
+            p_emb = model.wpe(pos_r)
+            xr = model.drop(t_emb + p_emb)
+            for block in model.blocks:
+                xr = block(xr)
+            h_resp_full = model.ln_f(xr)
+            h_resp = h_resp_full.mean(dim=1)
     else:
-        resp_hidden = prompt_hidden
+        h_resp = h_prompt
         
-    return response_text.strip(), prompt_hidden, resp_hidden
+    return response_text.strip(), h_prompt, h_resp
 
-
-def chat_loop(model, tokenizer, mapper, validator):
+def chat_loop(model, tokenizer, mapper, validator, device):
     """Main interactive chat loop."""
     print("\n" + "="*60)
-    print("  TRIADIC AI — Explainable Conversational Model")
+    print("  TRIADIC AI XL — Explainable Neural Engine")
     print("="*60)
     print("  Type 'quit' or 'exit' to stop.")
-    print("  The model will answer, then verify itself triadically.")
+    print("  Model will verify its grounding logic after each response.")
     print("-" * 60 + "\n")
     
     while True:
@@ -115,67 +129,57 @@ def chat_loop(model, tokenizer, mapper, validator):
                 
             print("\n\033[92mAI:\033[0m ", end="", flush=True)
             
-            # Generate response
             response, h_prompt, h_resp = generate_response(
-                model, tokenizer, prompt, max_tokens=80, temperature=0.7
+                model, tokenizer, prompt, device, max_tokens=128, temperature=0.7
             )
             print(f"{response}\n")
             
-            # Triadic Verification
-            # 1. Project to prime space
-            p_proj = model.project_to_triadic_np(h_prompt)
-            r_proj = model.project_to_triadic_np(h_resp)
+            # Triadic Verification using the model's head
+            with torch.no_grad():
+                p_proj = torch.tanh(model.triadic_head(h_prompt)).squeeze().cpu().numpy()
+                r_proj = torch.tanh(model.triadic_head(h_resp)).squeeze().cpu().numpy()
             
-            # 2. Map to composite primes
             prime_prompt = mapper.map(p_proj)
             prime_resp = mapper.map(r_proj)
             
-            # 3. Algebraic verification
             subsumes = validator.subsumes(prime_resp, prime_prompt)
             gap = validator.explain_gap(prime_resp, prime_prompt)
             similarity = validator.similarity(prime_resp, prime_prompt)
             
-            # 4. Display Verification Panel
+            # Display Verification Panel
             print("┌─ \033[93mTriadic Verification\033[0m ─────────────────────────┐")
             print(f"│ Question Φ = {prime_prompt:<20d}")
             print(f"│ Answer   Φ = {prime_resp:<20d}")
             
             sub_marker = "✅ Yes" if subsumes else "❌ No"
-            print(f"│ Answer ⊇ Question: {sub_marker:<28s}")
-            print(f"│ Similarity:        {similarity:>.1%}                        │")
+            print(f"│ Answer ⊇ Question (Logical Subsumption): {sub_marker:<10s} │")
+            print(f"│ Semantic Affinity: {similarity:>7.1%}                   │")
             
-            has_gap = bool(gap['only_in_a_factors'] or gap['only_in_b_factors'])
-            if has_gap:
-                shared = gap['shared_factors']
-                extra = gap['only_in_a_factors']
-                missing = gap['only_in_b_factors']
-                print(f"│ Shared semantic factors: {str(shared)[:24]:<24s}")
-                if missing:
-                    print(f"│ Semantic gap (missed info): {str(missing)[:21]:<21s}")
-                elif extra:
-                    print(f"│ Added concepts (extra info): {str(extra)[:20]:<20s}")
-            else:
-                print("│ Exactly identical semantic space.                │")
+            if gap['shared_factors']:
+                shared = ", ".join(map(str, gap['shared_factors'][:5]))
+                if len(gap['shared_factors']) > 5: shared += "..."
+                print(f"│ Shared semantic primes: {shared:<25s} │")
+                
+            if not subsumes and gap['only_in_b_factors']:
+                missing = ", ".join(map(str, gap['only_in_b_factors'][:5]))
+                if len(gap['only_in_b_factors']) > 5: missing += "..."
+                print(f"│ Missing features (Gap): {missing:<25s} │")
                 
             print("└─────────────────────────────────────────────────┘\n")
             
         except EOFError:
-            print("\nExiting...")
             break
         except KeyboardInterrupt:
-            print("\nExiting...")
             break
         except Exception as e:
             print(f"\nError: {e}\n")
             traceback.print_exc()
 
-
 if __name__ == '__main__':
     import argparse
-    parser = argparse.ArgumentParser(description='Interactive Chat with Triadic Verification')
-    parser.add_argument('--model', type=str, required=True, help='Path to fine-tuned .npz checkpoint')
-    parser.add_argument('--tokenizer', type=str, required=True, help='Path to tokenizer.json')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--ckpt', type=str, required=True, help='Path to PyTorch .pt checkpoint')
     args = parser.parse_args()
     
-    model, tokenizer, mapper, validator, config = load_chat_model(args.model, args.tokenizer)
-    chat_loop(model, tokenizer, mapper, validator)
+    model, tokenizer, mapper, validator, device = load_chat_model(args.ckpt)
+    chat_loop(model, tokenizer, mapper, validator, device)
