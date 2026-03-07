@@ -21,45 +21,40 @@ Only Queen:{7}       → Female
 - **Interactive CLI** — generate text, compare concepts, inspect prime signatures
 - **~200 lines per module** — readable, hackable, educational
 
-## Quick Start
+## Quick Start (v1.0 GoldPrimes Release)
 
-### Train the model
+### 1. Environment Setup
 
-```bash
-python src/train.py --steps 200
-```
-
-Options:
-```
---steps N        Training steps (default: 200)
---lr FLOAT       Learning rate (default: 0.01)
---warmup N       Steps before triadic loss activates (default: 50)
---alpha FLOAT    Triadic loss weight (default: 0.1)
---layers N       Transformer layers (default: 2)
---dim N          Embedding dimension (default: 32)
---heads N        Attention heads (default: 4)
---bits N         Triadic projection bits (default: 8)
-```
-
-### Run inference
+To run the full 40-Million parameter XL model with Knowledge Distillation, activate the Conda environment:
 
 ```bash
-python src/inference.py
+conda activate triadic-microgpt
 ```
 
-Interactive commands:
-```
-triadic> /generate           # Generate text
-triadic> /compare King | Queen   # Compare two texts algebraically
-triadic> /factors Doctor     # Show prime factorization per token
-triadic> /sample 10          # Generate 10 random samples
-triadic> /help               # Show all commands
-```
+*Note: If you don't have the environment, you can create it with `conda create -n triadic-microgpt python=3.10` and install the requirements.*
 
-### Run tests
+### 2. Pre-Train the XL Model (GPU)
+
+We've upgraded the engine to run on PyTorch. You can train the massive 64-bit Triadic XL Model on the 10,000-concept Gold Prime dictionary:
 
 ```bash
-python tests/test_all.py
+python src/torch_train.py --scale xl --steps 50000
+```
+
+### 3. Interactive Validation Chat
+
+Chat with the model and watch it natively render its deterministic Subsumption math in real-time:
+
+```bash
+python src/chat.py
+```
+
+### 4. Relational Bias Audit
+
+Run Experiment 8 from the paper to prove that the model's 64-bit projections eliminate vector collisions (False Positive Rate < 5%):
+
+```bash
+python src/auditor.py
 ```
 
 ## Architecture

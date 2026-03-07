@@ -1,0 +1,166 @@
+{
+  "benchmark": "geometric_topology",
+  "version": "v1.0-XL",
+  "date": "2026-03-06",
+  "model_checkpoint": "checkpoints/torch_runXL/model_L12_D512_B64_best.pt",
+  "model_config": "12L/512D/8H/64bits",
+  "hypothesis": "Semantically related concepts form dense simplicial complexes in prime space",
+  "metrics": {
+    "simplex_0": {
+      "mean_ubs": 206.1150360107422,
+      "std_ubs": 12.817749977111816,
+      "unique_primes": 86,
+      "total_concepts": 90
+    },
+    "simplex_1": {
+      "connected_pairs": 4005,
+      "total_pairs": 4005,
+      "connectivity": 1.0,
+      "mean_similarity": 0.6874453003784212,
+      "subsumption_count": 151
+    },
+    "simplex_2": {
+      "total_triangles": 564,
+      "coherent_triangles": 564,
+      "coherence_rate": 1.0
+    },
+    "bubbles": {
+      "royalty": {
+        "n_concepts": 6,
+        "avg_intra_similarity": 0.6266852973295981,
+        "bubble_entropy": 5.486495760962366,
+        "bubble_ubs": 325.0895798798883,
+        "shared_backbone_gcd": 61396530062807373302029742,
+        "n_shared_factors": 14,
+        "n_unique_factors": 51,
+        "avg_inter_similarity": 0.6641086469027816,
+        "separation_ratio": 0.943648754239663
+      },
+      "animals": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 0.6447664840459081,
+        "bubble_entropy": 5.481030813174495,
+        "bubble_ubs": 346.9458448401003,
+        "shared_backbone_gcd": 2022672721620177063608144198,
+        "n_shared_factors": 14,
+        "n_unique_factors": 52,
+        "avg_inter_similarity": 0.6420691129033277,
+        "separation_ratio": 1.0042010604285
+      },
+      "family": {
+        "n_concepts": 6,
+        "avg_intra_similarity": 0.6688064443931784,
+        "bubble_entropy": 5.383604435766434,
+        "bubble_ubs": 319.1155181926107,
+        "shared_backbone_gcd": 97422918517838454093511853350538,
+        "n_shared_factors": 16,
+        "n_unique_factors": 49,
+        "avg_inter_similarity": 0.6931483921958271,
+        "separation_ratio": 0.9648820540064504
+      },
+      "emotions": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 0.7341494576378099,
+        "bubble_entropy": 5.284280601665416,
+        "bubble_ubs": 289.266341206727,
+        "shared_backbone_gcd": 122255396162913969258950931343206,
+        "n_shared_factors": 18,
+        "n_unique_factors": 44,
+        "avg_inter_similarity": 0.7015046446722433,
+        "separation_ratio": 1.0465354195634997
+      },
+      "nature": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 0.7244491600178574,
+        "bubble_entropy": 5.325939631885574,
+        "bubble_ubs": 312.30652321738546,
+        "shared_backbone_gcd": 8180254165416245467478559986,
+        "n_shared_factors": 15,
+        "n_unique_factors": 48,
+        "avg_inter_similarity": 0.6752974413926793,
+        "separation_ratio": 1.0727852878041586
+      },
+      "elements": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 0.659491742377809,
+        "bubble_entropy": 5.395076033874378,
+        "bubble_ubs": 330.3786768791627,
+        "shared_backbone_gcd": 4368718839008027470163643272146,
+        "n_shared_factors": 16,
+        "n_unique_factors": 50,
+        "avg_inter_similarity": 0.6782878475106059,
+        "separation_ratio": 0.9722888959285049
+      },
+      "body": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 0.6390884163813965,
+        "bubble_entropy": 5.474334643429385,
+        "bubble_ubs": 358.24813742045023,
+        "shared_backbone_gcd": 1256469706687612330182,
+        "n_shared_factors": 12,
+        "n_unique_factors": 54,
+        "avg_inter_similarity": 0.6734995885289015,
+        "separation_ratio": 0.9489069143714431
+      },
+      "home": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 0.7817893953517725,
+        "bubble_entropy": 5.3156211169031655,
+        "bubble_ubs": 300.0484291121659,
+        "shared_backbone_gcd": 22677115211814961399515929639326084055154,
+        "n_shared_factors": 22,
+        "n_unique_factors": 46,
+        "avg_inter_similarity": 0.717625375537429,
+        "separation_ratio": 1.0894115815878043
+      },
+      "food": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 0.6737214298120023,
+        "bubble_entropy": 5.402315309666183,
+        "bubble_ubs": 322.8244780307068,
+        "shared_backbone_gcd": 1555899497615731076757318,
+        "n_shared_factors": 13,
+        "n_unique_factors": 50,
+        "avg_inter_similarity": 0.6851309904396827,
+        "separation_ratio": 0.9833468916354837
+      },
+      "actions": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 0.6317056766744527,
+        "bubble_entropy": 5.463452261092612,
+        "bubble_ubs": 341.2897197191509,
+        "shared_backbone_gcd": 116847823798181107868721754,
+        "n_shared_factors": 13,
+        "n_unique_factors": 52,
+        "avg_inter_similarity": 0.6656395283177613,
+        "separation_ratio": 0.9490206783105745
+      },
+      "colors": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 0.747461040753926,
+        "bubble_entropy": 5.293272277368817,
+        "bubble_ubs": 282.6642085597407,
+        "shared_backbone_gcd": 1805945747943827985463669848801153768534,
+        "n_shared_factors": 21,
+        "n_unique_factors": 44,
+        "avg_inter_similarity": 0.7143678594420082,
+        "separation_ratio": 1.0463251262980489
+      },
+      "professions": {
+        "n_concepts": 6,
+        "avg_intra_similarity": 0.8263231771590905,
+        "bubble_entropy": 5.165139844147056,
+        "bubble_ubs": 261.6554703409348,
+        "shared_backbone_gcd": 3744459297489130434536451670188497295488994,
+        "n_shared_factors": 23,
+        "n_unique_factors": 39,
+        "avg_inter_similarity": 0.7397398745467294,
+        "separation_ratio": 1.1170456069647652
+      }
+    }
+  },
+  "interpretation": {
+    "note": "This is an EXPLORATORY experiment. High separation_ratio (intra >> inter) validates the hypothesis. separation_ratio ~1.0 means domains are NOT differentiated in prime space.",
+    "uhrt_origin": "Adapted from Unified Holographic Resonance Theory (UHRT) layered structure: point\u2192line\u2192triangle\u2192volume\u2192bubble"
+  }
+}

@@ -220,15 +220,22 @@ class TriadicGPT(nn.Module):
 
         return logits, triadic_proj, loss
 
-    def triadic_loss(self, triadic_proj):
+    def triadic_loss(self, triadic_proj, entropy_weight=0.0, input_ids=None, align_weight=0.0):
         """
-        Compute triadic loss with three objectives:
-          1. Coherence: adjacent tokens in same sequence should agree
-          2. Diversity: bits should be diverse across the batch (not all same)
-          3. Contrastive: different sequences should have different projections
+        Compute triadic loss with up to four objectives:
+          1. Diversity: bits should be diverse across the batch (not all same)
+          2. Contrastive: different sequences should have different projections
+          3. Entropy: each bit should have high entropy across the batch (prevent dead bits)
+          4. Embedding alignment: triadic similarity should match embedding similarity
+
+        NOTE: Coherence loss (adjacent tokens agree) was REMOVED in Run 13.
+        It caused triadic collapse by pushing all tokens toward the same projection.
 
         Args:
             triadic_proj: (B, T, n_bits)
+            entropy_weight: weight for entropy regularization term (0 = disabled)
+            input_ids: (B, T) token IDs — needed for embedding alignment
+            align_weight: weight for embedding alignment loss (0 = disabled)
 
         Returns:
             loss: scalar
@@ -236,36 +243,68 @@ class TriadicGPT(nn.Module):
         if triadic_proj.size(1) < 2:
             return torch.tensor(0.0, device=triadic_proj.device)
 
-        # 1. Coherence: adjacent tokens agree (original loss)
-        pa = triadic_proj[:, :-1, :]  # (B, T-1, n_bits)
-        pb = triadic_proj[:, 1:, :]   # (B, T-1, n_bits)
-        agreement = (pa * pb).mean(dim=-1)  # (B, T-1)
-        coherence_loss = (1.0 - agreement).mean()
+        B, T, n_bits = triadic_proj.shape
 
-        # 2. Diversity: each bit should be active ~50% of the time across the batch
-        #    This prevents the trivial solution of all bits being identical
-        bit_means = triadic_proj.mean(dim=(0, 1))  # (n_bits,) — mean activation per bit
-        # Ideal is 0.0 (half positive, half negative). Penalize deviation.
+        # 1. Diversity: each bit should be active ~50% of the time across the batch
+        bit_means = triadic_proj.mean(dim=(0, 1))  # (n_bits,)
         diversity_loss = (bit_means ** 2).mean()
 
-        # 3. Contrastive: different batch items should differ
-        #    Take mean projection per sequence, then push apart pairs
+        # 2. Contrastive: different batch items should differ
         seq_proj = triadic_proj.mean(dim=1)  # (B, n_bits)
-        B = seq_proj.size(0)
         if B > 1:
-            # Cosine similarity matrix
             seq_norm = F.normalize(seq_proj, dim=-1)
             sim_matrix = seq_norm @ seq_norm.T  # (B, B)
-            # We want diagonal=1, off-diagonal=low
-            # Mask out diagonal and penalize high off-diagonal similarity
             mask = ~torch.eye(B, device=sim_matrix.device, dtype=torch.bool)
             off_diag = sim_matrix[mask]
             contrastive_loss = off_diag.pow(2).mean()
         else:
             contrastive_loss = torch.tensor(0.0, device=triadic_proj.device)
 
-        # Combined: coherence + diversity + contrastive
-        loss = coherence_loss + 0.5 * diversity_loss + 0.3 * contrastive_loss
+        # 3. Entropy regularization
+        entropy_loss = torch.tensor(0.0, device=triadic_proj.device)
+        if entropy_weight > 0:
+            flat_proj = triadic_proj.reshape(-1, n_bits)  # (B*T, n_bits)
+            probs = (flat_proj.mean(dim=0) + 1.0) / 2.0  # (n_bits,)
+            eps = 1e-7
+            probs = probs.clamp(eps, 1.0 - eps)
+            bit_entropy = -(probs * probs.log() + (1 - probs) * (1 - probs).log())
+            entropy_loss = (1.0 - bit_entropy / math.log(2)).mean()
+
+        # 4. Embedding alignment: use the model's own embeddings as semantic teacher
+        #    Sample random token pairs, align triadic similarity with embedding similarity
+        alignment_loss = torch.tensor(0.0, device=triadic_proj.device)
+        if align_weight > 0 and input_ids is not None:
+            n_pairs = 64  # pairs per sequence
+            with torch.no_grad():
+                embeds = self.wte(input_ids).detach()  # (B, T, n_embd) — no grad to embeddings
+
+            # Sample random pair indices: (B, n_pairs, 2)
+            idx = torch.randint(0, T, (B, n_pairs, 2), device=triadic_proj.device)
+            idx_i = idx[:, :, 0]  # (B, n_pairs)
+            idx_j = idx[:, :, 1]  # (B, n_pairs)
+
+            # Gather embeddings for sampled pairs
+            idx_i_e = idx_i.unsqueeze(-1).expand(-1, -1, embeds.size(-1))
+            idx_j_e = idx_j.unsqueeze(-1).expand(-1, -1, embeds.size(-1))
+            e_i = torch.gather(embeds, 1, idx_i_e)  # (B, n_pairs, n_embd)
+            e_j = torch.gather(embeds, 1, idx_j_e)
+            embed_sim = F.cosine_similarity(e_i, e_j, dim=-1)  # (B, n_pairs)
+
+            # Gather triadic projections for sampled pairs
+            idx_i_p = idx_i.unsqueeze(-1).expand(-1, -1, n_bits)
+            idx_j_p = idx_j.unsqueeze(-1).expand(-1, -1, n_bits)
+            p_i = torch.gather(triadic_proj, 1, idx_i_p)  # (B, n_pairs, n_bits)
+            p_j = torch.gather(triadic_proj, 1, idx_j_p)
+            triadic_sim = F.cosine_similarity(p_i, p_j, dim=-1)  # (B, n_pairs)
+
+            alignment_loss = F.mse_loss(triadic_sim, embed_sim)
+
+        # Combined loss
+        loss = diversity_loss + contrastive_loss
+        if entropy_weight > 0:
+            loss = loss + entropy_weight * entropy_loss
+        if align_weight > 0:
+            loss = loss + align_weight * alignment_loss
         return loss
 
     def distillation_loss(self, triadic_proj, targets_proj, mask):

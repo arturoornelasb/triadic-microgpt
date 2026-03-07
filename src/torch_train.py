@@ -202,7 +202,7 @@ def train(args):
     # --- Step 3.5: Gold Primes Distillation Loader ---
     gold_primes_path = os.path.join(project_root, 'data', f'gold_primes_{args.bits}.json')
     gold_sequences = []
-    if os.path.exists(gold_primes_path):
+    if not args.no_distill and os.path.exists(gold_primes_path):
         print("[4/5] Loading Gold Primes for Distillation...")
         with open(gold_primes_path, 'r', encoding='utf-8') as f:
             gold_data = json.load(f)
@@ -223,6 +223,9 @@ def train(args):
     print(f"[5/5] Training for {args.steps} steps...")
     print(f"  Batch size: {args.batch_size}")
     print(f"  Triadic activation: step {triadic_warmup}")
+    print(f"  Entropy weight: {args.entropy_weight}")
+    print(f"  Alignment weight: {args.align_weight}")
+    print(f"  Distillation weight: {args.dist_weight}x alpha")
     print("-" * 64)
 
     model.train()
@@ -278,7 +281,8 @@ def train(args):
                 alpha_factor = min(1.0, (step - triadic_warmup + 1) / alpha_warmup_steps)
                 current_alpha = args.alpha * alpha_factor
                 
-                tri_loss = model.triadic_loss(triadic_proj)
+                tri_loss = model.triadic_loss(triadic_proj, entropy_weight=args.entropy_weight,
+                                              input_ids=x, align_weight=args.align_weight)
                 total_loss = lang_loss + current_alpha * tri_loss
                 tri_loss_val = tri_loss.item()
                 
@@ -306,8 +310,8 @@ def train(args):
                     if match_found:
                         dist_loss = model.distillation_loss(triadic_proj, targets_proj, b_mask)
                         
-                        # Apply heavy emphasis to distillation vs standard triadic
-                        dist_alpha = args.alpha * 5.0 * alpha_factor
+                        # Distillation weight: reduced from 5x (which caused collapse) to 1x
+                        dist_alpha = args.alpha * args.dist_weight * alpha_factor
                         total_loss = total_loss + dist_alpha * dist_loss
                         dist_loss_val = dist_loss.item()
 
@@ -430,12 +434,16 @@ if __name__ == '__main__':
     parser.add_argument('--block', type=int, default=256, help='Block/context size')
     parser.add_argument('--dropout', type=float, default=0.1, help='Dropout rate')
     parser.add_argument('--alpha', type=float, default=0.05, help='Triadic loss weight')
+    parser.add_argument('--entropy-weight', type=float, default=0.0, help='Entropy regularization weight (0=off, try 1.0-2.0)')
+    parser.add_argument('--align-weight', type=float, default=0.0, help='Embedding alignment weight (0=off, try 1.0-3.0)')
+    parser.add_argument('--dist-weight', type=float, default=1.0, help='Distillation multiplier on alpha (was 5.0, now default 1.0)')
     parser.add_argument('--triadic-warmup-pct', type=float, default=0.8, help='Warmup fraction')
     parser.add_argument('--print-every', type=int, default=50, help='Print frequency')
     parser.add_argument('--save-every', type=int, default=1000, help='Save frequency')
     parser.add_argument('--checkpoint-dir', type=str, default=None, help='Checkpoint dir')
     parser.add_argument('--tokenizer', type=str, default=None, help='Pre-trained tokenizer path (skip BPE training)')
     parser.add_argument('--tokens', type=str, default=None, help='Pre-tokenized .npy cache (skip encoding)')
+    parser.add_argument('--no-distill', action='store_true', help='Skip gold primes distillation (faster training)')
     parser.add_argument('--scale', type=str, choices=['base', 'xl'], default='base', help='Model scale preset')
     args = parser.parse_args()
 

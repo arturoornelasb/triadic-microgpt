@@ -1,0 +1,166 @@
+{
+  "benchmark": "geometric_topology",
+  "version": "v1.1-entropy",
+  "date": "2026-03-07",
+  "model_checkpoint": "checkpoints/torch_run12_entropy/model_L12_D512_B64_best.pt",
+  "model_config": "12L/512D/8H/64bits",
+  "hypothesis": "Semantically related concepts form dense simplicial complexes in prime space",
+  "metrics": {
+    "simplex_0": {
+      "mean_ubs": 195.89991760253906,
+      "std_ubs": 1.52587890625e-05,
+      "unique_primes": 1,
+      "total_concepts": 90
+    },
+    "simplex_1": {
+      "connected_pairs": 4005,
+      "total_pairs": 4005,
+      "connectivity": 1.0,
+      "mean_similarity": 1.0,
+      "subsumption_count": 4005
+    },
+    "simplex_2": {
+      "total_triangles": 564,
+      "coherent_triangles": 564,
+      "coherence_rate": 1.0
+    },
+    "bubbles": {
+      "royalty": {
+        "n_concepts": 6,
+        "avg_intra_similarity": 1.0,
+        "bubble_entropy": 5.0,
+        "bubble_ubs": 200.89990111169448,
+        "shared_backbone_gcd": 93701465258151180039162038379011193064622855840389070140270,
+        "n_shared_factors": 32,
+        "n_unique_factors": 32,
+        "avg_inter_similarity": 1.0,
+        "separation_ratio": 1.0
+      },
+      "animals": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 1.0,
+        "bubble_entropy": 5.0,
+        "bubble_ubs": 200.89990111169448,
+        "shared_backbone_gcd": 93701465258151180039162038379011193064622855840389070140270,
+        "n_shared_factors": 32,
+        "n_unique_factors": 32,
+        "avg_inter_similarity": 1.0,
+        "separation_ratio": 1.0
+      },
+      "family": {
+        "n_concepts": 6,
+        "avg_intra_similarity": 1.0,
+        "bubble_entropy": 5.0,
+        "bubble_ubs": 200.89990111169448,
+        "shared_backbone_gcd": 93701465258151180039162038379011193064622855840389070140270,
+        "n_shared_factors": 32,
+        "n_unique_factors": 32,
+        "avg_inter_similarity": 1.0,
+        "separation_ratio": 1.0
+      },
+      "emotions": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 1.0,
+        "bubble_entropy": 5.0,
+        "bubble_ubs": 200.89990111169448,
+        "shared_backbone_gcd": 93701465258151180039162038379011193064622855840389070140270,
+        "n_shared_factors": 32,
+        "n_unique_factors": 32,
+        "avg_inter_similarity": 1.0,
+        "separation_ratio": 1.0
+      },
+      "nature": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 1.0,
+        "bubble_entropy": 5.0,
+        "bubble_ubs": 200.89990111169448,
+        "shared_backbone_gcd": 93701465258151180039162038379011193064622855840389070140270,
+        "n_shared_factors": 32,
+        "n_unique_factors": 32,
+        "avg_inter_similarity": 1.0,
+        "separation_ratio": 1.0
+      },
+      "elements": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 1.0,
+        "bubble_entropy": 5.0,
+        "bubble_ubs": 200.89990111169448,
+        "shared_backbone_gcd": 93701465258151180039162038379011193064622855840389070140270,
+        "n_shared_factors": 32,
+        "n_unique_factors": 32,
+        "avg_inter_similarity": 1.0,
+        "separation_ratio": 1.0
+      },
+      "body": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 1.0,
+        "bubble_entropy": 5.0,
+        "bubble_ubs": 200.89990111169448,
+        "shared_backbone_gcd": 93701465258151180039162038379011193064622855840389070140270,
+        "n_shared_factors": 32,
+        "n_unique_factors": 32,
+        "avg_inter_similarity": 1.0,
+        "separation_ratio": 1.0
+      },
+      "home": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 1.0,
+        "bubble_entropy": 5.0,
+        "bubble_ubs": 200.89990111169448,
+        "shared_backbone_gcd": 93701465258151180039162038379011193064622855840389070140270,
+        "n_shared_factors": 32,
+        "n_unique_factors": 32,
+        "avg_inter_similarity": 1.0,
+        "separation_ratio": 1.0
+      },
+      "food": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 1.0,
+        "bubble_entropy": 5.0,
+        "bubble_ubs": 200.89990111169448,
+        "shared_backbone_gcd": 93701465258151180039162038379011193064622855840389070140270,
+        "n_shared_factors": 32,
+        "n_unique_factors": 32,
+        "avg_inter_similarity": 1.0,
+        "separation_ratio": 1.0
+      },
+      "actions": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 1.0,
+        "bubble_entropy": 5.0,
+        "bubble_ubs": 200.89990111169448,
+        "shared_backbone_gcd": 93701465258151180039162038379011193064622855840389070140270,
+        "n_shared_factors": 32,
+        "n_unique_factors": 32,
+        "avg_inter_similarity": 1.0,
+        "separation_ratio": 1.0
+      },
+      "colors": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 1.0,
+        "bubble_entropy": 5.0,
+        "bubble_ubs": 200.89990111169448,
+        "shared_backbone_gcd": 93701465258151180039162038379011193064622855840389070140270,
+        "n_shared_factors": 32,
+        "n_unique_factors": 32,
+        "avg_inter_similarity": 1.0,
+        "separation_ratio": 1.0
+      },
+      "professions": {
+        "n_concepts": 6,
+        "avg_intra_similarity": 1.0,
+        "bubble_entropy": 5.0,
+        "bubble_ubs": 200.89990111169448,
+        "shared_backbone_gcd": 93701465258151180039162038379011193064622855840389070140270,
+        "n_shared_factors": 32,
+        "n_unique_factors": 32,
+        "avg_inter_similarity": 1.0,
+        "separation_ratio": 1.0
+      }
+    }
+  },
+  "interpretation": {
+    "note": "This is an EXPLORATORY experiment. High separation_ratio (intra >> inter) validates the hypothesis. separation_ratio ~1.0 means domains are NOT differentiated in prime space.",
+    "uhrt_origin": "Adapted from Unified Holographic Resonance Theory (UHRT) layered structure: point\u2192line\u2192triangle\u2192volume\u2192bubble"
+  }
+}
