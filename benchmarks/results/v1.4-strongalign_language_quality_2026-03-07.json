@@ -1,0 +1,30 @@
+{
+  "benchmark": "language_quality",
+  "version": "v1.4-strongalign",
+  "date": "2026-03-07",
+  "model_checkpoint": "checkpoints/torch_run15_strongalign/model_L12_D512_B64_best.pt",
+  "model_config": "12L/512D/8H/64bits",
+  "num_generations": 500,
+  "max_tokens": 128,
+  "val_samples": 200,
+  "metrics": {
+    "perplexity": 7.688545800803764,
+    "avg_loss": 2.039731663009098,
+    "distinct_1": 0.0686954662935541,
+    "distinct_2": 0.3069330245883946,
+    "distinct_3": 0.5419845815414495,
+    "repetition_rate": 0.28
+  },
+  "sample_generations": [
+    "Once upon a time, there was a little girl named Lily. She loved to play outside in the sunshine and pick flowers. One day, she found a shiny rock that glowed in the sunlight. She was so happy and showed it to her mom.\nHer mom said, \"Wow, that's a beautiful rock, Lily! Let's keep it safe.\" Lily was so happy and put the rock in her pocket.\nLater that day, Lily and her friend went to the park. They saw a big tree with lots of leaves. Lily said, \"Look, I found a pretty rock. It's so pretty.\" Her",
+    "Once upon a time, there was a little girl named Lily. She loved to eat peaches. One day, she went to the market with her mom to buy some peaches. \nAs they were walking, Lily saw a man selling peaches. She asked her mom, \"What's that man doing?\" Her mom replied, \"He selling peaches for cheaperts.\" \nLily's mom bought some peaches for the man and they went home. Lily was so happy to have the peaches and to eat them all. She said, \"I love peaches so much!\" Her mom smiled and said",
+    "Once upon a time there was a little girl who loved to bake. Every day, she would make different kind of cookies.\nOne day, she decided to bake a special cake. She gathered all the ingredients together and started to bake.\nOnce the mixture was done, she took it to the oven.\nWhen she took the cake out of the oven, she was amazed. It looked so delicious and smelled so sweet.\nShe took it out of the oven and let it cool. She cut it into slices and put them on a plate.\nThe cake looked so delicious that she couldn't wait to share",
+    "Once upon a time, there was a little girl named Lily. She loved to play with her toys, especially her dolls. One day, she went to the park with her mom and saw a big, scary dog. She was fearful and hid behind her mom.\nHer mom saw that Lily was scared and said, \"Don't worry, Lily. The dog is friendly. He just wants to play.\" Lily looked at the dog and saw that he was wagging his tail. She felt better and said, \"Okay, I will play with him.\" They went back to playing together and had lots of fun.\nAfter a while",
+    "Once upon a time there was a little girl called Daisy. Daisy was very happy and loved to play.\nOne day, Daisy was playing outside in her garden when she saw a very long cable. She was very curious and wanted to see what it was. She touched it and it felt cool and smooth.\nDaisy was so excited that she wanted to show her mum. She ran inside to show her mum. \"Mum, mum! I found a big cable!\" she said. Her mum smiled and said, \"That's great, Daisy. You can use it to play with.\"\nDaisy was so happy and she ran",
+    "Once upon a time there was a little girl named Jane. She was very curious and loved to explore the world around her.\nOne day, Jane found a big box in her garden. She wanted to see what was inside, so she opened it. Inside the box was a beautiful comb. Jane was so excited, she quickly took it and ran home.\nWhen she showed her parents the new comb, her mother said, \u201cThat comb is so useful! You can use it to comb your hair and make it look beautiful.\u201d\nSo Jane used the comb to comb her hair and make it look perfect. When she was done,",
+    "Once upon a time, there was a little girl named Lily who loved to read books. She had a big book with many stories about animals and princesses. One day, Lily's friend came over to play. Her friend saw a new book and asked, \"Can I borrow that book, Lily?\" Lily said yes and gave her friend a big, sparkly book.\nHer friend was very happy and wanted to read the book. But Lily's friend was being mean and didn't want to share. Lily felt sad and didn't know what to do. She decided to ask her mom for help again. Her mom talked to her friend",
+    "Once upon a time there was a little girl who loved to explore. One day she saw an unusual drawer in her room she had never seen before. She opened it and found a secret inside! It was a magical whistle and it glowed brighter and brighter than ever before.\nThe little girl was so excited and asked her mum, \"What is this?\" Her mum replied, \"It's a magical whistle and it can give you power!\" The little girl was amazed. She took the whistle and ran off to find more power to make her music happen.\nThe next day, the little girl returned to the same drawer and tried her",
+    "Tom and Lily were playing in the park. They liked to run, swing and slide. They saw a big hole in the ground. It was a pit. They wanted to look inside.\n\"Let's go, Lily!\" Tom said. \"Maybe we can find something cool.\"\n\"OK, Tom!\" Lily said. \"But be careful. It might be dark and scary.\"\nThey held hands and walked to the pit. They felt the pit under it. It was dark and deep. They could not see anything.\n\"Hello, is anyone here?\" Tom asked. \"What is in the pit?\"\nSuddenly,",
+    "Once upon a time, there was a little girl named Lily. She loved to play with her toys and her favorite was a big, red ball. One day, Lily accidentally threw the ball too hard and it hit the glass jar. The glass broke into many pieces and Lily was sad. \nHer mom came in and saw what happened. She hugged Lily and said, \"It's okay, accidents happen. Let's clean this up together.\" They went inside and her mom cleaned the glass. Lily felt better and learned that it's okay to make mistakes and that it's important to forgive. \nFrom that day on"
+  ]
+}
