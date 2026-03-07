@@ -1,0 +1,30 @@
+{
+  "benchmark": "language_quality",
+  "version": "v2.0-ablation",
+  "date": "2026-03-07",
+  "model_checkpoint": "checkpoints/torch_run18_ablation/model_L12_D512_B64_best.pt",
+  "model_config": "12L/512D/8H/64bits",
+  "num_generations": 500,
+  "max_tokens": 128,
+  "val_samples": 200,
+  "metrics": {
+    "perplexity": 7.559767674366711,
+    "avg_loss": 2.0228404588153635,
+    "distinct_1": 0.0676539360872954,
+    "distinct_2": 0.3022038567493113,
+    "distinct_3": 0.5364069952305246,
+    "repetition_rate": 0.274
+  },
+  "sample_generations": [
+    "Once upon a time there was a little girl named Grace. Grace loved to explore her backyard, especially in the garden. There was a big tree in the middle of her yard and she liked to look up at the sky.\nOne day, Grace saw something unusual in the sprouting. It was a bird! The bird was looking right at Grace and flew away. Grace was scared and ran back to her house.\nWhen she got home, Grace's mom asked her what happened. Grace told her about the strange bird. Her mom said that the bird was probably hurt and",
+    "Once there was a little girl named Jane. She was three years old and loved to play.\nOne day, Jane was playing with her toys when she heard a knock at the door. She was very curious, so she opened it.\nInside, Jane found a man with a big box. Inside the box was a big, shiny toy telephone. Jane was so excited!\n\"Hi, I'm Bob,\" said Jane.\n\"Hi Jane,\" said the man. \"Do you like my telephone?\"\n\"Yes!\" said Jane.\nBob looked at the telephone and said, \"I",
+    "Lily and Ben are twins. They like to play with their toys and books. But sometimes they fight over them. One day, they both want the same book. It is big and has many pictures.\n\"Give me the book!\" Lily says.\n\"No, it is mine!\" Ben says.\nThey pull and tug on the book. The book rips in half. Lily and Ben are sad and angry.\n\"Look what you did!\" Lily says.\n\"It was not nice!\" Ben says.\nThey start to fight. They pull and push and shout. They forget to be kind and share.",
+    "Once upon a time, there was a big, big bear named Ben. Ben was very hungry and wanted to eat some honey. He searched in the forest, but he couldn't find any honey. Then, he saw a little girl named Lily. Lily was sad because she couldn't find any honey.\nBen asked, \"What are you looking for, Lily?\" Lily said, \"I can't find any honey. But let's look together.\" They looked and looked, but they couldn't find any honey.\nThen, Ben had an idea. He said, \"Let's ask the tree, and see if we can find",
+    "Once upon a time, there was a little girl named Lily. She loved to visit her grandma's house. Her grandma's house was very tidy and always had lots of toys to play with. \nOne day, Lily's mom told her to pack her toys in a little box. Lily didn't want to go, but her grandma said it would be fun to find some things to bring in the house. \nThey packed all their things and went to the car. They drove and drove until they reached grandma's house. Lily was so happy to see her grandma and gave her a big hug. She couldn't wait to visit",
+    "Once upon a time, there was a little girl named Lily. She loved to play outside and explore the world around her. One day, she went on an adventure in the forest and found a shiny rock. She picked it up and put it in her pocket.\nAs she walked, she saw a big chimney and decided to climb it. When she got to the top, she saw a big window that was closed. She felt frustrated because she couldn't get to the top.\nSuddenly, she saw a little bird chirping nearby. It was a little bird with a broken wing. Lily felt sad for the",
+    "Once upon a time, there was a little girl named Lily. She loved to eat toast with jam on it. One day, her mom cooked some toast with butter and jam. Lily was so happy and said, \"Thank you, Mommy!\" \nLater that day, Lily and her mom went to the park to play. They saw a big black dog running around. Lily said, \"Mommy, look at the dog! It's so black!\" \nHer mom said, \"Yes, he's a big black dog. But we have to be careful. We don't want any dogs to get hurt.\" \nLily and",
+    "Once upon a time, there was a kind man named Tom. Tom had a big car that he loved to play with every day. One day, Tom was driving his car when he saw a little girl named Lily.\n\"Hi, Lily! Do you want to play with my car?\" Tom asked.\n\"Yes, please!\" Lily said. They drove their cars on the big road, and Tom took out his paints and started to paint. Lily had a big, soft blanket that she liked to paint with.\nAs they played, Tom helped Lily paint a picture of a big, yummy cake. Lily had an idea",
+    "Once upon a time, there was a little boy named Timmy. Timmy loved to play outside, especially when it rained. One day, Timmy put on his raincoat and rain boots and went outside to jump in puddles. \nAs Timmy was jumping in puddles, he saw a little bird flying around. The bird looked sad and lonely. Timmy wanted to help the bird, so he hopped over and tugged on his leg. \nThe bird didn't like being pulled and fell down, but Timmy wasn't scared anymore. He kneeled down next to the bird and started to sing a song. The bird",
+    "Once upon a time, there was a little girl named Lily. She loved to play outside in the grass and pick flowers. One day, she saw a big, scary dog. The dog was barking loudly and wouldn't go away. \nLily was scared and didn't know what to do. She decided to protect her mommy and her house. She ran inside and picked up a little plant that had fallen down. She gave it to the plant and said, \"Here, this will keep you safe.\" \nThe plant was very grateful and said, \"Thank you, Lily. You are so kind.\" Lily smiled and felt"
+  ]
+}

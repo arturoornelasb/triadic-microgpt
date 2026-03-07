@@ -1,0 +1,328 @@
+{
+  "benchmark": "subsumption",
+  "version": "v1.4-strongalign",
+  "date": "2026-03-07",
+  "model_checkpoint": "checkpoints/torch_run15_strongalign/model_L12_D512_B64_best.pt",
+  "model_config": "12L/512D/8H/64bits",
+  "n_hypernym_pairs": 87,
+  "n_unrelated_pairs": 52,
+  "metrics": {
+    "recall": 0.0,
+    "fpr": 0.0,
+    "precision": 0.0,
+    "f1": 0.0,
+    "true_positives": 0,
+    "false_negatives": 87,
+    "false_positives": 0,
+    "true_negatives": 52,
+    "mean_related_similarity": 0.505073540393984,
+    "mean_unrelated_similarity": 0.5112838507596213,
+    "mean_related_jaccard": 0.505073540393984,
+    "mean_unrelated_jaccard": 0.5112838507596213,
+    "jaccard_gap": -0.00621031036563735
+  },
+  "sample_true_pairs": [
+    {
+      "hypernym": "animal",
+      "hyponym": "dog",
+      "subsumes": false,
+      "similarity": 0.6571428571428571,
+      "phi_hyper": 55165478194329721643164576801104102362529278188684706215,
+      "phi_hypo": 163539777591460108339582357559769578977476100988133584930
+    },
+    {
+      "hypernym": "animal",
+      "hyponym": "cat",
+      "subsumes": false,
+      "similarity": 0.42105263157894735,
+      "phi_hyper": 55165478194329721643164576801104102362529278188684706215,
+      "phi_hypo": 2003104058492832870656054457856961297429480683462
+    },
+    {
+      "hypernym": "animal",
+      "hyponym": "bird",
+      "subsumes": false,
+      "similarity": 0.5135135135135135,
+      "phi_hyper": 55165478194329721643164576801104102362529278188684706215,
+      "phi_hypo": 95966684997081255092344631933457627718644145334218594054
+    },
+    {
+      "hypernym": "animal",
+      "hyponym": "fish",
+      "subsumes": false,
+      "similarity": 0.5526315789473685,
+      "phi_hyper": 55165478194329721643164576801104102362529278188684706215,
+      "phi_hypo": 21517376203450692829849849472447188763159185146677301849575735
+    },
+    {
+      "hypernym": "animal",
+      "hyponym": "horse",
+      "subsumes": false,
+      "similarity": 0.47368421052631576,
+      "phi_hyper": 55165478194329721643164576801104102362529278188684706215,
+      "phi_hypo": 26970789229822350648069373010273313992370986189181814730
+    },
+    {
+      "hypernym": "animal",
+      "hyponym": "cow",
+      "subsumes": false,
+      "similarity": 0.47368421052631576,
+      "phi_hyper": 55165478194329721643164576801104102362529278188684706215,
+      "phi_hypo": 804458083065401148474768289672796510222846372443361354
+    },
+    {
+      "hypernym": "animal",
+      "hyponym": "pig",
+      "subsumes": false,
+      "similarity": 0.4146341463414634,
+      "phi_hyper": 55165478194329721643164576801104102362529278188684706215,
+      "phi_hypo": 707629033099861211509570970810424849162501639353915849282246
+    },
+    {
+      "hypernym": "animal",
+      "hyponym": "sheep",
+      "subsumes": false,
+      "similarity": 0.5348837209302325,
+      "phi_hyper": 55165478194329721643164576801104102362529278188684706215,
+      "phi_hypo": 6034901559009862775743547471640594955789031709350883326442017248396420122862
+    },
+    {
+      "hypernym": "person",
+      "hyponym": "boy",
+      "subsumes": false,
+      "similarity": 0.6111111111111112,
+      "phi_hyper": 46061247801415781560108915315322607926450160409376728467482,
+      "phi_hypo": 2595599337322497093832418218716342393929839885980600730
+    },
+    {
+      "hypernym": "person",
+      "hyponym": "girl",
+      "subsumes": false,
+      "similarity": 0.4864864864864865,
+      "phi_hyper": 46061247801415781560108915315322607926450160409376728467482,
+      "phi_hypo": 268035866452172095880614117481712566691415093910
+    },
+    {
+      "hypernym": "person",
+      "hyponym": "man",
+      "subsumes": false,
+      "similarity": 0.45,
+      "phi_hyper": 46061247801415781560108915315322607926450160409376728467482,
+      "phi_hypo": 1080258942733166263957754866303287904520491323547770085
+    },
+    {
+      "hypernym": "person",
+      "hyponym": "woman",
+      "subsumes": false,
+      "similarity": 0.6153846153846154,
+      "phi_hyper": 46061247801415781560108915315322607926450160409376728467482,
+      "phi_hypo": 6483308406230812579113215287877977574323432439555181613325132100233
+    },
+    {
+      "hypernym": "person",
+      "hyponym": "king",
+      "subsumes": false,
+      "similarity": 0.3333333333333333,
+      "phi_hyper": 46061247801415781560108915315322607926450160409376728467482,
+      "phi_hypo": 1729378497916513665869265617903521890776281934919600852678405
+    },
+    {
+      "hypernym": "person",
+      "hyponym": "queen",
+      "subsumes": false,
+      "similarity": 0.5405405405405406,
+      "phi_hyper": 46061247801415781560108915315322607926450160409376728467482,
+      "phi_hypo": 58620291661219236315413077547443855993461445548587165
+    },
+    {
+      "hypernym": "person",
+      "hyponym": "prince",
+      "subsumes": false,
+      "similarity": 0.6666666666666666,
+      "phi_hyper": 46061247801415781560108915315322607926450160409376728467482,
+      "phi_hypo": 60211447731260528891196232381452138265124663841780297553386
+    },
+    {
+      "hypernym": "person",
+      "hyponym": "princess",
+      "subsumes": false,
+      "similarity": 0.7647058823529411,
+      "phi_hyper": 46061247801415781560108915315322607926450160409376728467482,
+      "phi_hypo": 107099206171062770924930975044321200774334755524349561717094
+    },
+    {
+      "hypernym": "person",
+      "hyponym": "doctor",
+      "subsumes": false,
+      "similarity": 0.7941176470588235,
+      "phi_hyper": 46061247801415781560108915315322607926450160409376728467482,
+      "phi_hypo": 5139966750280486232828677624010050334232927617101458982330
+    },
+    {
+      "hypernym": "person",
+      "hyponym": "nurse",
+      "subsumes": false,
+      "similarity": 0.6285714285714286,
+      "phi_hyper": 46061247801415781560108915315322607926450160409376728467482,
+      "phi_hypo": 3044047125306835240068867238995340281691943060643230
+    },
+    {
+      "hypernym": "person",
+      "hyponym": "teacher",
+      "subsumes": false,
+      "similarity": 0.5675675675675675,
+      "phi_hyper": 46061247801415781560108915315322607926450160409376728467482,
+      "phi_hypo": 1223957990326137571421845447060806131377711234454190
+    },
+    {
+      "hypernym": "person",
+      "hyponym": "student",
+      "subsumes": false,
+      "similarity": 0.48717948717948717,
+      "phi_hyper": 46061247801415781560108915315322607926450160409376728467482,
+      "phi_hypo": 11559105189881566329129113264821846332028630376123296370
+    }
+  ],
+  "sample_false_pairs": [
+    {
+      "concept_a": "dog",
+      "concept_b": "table",
+      "subsumes_ab": false,
+      "subsumes_ba": false,
+      "similarity": 0.6052631578947368
+    },
+    {
+      "concept_a": "cat",
+      "concept_b": "bread",
+      "subsumes_ab": false,
+      "subsumes_ba": false,
+      "similarity": 0.47368421052631576
+    },
+    {
+      "concept_a": "king",
+      "concept_b": "river",
+      "subsumes_ab": false,
+      "subsumes_ba": false,
+      "similarity": 0.35555555555555557
+    },
+    {
+      "concept_a": "happy",
+      "concept_b": "chair",
+      "subsumes_ab": false,
+      "subsumes_ba": false,
+      "similarity": 0.39215686274509803
+    },
+    {
+      "concept_a": "fire",
+      "concept_b": "nurse",
+      "subsumes_ab": false,
+      "subsumes_ba": false,
+      "similarity": 0.41025641025641024
+    },
+    {
+      "concept_a": "bird",
+      "concept_b": "cake",
+      "subsumes_ab": false,
+      "subsumes_ba": false,
+      "similarity": 0.55
+    },
+    {
+      "concept_a": "mother",
+      "concept_b": "cloud",
+      "subsumes_ab": false,
+      "subsumes_ba": false,
+      "similarity": 0.4358974358974359
+    },
+    {
+      "concept_a": "red",
+      "concept_b": "horse",
+      "subsumes_ab": false,
+      "subsumes_ba": false,
+      "similarity": 0.5238095238095238
+    },
+    {
+      "concept_a": "school",
+      "concept_b": "pig",
+      "subsumes_ab": false,
+      "subsumes_ba": false,
+      "similarity": 0.5
+    },
+    {
+      "concept_a": "doctor",
+      "concept_b": "rain",
+      "subsumes_ab": false,
+      "subsumes_ba": false,
+      "similarity": 0.5897435897435898
+    },
+    {
+      "concept_a": "boy",
+      "concept_b": "lamp",
+      "subsumes_ab": false,
+      "subsumes_ba": false,
+      "similarity": 0.5714285714285714
+    },
+    {
+      "concept_a": "ocean",
+      "concept_b": "angry",
+      "subsumes_ab": false,
+      "subsumes_ba": false,
+      "similarity": 0.5365853658536586
+    },
+    {
+      "concept_a": "tree",
+      "concept_b": "judge",
+      "subsumes_ab": false,
+      "subsumes_ba": false,
+      "similarity": 0.5714285714285714
+    },
+    {
+      "concept_a": "music",
+      "concept_b": "cow",
+      "subsumes_ab": false,
+      "subsumes_ba": false,
+      "similarity": 0.5882352941176471
+    },
+    {
+      "concept_a": "book",
+      "concept_b": "sun",
+      "subsumes_ab": false,
+      "subsumes_ba": false,
+      "similarity": 0.42857142857142855
+    },
+    {
+      "concept_a": "door",
+      "concept_b": "fish",
+      "subsumes_ab": false,
+      "subsumes_ba": false,
+      "similarity": 0.4318181818181818
+    },
+    {
+      "concept_a": "window",
+      "concept_b": "sad",
+      "subsumes_ab": false,
+      "subsumes_ba": false,
+      "similarity": 0.4523809523809524
+    },
+    {
+      "concept_a": "pen",
+      "concept_b": "moon",
+      "subsumes_ab": false,
+      "subsumes_ba": false,
+      "similarity": 0.675
+    },
+    {
+      "concept_a": "car",
+      "concept_b": "brave",
+      "subsumes_ab": false,
+      "subsumes_ba": false,
+      "similarity": 0.46153846153846156
+    },
+    {
+      "concept_a": "flower",
+      "concept_b": "milk",
+      "subsumes_ab": false,
+      "subsumes_ba": false,
+      "similarity": 0.425
+    }
+  ]
+}
