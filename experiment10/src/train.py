@@ -50,15 +50,34 @@ def load_gpt2(model_name, device):
     return gpt2, tokenizer
 
 
-def load_data(tokenizer, data_path, seq_len):
-    """Load and tokenize TinyStories for GPT-2."""
-    print(f"  Loading data from {data_path}...")
-    with open(data_path, 'r', encoding='utf-8') as f:
-        text = f.read()
+def load_data(tokenizer, data_path, seq_len, max_mb=300):
+    """Load and tokenize TinyStories for GPT-2.
 
+    Args:
+        max_mb: Max megabytes of text to read (default 300MB ≈ 75M tokens,
+                enough for 15K steps × 16 batch × 256 seq = 61M tokens).
+    """
+    print(f"  Loading data from {data_path} (max {max_mb}MB)...")
+    max_chars = max_mb * 1024 * 1024
+    with open(data_path, 'r', encoding='utf-8') as f:
+        text = f.read(max_chars)
+    print(f"  Read {len(text) / 1e6:.1f}M characters")
+
+    # Tokenize in chunks to avoid OOM
+    chunk_size = 10 * 1024 * 1024  # 10MB text chunks
     print(f"  Tokenizing with GPT-2 tokenizer (vocab={tokenizer.vocab_size})...")
-    tokens = tokenizer.encode(text)
-    tokens = torch.tensor(tokens, dtype=torch.long)
+    all_tokens = []
+    for i in range(0, len(text), chunk_size):
+        chunk = text[i:i + chunk_size]
+        all_tokens.extend(tokenizer.encode(chunk))
+        if (i // chunk_size + 1) % 5 == 0:
+            print(f"    Tokenized {(i + chunk_size) / 1e6:.0f}M chars ({len(all_tokens):,} tokens)...")
+
+    # Free the text string
+    del text
+
+    tokens = torch.tensor(all_tokens, dtype=torch.long)
+    del all_tokens
     print(f"  Total tokens: {len(tokens):,} ({len(tokens) // seq_len:,} chunks of {seq_len})")
 
     # Pre-chunk into sequences
@@ -76,7 +95,8 @@ def get_batch(data, batch_size, device):
 
 def train_phase(model, data, phase_name, steps, lr, batch_size, seq_len,
                 alpha, entropy_weight, align_weight, warmup_pct,
-                device, checkpoint_dir, log_writer, global_step_offset=0):
+                device, checkpoint_dir, log_writer, global_step_offset=0,
+                backbone_frozen=False, align_mode='mse'):
     """Run one training phase."""
     optimizer = torch.optim.AdamW(
         filter(lambda p: p.requires_grad, model.parameters()),
@@ -108,7 +128,8 @@ def train_phase(model, data, phase_name, steps, lr, batch_size, seq_len,
             pg['lr'] = current_lr
 
         # Triadic warmup: activate triadic loss after 25% of steps
-        triadic_active = step > int(steps * 0.25)
+        # Skip warmup in Phase 1 (backbone frozen) — triadic head is the only trainable thing
+        triadic_active = True if backbone_frozen else step > int(steps * 0.25)
 
         batch = get_batch(data, batch_size, device)
 
@@ -123,8 +144,13 @@ def train_phase(model, data, phase_name, steps, lr, batch_size, seq_len,
                     entropy_weight=entropy_weight,
                     input_ids=batch,
                     align_weight=align_weight,
+                    align_mode=align_mode,
                 )
-                total_loss = lang_loss + alpha * tri_loss
+                if backbone_frozen:
+                    # Phase 1: only triadic head is trainable, lang_loss has no grad
+                    total_loss = alpha * tri_loss
+                else:
+                    total_loss = lang_loss + alpha * tri_loss
             else:
                 tri_loss = torch.tensor(0.0)
                 total_loss = lang_loss
@@ -171,6 +197,7 @@ def train_phase(model, data, phase_name, steps, lr, batch_size, seq_len,
                 'n_triadic_bits': model.n_triadic_bits,
                 'n_embd': model.n_embd,
                 'gpt2_model_name': args.model,
+                'align_mode': align_mode,
                 'step': global_step,
                 'phase': phase_name,
                 'lang_loss': lang_loss.item(),
@@ -221,6 +248,8 @@ if __name__ == '__main__':
     parser.add_argument('--entropy-weight', type=float, default=1.0)
     parser.add_argument('--align-weight', type=float, default=5.0)
     parser.add_argument('--warmup-pct', type=float, default=0.25)
+    parser.add_argument('--align-mode', default='mse', choices=['mse', 'rank', 'infonce'],
+                        help='Alignment loss mode: mse (original), rank (margin ranking), infonce (contrastive)')
 
     parser.add_argument('--checkpoint-dir', default='experiment10/checkpoints')
     parser.add_argument('--skip-phase1', action='store_true', help='Skip Phase 1 (load from checkpoint)')
@@ -240,6 +269,7 @@ if __name__ == '__main__':
     print(f"  Phase 1:        {args.phase1_steps} steps (backbone frozen, LR={args.phase1_lr})")
     print(f"  Phase 2:        {args.phase2_steps} steps (unfreeze last {args.unfreeze_layers}, LR={args.phase2_lr})")
     print(f"  Triadic params: alpha={args.alpha}, entropy={args.entropy_weight}, align={args.align_weight}")
+    print(f"  Align mode:     {args.align_mode}")
     print(f"  Device:         {device}")
     print("=" * 80)
 
@@ -280,6 +310,8 @@ if __name__ == '__main__':
             checkpoint_dir=args.checkpoint_dir,
             log_writer=log_writer,
             global_step_offset=0,
+            backbone_frozen=True,
+            align_mode=args.align_mode,
         )
         generate_samples(model, tokenizer, device)
     else:
@@ -311,6 +343,7 @@ if __name__ == '__main__':
             checkpoint_dir=args.checkpoint_dir,
             log_writer=log_writer,
             global_step_offset=global_step,
+            align_mode=args.align_mode,
         )
         generate_samples(model, tokenizer, device)
 

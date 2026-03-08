@@ -16,3 +16,5 @@ checkpoints/
 reports/
 bits_sweep_log.txt
 experiment10/checkpoints/
+experiment10/checkpoints_rank/
+experiment10/checkpoints_infonce/

@@ -1,0 +1,18 @@
+{
+  "bit_entropy": 0.7289216669657297,
+  "unique_sigs": 111,
+  "total_concepts": 111,
+  "unique_pct": 100.0,
+  "mean_related_sim": 0.5779399177231994,
+  "mean_unrelated_sim": 0.4791444887189469,
+  "semantic_gap": 0.09879542900425253,
+  "subsumption_recall": 0.0,
+  "subsumption_fpr": 0.0,
+  "analogy_verification": 0.6666666666666666,
+  "analogy_total": 12,
+  "ms_per_concept": 9.96202105255961,
+  "method": "GPT-2+Triadic (transfer)",
+  "n_bits": 64,
+  "n_params": 124488960,
+  "n_params_trainable": 124488960
+}
