@@ -15,3 +15,4 @@ data/
 checkpoints/
 reports/
 bits_sweep_log.txt
+experiment10/checkpoints/
