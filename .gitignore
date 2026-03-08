@@ -13,3 +13,5 @@ ENV/
 .DS_Store
 data/
 checkpoints/
+reports/
+bits_sweep_log.txt

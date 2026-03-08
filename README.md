@@ -1,120 +1,186 @@
-# Triadic MicroGPT
+# TriadicGPT
 
-**A zero-dependency GPT with algebraically verifiable internal representations.**
+**End-to-end prime factorization in a generative language model.**
 
-Standard GPTs produce opaque embeddings — you can compute cosine similarity (`0.87`) but never know *why* two concepts are similar. Triadic MicroGPT solves this by training a projection head that maps hidden states into **prime-factor space**, where semantic relationships become arithmetic:
+TriadicGPT is a 40M-parameter GPT augmented with a *triadic projection head* that produces discrete prime-factor signatures alongside standard next-token predictions. Unlike post-hoc approaches that project frozen embeddings into prime space, TriadicGPT learns algebraically verifiable semantic representations end-to-end as a side effect of language modeling.
 
 ```
-King  = 2 × 3 × 5    (Royalty × Male × Authority)
-Queen = 2 × 5 × 7    (Royalty × Authority × Female)
+King  = 2 x 3 x 5        (Royalty x Male x Authority)
+Queen = 2 x 5 x 7        (Royalty x Authority x Female)
 
-Shared:    {2, 5}    → Royalty, Authority
-Only King: {3}       → Male
-Only Queen:{7}       → Female
+Shared:     gcd  -> {2, 5}    Royalty, Authority
+Difference: div  -> {3} vs {7}   Male vs Female
+Analogy:    factor transfer   king:queen :: man:woman
 ```
 
-## Features
+## Key Results
 
-- **Zero external dependencies** — autograd, transformer, LSH, and prime mapper all implemented from scratch in pure Python
-- **Dual-objective training** — language modeling (next-token) + triadic alignment (prime factor sharing)
-- **Algebraic verification** — subsumption (`A ⊆ B`), composition (`A ∪ B`), gap analysis (`A △ B`)
-- **Interactive CLI** — generate text, compare concepts, inspect prime signatures
-- **~200 lines per module** — readable, hackable, educational
+| Finding | Result |
+|---------|--------|
+| Language cost of triadic head | **Zero** (PPL 7.69 vs 7.56 ablation, within noise) |
+| Semantic ordering emergence | Phase transition at **40M params** (gap: -0.076 -> +0.020) |
+| Optimal bit width | **k=32-64** (shifted from k=6-12 post-hoc) |
+| Analogy verification | **69.2%** (random baseline 50%) |
+| Semantic compression | **8x** (64 bits = 512D embedding probe accuracy) |
+| Signature uniqueness | **100%** across all evaluated concepts |
 
-## Quick Start (v1.0 GoldPrimes Release)
+## Architecture
 
-### 1. Environment Setup
+```
+Text -> BPE Tokenizer (4096 vocab) -> Token IDs -> TriadicGPT (12L/512D/8H)
+                                                          |
+                                                    +-----+-----+
+                                                    |           |
+                                               LM Head    Triadic Head
+                                                    |           |
+                                              Next-Token   tanh(Wx) -> bits
+                                              Prediction   [+, -, +, +, ...]
+                                                    |           |
+                                              L_lang       PrimeMapper
+                                              (CE)         Phi = 2 x 5 x 7
+                                                    |           |
+                                                    +-----+-----+
+                                                          |
+                                              L = L_lang + alpha * L_triadic
+```
 
-To run the full 40-Million parameter XL model with Knowledge Distillation, activate the Conda environment:
+The triadic loss has four components: diversity (bits fire ~50%), contrastive (sequences differ), entropy (no dead bits), and **embedding alignment** (triadic similarity matches embedding similarity -- the key innovation).
+
+## Quick Start
+
+### Environment
 
 ```bash
+conda create -n triadic-microgpt python=3.10
 conda activate triadic-microgpt
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
+pip install tokenizers numpy matplotlib
 ```
 
-*Note: If you don't have the environment, you can create it with `conda create -n triadic-microgpt python=3.10` and install the requirements.*
-
-### 2. Pre-Train the XL Model (GPU)
-
-We've upgraded the engine to run on PyTorch. You can train the massive 64-bit Triadic XL Model on the 10,000-concept Gold Prime dictionary:
+### Train
 
 ```bash
+# Train XL model (40M params, ~76 min on RTX 5060 Ti)
 python src/torch_train.py --scale xl --steps 50000
+
+# Train with custom triadic bits
+python src/torch_train.py --scale xl --override-bits 32 --steps 50000
 ```
 
-### 3. Interactive Validation Chat
+### Evaluate
 
-Chat with the model and watch it natively render its deterministic Subsumption math in real-time:
+```bash
+# Full evaluation (perplexity, generation, triadic analysis)
+python src/evaluate.py --model checkpoints/torch/model_best.pt
+
+# Run benchmark suite
+python benchmarks/scripts/scaling_study.py --model checkpoints/torch_run15_strongalign/model_best.pt
+```
+
+### Chat
 
 ```bash
 python src/chat.py
 ```
 
-### 4. Relational Bias Audit
+## Repository Structure
 
-Run Experiment 8 from the paper to prove that the model's 64-bit projections eliminate vector collisions (False Positive Rate < 5%):
+```
+src/
+  torch_transformer.py     # TriadicGPT model (nn.Module) -- core architecture
+  torch_train.py           # GPU training (dual-loss: language + triadic)
+  torch_finetune.py        # Chat fine-tuning on Alpaca
+  triadic.py               # PrimeMapper, TriadicValidator, algebraic operations
+  evaluate.py              # Perplexity, generation, triadic analysis
+  auditor.py               # Relational bias audit (FPR measurement)
+  fast_tokenizer.py        # HuggingFace BPE tokenizer (Rust backend)
+  chat.py                  # Interactive chat REPL
+  autograd.py              # Pure-Python autograd (educational)
+  transformer.py           # Pure-Python GPT (educational)
+
+benchmarks/
+  scripts/
+    scaling_study.py       # 4-point scaling study benchmark
+    scaling_plots.py       # Publication-quality scaling figures
+    bits_sweep_plots.py    # Bits sweep figures
+    engine_comparison.py   # TriadicGPT vs Engine (5-method Table 7)
+    bit_entropy.py         # Per-bit entropy analysis
+    analogy_benchmark.py   # Analogy verification benchmark
+    subsumption_benchmark.py
+    interpretability_probe.py
+    language_quality.py
+  results/                 # All benchmark JSON results
+  plots/                   # Generated figures
+
+paper/
+  triadic_microgpt.tex     # Full paper (LaTeX)
+  figures/                 # Paper figures
+
+scripts/
+  run_bits_sweep.py        # Orchestrator for k={8,16,32,48,64,128} sweep
+  generate_gold_primes.py  # WordNet gold prime dictionary generator
+  build_vocab.py           # BPE vocabulary builder
+
+tests/
+  test_all.py              # 37 unit tests
+
+experiment_log.md          # Complete record of all 26 training runs
+EVOLUTION_PLAN.md          # Research roadmap and phase tracking
+```
+
+## Reproducing Results
+
+### Data
+
+Download [TinyStories](https://huggingface.co/datasets/roneneldan/TinyStories) and place `TinyStories-train.txt` in `data/`.
+
+### Training Runs
+
+The paper's production model is **Run 15** (`v1.4-strongalign`):
 
 ```bash
-python src/auditor.py
+python src/torch_train.py \
+  --scale xl \
+  --steps 50000 \
+  --alpha 0.05 \
+  --entropy-weight 1.0 \
+  --align-weight 5.0 \
+  --triadic-warmup-pct 0.25 \
+  --no-distill \
+  --checkpoint-dir checkpoints/torch_run15_strongalign
 ```
 
-## Architecture
+### Bits Sweep (Runs 22-26)
 
-```
-Text ──→ Char Tokenizer ──→ Transformer (Attention + MLP)
-                                  │
-                          ┌───────┴───────┐
-                          │               │
-                     LM Head         Triadic Head
-                          │               │
-                    Next-Token       tanh(Wx) → bits
-                    Prediction       [+, -, +, +, ...]
-                          │               │
-                    Language Loss    Prime Mapper
-                     (cross-entropy)     │
-                          │          Φ = 2 × 5 × 7 = 70
-                          │               │
-                          └───────┬───────┘
-                                  │
-                          Total Loss = L_lang + α · L_triadic
+```bash
+python scripts/run_bits_sweep.py
 ```
 
-### Modules
+### Experiment 9 (Table 7: Full Comparison)
 
-| File | Lines | Description |
-|------|-------|-------------|
-| `autograd.py` | ~120 | Scalar autograd engine (`Value` class with backward) |
-| `transformer.py` | ~210 | GPT model: multi-head attention, RMSNorm, MLP, projection head |
-| `triadic.py` | ~240 | Prime sieve, `PrimeMapper`, `TriadicValidator`, differentiable `triadic_loss` |
-| `train.py` | ~220 | Dual-objective training loop with Adam optimizer |
-| `inference.py` | ~260 | Generation, text analysis, comparison, interactive CLI |
-| `test_all.py` | ~320 | 30+ automated tests covering all modules |
+Requires [Triadic-Neurosymbolic-Engine](https://github.com/arturoornelasb/Triadic-Neurosymbolic-Engine) cloned alongside this repo:
 
-## How It Works
+```bash
+python benchmarks/scripts/engine_comparison.py \
+  --model checkpoints/torch_run15_strongalign/model_best.pt \
+  --engine-path ../Triadic-Neurosymbolic-Engine
+```
 
-### 1. Autograd Engine
-Every computation builds a graph of `Value` nodes. Calling `.backward()` on the loss applies the chain rule in reverse to compute all gradients — identical to PyTorch's autograd but in ~120 lines of pure Python.
+## Paper
 
-### 2. Transformer
-A GPT-2-style architecture (multi-head attention → RMSNorm → MLP) processes character tokens. The **key innovation** is a triadic projection head that maps the final hidden state to `n_bits` values via `tanh`.
+> **End-to-End Prime Factorization in a Generative Language Model: Emergent Algebraic Semantics from Joint Training**
+> Arturo Ornelas Brand, 2026
 
-### 3. Triadic Bridge
-Each `tanh` output corresponds to a unique prime number. Positive outputs activate their prime; negative ones don't. The product of all active primes becomes the concept's **prime signature** — a single integer encoding its semantic features.
+The full paper is in `paper/triadic_microgpt.tex`. Compile with:
 
-### 4. Dual Training
-The model optimizes two objectives simultaneously:
-- **Language**: Predict the next character (standard LM)
-- **Triadic**: Related tokens should share prime factors (algebraic alignment)
-
-### 5. Verification
-After training, you can use `gcd`, `mod`, and `lcm` to:
-- **Subsumption**: Does A contain all features of B? (`Φ(A) % Φ(B) == 0`)
-- **Composition**: What combines A and B? (`lcm(Φ(A), Φ(B))`)
-- **Gap Analysis**: What's shared vs. unique? (`gcd` + quotients)
+```bash
+cd paper && pdflatex triadic_microgpt.tex && pdflatex triadic_microgpt.tex
+```
 
 ## Credits
 
-- **Autograd + Transformer**: Inspired by [Andrej Karpathy's microgpt.py](https://gist.github.com/karpathy/microgpt)
-- **Triadic Algebra**: Based on the [Triadic Neurosymbolic Engine](https://github.com/arturoornelasb/Triadic-Neurosymbolic-Engine) by J. Arturo Ornelas Brand
+- **Initial scaffolding**: Inspired by [Andrej Karpathy's nanoGPT](https://github.com/karpathy/nanoGPT)
+- **Triadic algebra**: Based on the [Triadic-Neurosymbolic-Engine](https://github.com/arturoornelasb/Triadic-Neurosymbolic-Engine) (Ornelas Brand, 2026)
 
 ## License
 

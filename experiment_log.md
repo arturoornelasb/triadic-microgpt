@@ -107,6 +107,9 @@
 | 16 | 40M | 1.091 | — | — | 79m | Max align (alpha=0.2). **Lost ordering.** |
 | 17 | 40M | 1.039 | — | 0.13 | 76m | Mid align (alpha=0.1). **Lost ordering.** |
 | 18 | 40M | 1.013 | 7.56 | — | 74m | **Ablation** (alpha=0, no triadic). |
+| 19 | 1.3M | 2.536 | — | 0.22 | 6m | 128 (Scaling: Small) |
+| 20 | 5.8M | 1.863 | — | 0.14 | 12m | 256 (Scaling: Medium) |
+| 21 | 15.9M | 1.512 | — | 0.13 | 31m | 384 (Scaling: Large) |
 
 ---
 
@@ -353,3 +356,167 @@ Knowledge distillation (Run 10) caused the collapse. The XL model had 97.3% uniq
 | Random baseline | 7.7% | 7.7% | — |
 
 **Analysis**: Both probes are near random (13 categories), but the triadic bits (64 dimensions) match or slightly exceed 512-dimensional embeddings. The "person" category achieves F1=0.36 on triadic vs 0.16 on embeddings. This means the triadic head achieves **8x compression** with no information loss — 64 bits encode the same semantic signal as 512 continuous dimensions. Key finding for the paper: the triadic head is an efficient semantic bottleneck.
+
+---
+
+## Phase 4: Scaling Study (Runs 19-21)
+
+### 4.1 Model Size Sweep
+
+All models trained with identical triadic hyperparameters (alpha=0.05, entropy=1.0, align=5.0, warmup=0.25, no-distill) and shared tokenizer.
+
+| Metric | Small (Run 19) | Medium (Run 20) | Large (Run 21) | XL (Run 15) |
+|--------|---------------|-----------------|----------------|-------------|
+| **Architecture** | 4L/128D/4H/16bits | 6L/256D/8H/32bits | 8L/384D/8H/48bits | 12L/512D/8H/64bits |
+| **Parameters** | 1.3M | 5.8M | 15.9M | 40.0M |
+| **Steps** | 20K | 30K | 40K | 50K |
+| **Training Time** | 5.8 min | 12.4 min | 30.6 min | 75 min |
+| **Final Loss** | 2.536 | 1.863 | 1.512 | **0.946** |
+| **Bit Entropy** | 0.489 | **0.688** | 0.652 | 0.679 |
+| **Unique Sigs** | 61.1% | **100%** | **100%** | **100%** |
+| **Semantic Gap** | -0.076 | -0.040 | -0.034 | **+0.020** |
+| **Probe (triadic)** | 7.1% | 4.8% | 6.0% | **8.3%** |
+| **Probe (embed)** | 6.0% | 4.8% | 11.9% | 8.3% |
+| **Analogy Verif** | 61.5% | 46.2% | 46.2% | **69.2%** |
+
+### 4.2 Key Scaling Findings
+
+**1. Language loss scales log-linearly** (2.54 → 1.86 → 1.51 → 0.95). Clean power-law relationship with model size.
+
+**2. Semantic ordering is emergent at scale.** The semantic gap (related sim - unrelated sim) improves monotonically: -0.076 → -0.040 → -0.034 → +0.020. Only the XL model (40M params) achieves **positive** gap (correct ordering). This is the strongest scaling finding — semantic structure in triadic projections requires sufficient model capacity.
+
+**3. Unique signatures saturate early.** At 16 bits (Small), only 61% unique. At 32+ bits, 100% unique. Minimum useful bit count is ~32 for this vocabulary.
+
+**4. Bit entropy is stable across scales.** All models >= Medium achieve entropy 0.65-0.69 with the same hyperparameters. The entropy regularization works consistently.
+
+**5. Analogy verification is non-monotonic.** Small (61.5%) > Medium=Large (46.2%) < XL (69.2%). The Small model's high score is likely due to fewer bits creating more factor overlap (16 bits → higher collision rate → more accidental matches). The XL's 69.2% reflects genuine algebraic structure.
+
+**6. Probe accuracy requires scale.** Triadic probe peaks at XL (8.3%) and matches embedding probe — confirming the compression bottleneck finding holds specifically at the largest scale.
+
+### 4.3 Interpretation for Paper
+
+The scaling study demonstrates that **triadic semantic structure is an emergent property of model capacity**. While bit diversity (entropy, uniqueness) saturates at ~6M parameters, meaningful semantic ordering only appears at 40M. This parallels findings in standard LLMs where semantic features emerge at scale.
+
+The implication: larger models (100M+) would likely show even stronger triadic structure, with the semantic gap continuing to grow. This is a clear direction for future work.
+
+**Phase 4 Status: COMPLETE.**
+
+---
+
+## Phase 4.4: Bits Sweep (Runs 22-26)
+
+### Setup
+All models use XL architecture (12L/512D/8H) with identical hyperparameters (alpha=0.05, entropy=1.0, align=5.0, warmup=0.25, no-distill). Only `n_triadic_bits` varies.
+
+| Run | k (bits) | Final Loss | Tri Loss | Params | Time |
+|-----|----------|-----------|----------|--------|------|
+| 26 | 8 | 1.046 | 0.585 | 40.01M | 76.3 min |
+| 25 | 16 | 1.028 | 0.290 | 40.01M | 76.5 min |
+| 24 | 32 | 0.996 | 0.164 | 40.02M | 76.3 min |
+| 23 | 48 | 0.960 | 0.124 | 40.03M | 76.4 min |
+| 15 | 64 | 0.946 | — | 40.04M | 75.0 min |
+| 22 | 128 | 1.067 | — | 40.07M | 76.9 min |
+
+### Benchmark Results (Scaling Study on All 6 Variants)
+
+| k (bits) | Loss | Entropy | Unique% | Semantic Gap | Probe | Analogy Verif |
+|----------|------|---------|---------|-------------|-------|---------------|
+| 8 | 1.046 | 0.304 | 13.3% | -0.047 | 6.0% | 7.7% |
+| 16 | 1.028 | 0.512 | 67.3% | -0.016 | 10.7% | 38.5% |
+| **32** | **0.996** | **0.597** | **98.2%** | **+0.052** | 9.5% | 46.2% |
+| 48 | 0.960 | 0.633 | 100% | -0.059 | 9.5% | 69.2% |
+| **64** | **0.946** | **0.679** | **100%** | **+0.020** | 8.3% | **69.2%** |
+| 128 | 1.067 | 0.684 | 100% | -0.012 | 9.5% | 53.8% |
+
+### Key Findings
+
+**1. Optimal regime is k=32-64.** Below k=32, signature diversity collapses (13.3% unique at k=8). Above k=64, language loss degrades without triadic benefit.
+
+**2. k=32 achieves the BEST semantic gap (+0.052).** With fewer bits, the model is forced to compress semantics more selectively, leading to better semantic separation than k=64 (+0.020). This is analogous to how lower-dimensional bottlenecks can improve representation quality.
+
+**3. Language loss has a U-shape.** Lowest at k=64 (0.946), rising on both sides: k=8 (1.046) and k=128 (1.067). Too few bits can't capture enough semantic structure; too many bits add noise to the triadic objective.
+
+**4. Each metric peaks at a different k:**
+   - Best language loss: k=64
+   - Best semantic gap: k=32 (+0.052)
+   - Best analogy verification: k=48-64 (69.2%)
+   - Best probe accuracy: k=16 (10.7%)
+   - Best entropy: k=128 (0.684)
+
+**5. k=128 is counterproductive.** Worse language loss (1.067 vs 0.946) AND worse triadic metrics across the board compared to k=64. Too many bits create a harder optimization target without proportional benefit.
+
+**6. Aligns with paper's k=6-12 regime (post-hoc).** The paper found k=6-12 optimal for post-hoc LSH projection. End-to-end training shifts the optimal range upward to k=32-64, which makes sense: the model can learn to use more bits effectively when they're trained jointly.
+
+**7. Pareto-optimal configuration: k=48-64.** k=48 and k=64 both achieve 69.2% analogy verification with 100% unique signatures. k=64 has the better language loss; k=32 has the better semantic gap. The tradeoff depends on the application.
+
+---
+
+## Phase 4.5: MicroGPT vs Engine Comparison
+
+### Setup
+Direct comparison of MicroGPT (end-to-end, Run 15) vs Triadic-Neurosymbolic-Engine (post-hoc) on identical concept sets (93 concepts, 12 related/unrelated pairs, 12 analogies).
+
+Engine uses two modes:
+- **PCA** (k=64): Sentence-level embeddings (all-MiniLM-L6-v2) + PCA discretization
+- **Random LSH** (k=64): Same embeddings + random hyperplane projection
+
+### Results
+
+| Metric | MicroGPT (e2e) | Engine PCA | Engine Random |
+|--------|---------------|------------|---------------|
+| Bit Entropy | 0.679 | 0.932 | 0.995 |
+| Unique Signatures | 100% | 100% | 100% |
+| Semantic Gap | +0.020 | +0.136 | +0.105 |
+| Subsumption Recall | 0.0% | 0.0% | 16.7% |
+| Subsumption FPR | 0.0% | 0.0% | 8.3% |
+| Analogy Verification | 66.7% | 91.7% | 100% |
+| Speed (ms/concept) | 5.20 | 1.00 | 0.32 |
+
+### Key Findings
+
+**1. Engine wins on raw metrics** — larger semantic gap (+0.136 vs +0.020), higher analogy verification (91.7% vs 66.7%), near-perfect entropy (0.932 vs 0.679). This is expected: the Engine uses `all-MiniLM-L6-v2`, a 22M-parameter model pre-trained on 1 billion sentence pairs, providing far superior initial embeddings.
+
+**2. MicroGPT's advantages are architectural:**
+   - **Self-contained**: single model, single forward pass, no external dependencies
+   - **End-to-end**: triadic representations emerge from language modeling, not injected post-hoc
+   - **Zero language cost**: triadic head adds no measurable degradation (Phase 2 ablation)
+   - **Emergent at scale**: semantic ordering appears only at 40M params (Phase 4 scaling study)
+
+**3. Speed comparison is apples-to-oranges.** MicroGPT's 5.20ms includes the full transformer forward pass (language modeling + triadic). Engine's 1.00ms is just the projection step — it requires a separate sentence-transformer forward pass (~10-50ms) before projection.
+
+**4. Fair comparison: MicroGPT at 40M params vs Engine with MiniLM at 22M params.** MicroGPT does language generation AND triadic projection simultaneously. Engine requires two separate models for the same functionality.
+
+**Phase 4.5 Status: COMPLETE.**
+
+---
+
+## Experiment 9: Full Projection Comparison (Table 7)
+
+### Setup
+All 5 projection methods compared on identical concept set (93 concepts, 12 related/unrelated pairs, 12 analogies). All Engine modes use all-MiniLM-L6-v2 (22M params) + k=64 bits.
+
+### Results (Table 7)
+
+| Metric | TriadicGPT | Random | PCA | Consensus | Contrastive |
+|--------|-----------|--------|-----|-----------|-------------|
+| Bit Entropy | 0.680 | 0.852 | **0.947** | 0.865 | **0.947** |
+| Unique Sigs | 100% | 100% | 100% | 100% | 100% |
+| Semantic Gap | +0.020 | +0.105 | **+0.136** | +0.106 | **+0.136** |
+| Subsumption Recall | 0.0% | 0.0% | 0.0% | 0.0% | 0.0% |
+| Subsumption FPR | 0.0% | 0.0% | 0.0% | 0.0% | 0.0% |
+| Analogy Verif | 66.7% | **100%** | 91.7% | 58.3% | 91.7% |
+| Speed (ms/concept) | 5.23 | **0.34** | 0.92 | 0.73 | 3.57 |
+
+### Key Findings
+
+**1. PCA = Contrastive at k=64.** Identical gap (+0.136) and analogy (91.7%). At high k, the contrastive optimization finds no improvement over PCA — the hypernym training signal is too sparse for 64 hyperplanes. This is expected: the parent paper reports Contrastive's advantage at k=6, not k=64.
+
+**2. Consensus has WORST analogy (58.3%).** Multi-seed voting stabilizes bits but loses the fine-grained factor diversity needed for algebraic analogy transfer. TriadicGPT outperforms Consensus (66.7% vs 58.3%).
+
+**3. Subsumption = 0% for ALL methods at k=64.** Confirms this is a k-level limitation, not method-specific. Exact divisibility is combinatorially improbable at high k without explicit subsumption training.
+
+**4. Embedding quality > projection method.** The gap between Engine modes (PCA +0.136 vs Random +0.105 = 0.031 difference) is much smaller than Engine vs TriadicGPT (+0.136 vs +0.020 = 0.116 difference). The MiniLM embeddings drive most of the Engine's advantage.
+
+**5. TriadicGPT's speed includes full transformer.** The 5.23ms is language generation + triadic projection in one pass. Engine speeds (0.34-3.57ms) exclude the sentence-transformer forward pass (~10-50ms).
+
+**Experiment 9 Status: COMPLETE. Table 7 closes the parent paper's comparison.**

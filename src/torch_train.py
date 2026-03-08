@@ -1,5 +1,5 @@
 """
-GPU Training Loop — PyTorch-based training with CUDA acceleration.
+GPU Training Loop - PyTorch-based training with CUDA acceleration.
 
 Features:
   - Batch training with DataLoader
@@ -106,7 +106,7 @@ def train(args):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print()
     print("=" * 64)
-    print("  TRIADIC MICROGPT — PyTorch GPU Training")
+    print("  TRIADIC MICROGPT - PyTorch GPU Training")
     print("=" * 64)
     print(f"  Device: {device}")
     if device.type == 'cuda':
@@ -336,7 +336,7 @@ def train(args):
             # Progress bar
             bar_len = 30
             filled = int(bar_len * (step + 1) / args.steps)
-            bar = '█' * filled + '░' * (bar_len - filled)
+            bar = '#' * filled + '-' * (bar_len - filled)
 
             # Format ETA
             if remaining >= 60:
@@ -444,13 +444,24 @@ if __name__ == '__main__':
     parser.add_argument('--tokenizer', type=str, default=None, help='Pre-trained tokenizer path (skip BPE training)')
     parser.add_argument('--tokens', type=str, default=None, help='Pre-tokenized .npy cache (skip encoding)')
     parser.add_argument('--no-distill', action='store_true', help='Skip gold primes distillation (faster training)')
-    parser.add_argument('--scale', type=str, choices=['base', 'xl'], default='base', help='Model scale preset')
+    parser.add_argument('--scale', type=str, choices=['small', 'base', 'large', 'xl'], default='base', help='Model scale preset')
+    parser.add_argument('--override-bits', type=int, default=None, help='Override triadic bits from scale preset (for bits sweep)')
     args = parser.parse_args()
 
-    if args.scale == 'xl':
-        args.layers = 12
-        args.dim = 512
-        args.heads = 8
-        args.bits = 64
+    SCALE_PRESETS = {
+        'small':  {'layers': 4,  'dim': 128, 'heads': 4, 'bits': 16},
+        'base':   {'layers': 6,  'dim': 256, 'heads': 8, 'bits': 32},
+        'large':  {'layers': 8,  'dim': 384, 'heads': 8, 'bits': 48},
+        'xl':     {'layers': 12, 'dim': 512, 'heads': 8, 'bits': 64},
+    }
+
+    preset = SCALE_PRESETS[args.scale]
+    args.layers = preset['layers']
+    args.dim = preset['dim']
+    args.heads = preset['heads']
+    args.bits = preset['bits']
+
+    if args.override_bits is not None:
+        args.bits = args.override_bits
 
     train(args)

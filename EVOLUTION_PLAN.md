@@ -174,27 +174,50 @@ Compare Triadic MicroGPT's learned projections against the parent Engine's post-
 
 ---
 
-## Phase 4: Scaling Study
+## Phase 4: Scaling Study (COMPLETE — Emergent Semantic Ordering)
 **Objective**: Demonstrate scaling laws for the triadic approach across model sizes.
 
-### 4.1 Model Size Sweep
-| Config | Params | Train Steps | Expected Time |
-|--------|--------|-------------|---------------|
-| Small: 4L/128D/4H/16bits | ~1M | 20K | ~2 min |
-| Medium: 6L/256D/8H/32bits | ~6M | 30K | ~5 min |
-| Large: 8L/384D/8H/48bits | ~16M | 40K | ~15 min |
-| XL: 12L/512D/8H/64bits | ~40M | 50K | ~76 min |
+### 4.1 Model Size Sweep Results (Runs 19-21 + Run 15)
 
-For each size, measure: language loss, perplexity, triadic entropy, subsumption F1, bit utilization.
-Plot scaling curves: metric vs log(params).
+All models trained with identical hyperparameters (alpha=0.05, entropy=1.0, align=5.0).
 
-### 4.2 Triadic Bits Sweep
-Fix model at XL size, vary only n_triadic_bits: 8, 16, 32, 48, 64, 128.
-Measure: expressiveness (unique primes), collision rate, subsumption accuracy.
+| Scale | Params | Loss | Entropy | Unique% | Semantic Gap | Probe | Analogy Verif |
+|-------|--------|------|---------|---------|-------------|-------|---------------|
+| Small (4L/128D/16bits) | 1.3M | 2.536 | 0.489 | 61.1% | -0.076 | 7.1% | 61.5% |
+| Medium (6L/256D/32bits) | 5.8M | 1.863 | 0.688 | 100% | -0.040 | 4.8% | 46.2% |
+| Large (8L/384D/48bits) | 15.9M | 1.512 | 0.652 | 100% | -0.034 | 6.0% | 46.2% |
+| **XL (12L/512D/64bits)** | **40M** | **0.946** | **0.679** | **100%** | **+0.020** | **8.3%** | **69.2%** |
 
-### 4.3 Alpha (Triadic Weight) Sweep
-Fix model at XL size, vary α: 0.01, 0.05, 0.1, 0.15, 0.3, 0.5.
-Measure: language loss vs triadic quality tradeoff curve (Pareto frontier).
+### 4.2 Key Finding: Emergent Semantic Ordering
+Semantic gap improves monotonically with scale (-0.076 → -0.040 → -0.034 → +0.020). Only the XL model achieves positive gap. **Triadic semantic structure is an emergent property of model capacity** — analogous to emergent abilities in standard LLMs.
+
+### 4.3 Alpha Sweep (from Phase 1, Runs 15-17)
+Already completed during Phase 1. Sharp cliff at alpha > 0.05. Run 15 (alpha=0.05) is Pareto-optimal.
+
+### 4.4 Bits Sweep (COMPLETE -- Runs 22-26)
+
+XL architecture fixed, only k varies (8, 16, 32, 48, 64, 128 bits).
+
+| k (bits) | Loss | Entropy | Unique% | Semantic Gap | Probe | Analogy Verif |
+|----------|------|---------|---------|-------------|-------|---------------|
+| 8 | 1.046 | 0.304 | 13.3% | -0.047 | 6.0% | 7.7% |
+| 16 | 1.028 | 0.512 | 67.3% | -0.016 | 10.7% | 38.5% |
+| **32** | **0.996** | 0.597 | 98.2% | **+0.052** | 9.5% | 46.2% |
+| 48 | 0.960 | 0.633 | 100% | -0.059 | 9.5% | 69.2% |
+| **64** | **0.946** | 0.679 | 100% | +0.020 | 8.3% | **69.2%** |
+| 128 | 1.067 | 0.684 | 100% | -0.012 | 9.5% | 53.8% |
+
+**Key finding**: Optimal regime is k=32-64. k=32 has the best semantic gap (+0.052); k=48-64 have the best analogy verification (69.2%). k=128 is counterproductive. Language loss follows a U-shape with minimum at k=64.
+
+### 4.5 MicroGPT vs Engine Comparison (COMPLETE)
+
+| Metric | MicroGPT (e2e) | Engine PCA | Engine Random |
+|--------|---------------|------------|---------------|
+| Semantic Gap | +0.020 | +0.136 | +0.105 |
+| Analogy Verif | 66.7% | 91.7% | 100% |
+| Speed (ms/concept) | 5.20 | 1.00 | 0.32 |
+
+Engine wins on raw metrics (uses pre-trained MiniLM-L6-v2 with 1B sentence pairs). MicroGPT's advantage: self-contained, end-to-end, zero language cost, emergent at scale.
 
 ---
 
@@ -261,7 +284,7 @@ Measure: language loss vs triadic quality tradeoff curve (Pareto frontier).
 Phase 1 (Triadic Quality)    ████████████████████  COMPLETE — Run 15 is production model
 Phase 2 (Language Benchmarks) ████████████████████  COMPLETE — ablation proves zero cost
 Phase 3 (Triadic Benchmarks)  ████████████████████  COMPLETE — 3 benchmarks executed
-Phase 4 (Scaling Study)       ██████████░░░░░░░░░░  Optional — strengthens claims
+Phase 4 (Scaling Study)       ████████████████████  COMPLETE — emergent semantic ordering found
 Phase 5 (Data/Training)       ██████████░░░░░░░░░░  Optional — improves results
 Phase 6 (Paper)               ████████████░░░░░░░░  NEXT — all data collected
 ```
@@ -285,4 +308,5 @@ Phase 6 (Paper)               ████████████░░░░�
 | v1.6-midalign | 2026-03-07 | Run 17: alpha=0.1, align=7 — still loses ordering, confirms Pareto cliff |
 | **v2.0-ablation** | **2026-03-07** | **Run 18: ablation baseline, proves zero language cost** |
 | **v2.0-benchmarks** | **2026-03-07** | **Phase 3 complete: subsumption, analogy, probe benchmarks** |
-| **v3.0** | TBD | Paper submission |
+| **v3.0-scaling** | **2026-03-07** | **Phase 4 complete: 4-point scaling study, emergent semantic ordering** |
+| **v4.0** | TBD | Paper submission |
