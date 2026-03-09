@@ -760,3 +760,70 @@ structure (clear positives vs negatives) that TinyStories embeddings don't provi
 | Weak (512D, TinyStories) | Rank/InfoNCE | FAIL — insufficient pos/neg contrast |
 
 **Run 28 Status: COMPLETE. Confirms MSE is optimal for from-scratch with weak embeddings.**
+
+---
+
+## Run 29: Staged MSE→InfoNCE (From-Scratch)
+
+### Hypothesis
+MSE works with weak embeddings (early training), InfoNCE works with rich embeddings (late training).
+Switching mid-training should combine both: MSE builds correct semantic ordering while embeddings
+are weak, then InfoNCE amplifies the structure once embeddings have matured.
+
+### Setup
+| Key | Value |
+|-----|-------|
+| **Date** | 2026-03-08 |
+| **Architecture** | TriadicGPT XL (12L/512D/8H/64bits, 40M params) |
+| **Alignment** | Staged: MSE (steps 1-25000) → InfoNCE (steps 25001-50000) |
+| **Switch point** | 50% (`--staged-switch-pct 0.5`) |
+| **Other params** | alpha=0.05, entropy=1.0, align=5.0 |
+| **Distillation** | OFF (--no-distill) |
+| **Steps** | 50,000 |
+| **Training time** | 74.4 min (4461s) |
+| **Final loss** | 1.051 (tri_loss=5.867, InfoNCE phase) |
+
+### Results
+| Metric | Run 29 (Staged) | Run 15 (MSE) | Run 27 (InfoNCE) | Run 28 (Rank) |
+|--------|:---:|:---:|:---:|:---:|
+| Perplexity | **7.39** | 7.69 | **7.30** | 7.76 |
+| Bit Entropy | 0.686 | **0.749** | — | — |
+| Unique Sigs | 99.1% | **100%** | — | — |
+| King↔Queen | 65.7% | **89%** | 66% | 49% |
+| King↔Dog | 57.9% | 60% | 67% | 55% |
+| Semantic Ordering | CORRECT (+7.8pt) | **CORRECT (+29pt)** | BROKEN (-1pt) | BROKEN (-6pt) |
+| Analogy Verif | 53.8% | **65.4%** | — | — |
+| Analogy Top-1 | 3.8% | 3.8% | — | — |
+
+### Key Findings
+
+**1. Staged training preserves ordering but weakens it.**
+King↔Queen (65.7%) > King↔Dog (57.9%) — correct ordering maintained. But the gap (+7.8pt)
+is much smaller than pure MSE (+29pt). The InfoNCE phase partially disrupted the structure
+that MSE built in the first 25K steps.
+
+**2. Perplexity is the best of all triadic runs (7.39).**
+Better than MSE (7.69), approaching InfoNCE (7.30). The staged approach benefits language
+quality, likely because InfoNCE acts as stronger regularization in the second half.
+
+**3. Bit entropy regresses slightly (0.686 vs 0.749).**
+The InfoNCE phase may be concentrating information on fewer bits, reducing overall entropy.
+
+**4. Confirms: InfoNCE cannot leverage weak embeddings even after MSE priming.**
+The 25K-step MSE phase built correct ordering, but when InfoNCE took over at step 25K,
+the embeddings were still "weak" by InfoNCE standards (512D, TinyStories). The 25K steps
+of MSE training improved the triadic head but did not fundamentally change the embedding
+quality that InfoNCE needs.
+
+**5. The loss-embedding interaction is about embedding space structure, not training stage.**
+Even late in training, from-scratch TinyStories embeddings lack the global semantic clustering
+that InfoNCE requires. The interaction is a property of the data/model capacity, not training time.
+
+### Conclusion
+**Staged training is NOT an improvement over pure MSE for from-scratch training.**
+The hypothesis was wrong: MSE's advantage comes from the embedding space structure (local vs global),
+not from training stage. To make InfoNCE work from-scratch, you'd need either:
+(a) much larger training data (not 50K stories), or
+(b) much larger model capacity so embeddings develop richer structure.
+
+**Run 29 Status: COMPLETE. Negative result — confirms loss-embedding interaction is structural.**

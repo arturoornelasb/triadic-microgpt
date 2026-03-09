@@ -1,0 +1,486 @@
+{
+  "benchmark": "analogy",
+  "version": "v5.0-staged",
+  "date": "2026-03-09",
+  "model_checkpoint": "checkpoints/torch_run29_staged/model_L12_D512_B64_best.pt",
+  "model_config": "12L/512D/8H/64bits",
+  "n_analogies": 26,
+  "n_vocab_pool": 114,
+  "metrics": {
+    "top1_accuracy": 0.038461538461538464,
+    "top5_accuracy": 0.038461538461538464,
+    "verification_accuracy": 0.5384615384615384,
+    "top1_correct": 1,
+    "top5_correct": 1
+  },
+  "details": [
+    {
+      "analogy": "king:queen::man:woman",
+      "target_prime": 73609438293525867599927080859767730604898816377469698118596336112635891410,
+      "correct_answer": "woman",
+      "top1": "car",
+      "top5": [
+        "car",
+        "green",
+        "garden",
+        "girl",
+        "apple"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.6046511627906976,
+      "median_similarity": 0.6341463414634146,
+      "above_median": "False"
+    },
+    {
+      "analogy": "king:queen::boy:girl",
+      "target_prime": 7312516556104460371158807605907836680369419891368136119953910690,
+      "correct_answer": "girl",
+      "top1": "girl",
+      "top5": [
+        "girl",
+        "brave",
+        "dream",
+        "city",
+        "bird"
+      ],
+      "is_top1": true,
+      "is_top5": true,
+      "d_similarity": 0.8571428571428571,
+      "median_similarity": 0.7105263157894737,
+      "above_median": "True"
+    },
+    {
+      "analogy": "king:queen::prince:princess",
+      "target_prime": 3289587949585452124425607124517417361819110252780301079885417870,
+      "correct_answer": "princess",
+      "top1": "music",
+      "top5": [
+        "music",
+        "magic",
+        "dance",
+        "city",
+        "run"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.7435897435897436,
+      "median_similarity": 0.675,
+      "above_median": "True"
+    },
+    {
+      "analogy": "king:queen::father:mother",
+      "target_prime": 120862846582500975087697035170014994791803708791464874521160278246918070,
+      "correct_answer": "mother",
+      "top1": "fire",
+      "top5": [
+        "fire",
+        "food",
+        "fall",
+        "float",
+        "village"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.775,
+      "median_similarity": 0.7435897435897436,
+      "above_median": "True"
+    },
+    {
+      "analogy": "king:queen::brother:sister",
+      "target_prime": 89271190089069577392295562054525267048742545034815260910,
+      "correct_answer": "sister",
+      "top1": "lamp",
+      "top5": [
+        "lamp",
+        "flower",
+        "dream",
+        "jump",
+        "scientist"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.7272727272727273,
+      "median_similarity": 0.7027027027027027,
+      "above_median": "True"
+    },
+    {
+      "analogy": "man:woman::boy:girl",
+      "target_prime": 453506307010681276259755007733507696999326107953228243247451842330,
+      "correct_answer": "girl",
+      "top1": "music",
+      "top5": [
+        "music",
+        "student",
+        "young",
+        "dream",
+        "dance"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.7837837837837838,
+      "median_similarity": 0.6923076923076923,
+      "above_median": "True"
+    },
+    {
+      "analogy": "man:woman::father:mother",
+      "target_prime": 142267310218700342304224166299165019305301032451105360486382982390906210,
+      "correct_answer": "mother",
+      "top1": "fire",
+      "top5": [
+        "fire",
+        "food",
+        "fall",
+        "fly",
+        "water"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.7317073170731707,
+      "median_similarity": 0.7317073170731707,
+      "above_median": "False"
+    },
+    {
+      "analogy": "man:woman::brother:sister",
+      "target_prime": 49270279659316285005467769521136227717686241281545242890,
+      "correct_answer": "sister",
+      "top1": "lamp",
+      "top5": [
+        "lamp",
+        "walk",
+        "hope",
+        "scientist",
+        "afraid"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.7272727272727273,
+      "median_similarity": 0.6857142857142857,
+      "above_median": "True"
+    },
+    {
+      "analogy": "father:mother::brother:sister",
+      "target_prime": 119810558788498903693748190003555146551525161281941607731330,
+      "correct_answer": "sister",
+      "top1": "boy",
+      "top5": [
+        "boy",
+        "young",
+        "afraid",
+        "cloud",
+        "climb"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.7352941176470589,
+      "median_similarity": 0.6944444444444444,
+      "above_median": "True"
+    },
+    {
+      "analogy": "prince:princess::boy:girl",
+      "target_prime": 3286681229051914030948611694907857387159508446540070325068351926362675590,
+      "correct_answer": "girl",
+      "top1": "rain",
+      "top5": [
+        "rain",
+        "garden",
+        "enemy",
+        "fear",
+        "brave"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.8157894736842105,
+      "median_similarity": 0.7142857142857143,
+      "above_median": "True"
+    },
+    {
+      "analogy": "happy:sad::love:hate",
+      "target_prime": 50209036679333353173997856605561642002679067632795490757397304161767370,
+      "correct_answer": "hate",
+      "top1": "fly",
+      "top5": [
+        "fly",
+        "fire",
+        "food",
+        "peace",
+        "war"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.6923076923076923,
+      "median_similarity": 0.6923076923076923,
+      "above_median": "False"
+    },
+    {
+      "analogy": "happy:sad::peace:war",
+      "target_prime": 1597397040173778057759125344970772145096699856887439309773450585592330,
+      "correct_answer": "war",
+      "top1": "fire",
+      "top5": [
+        "fire",
+        "fly",
+        "village",
+        "teacher",
+        "ocean"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.7435897435897436,
+      "median_similarity": 0.675,
+      "above_median": "True"
+    },
+    {
+      "analogy": "happy:sad::hope:fear",
+      "target_prime": 56656797369446414215885056749532971373164972545309788860884649508450739034549830,
+      "correct_answer": "fear",
+      "top1": "fire",
+      "top5": [
+        "fire",
+        "water",
+        "friend",
+        "fly",
+        "apple"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.7804878048780488,
+      "median_similarity": 0.7317073170731707,
+      "above_median": "True"
+    },
+    {
+      "analogy": "big:small::fast:slow",
+      "target_prime": 17861722011640281448998849926836726216542051962555268924996520490,
+      "correct_answer": "slow",
+      "top1": "swim",
+      "top5": [
+        "swim",
+        "school",
+        "angry",
+        "red",
+        "church"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.6410256410256411,
+      "median_similarity": 0.7,
+      "above_median": "False"
+    },
+    {
+      "analogy": "big:small::old:young",
+      "target_prime": 960376077101195289385195712560330695314233861665990878986410,
+      "correct_answer": "young",
+      "top1": "mountain",
+      "top5": [
+        "mountain",
+        "chair",
+        "enemy",
+        "kind",
+        "garden"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.575,
+      "median_similarity": 0.5365853658536586,
+      "above_median": "True"
+    },
+    {
+      "analogy": "fast:slow::old:young",
+      "target_prime": 5590586763629258075252927796392050420070418624352371914632425330,
+      "correct_answer": "young",
+      "top1": "enemy",
+      "top5": [
+        "enemy",
+        "chair",
+        "city",
+        "fly",
+        "dog"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.625,
+      "median_similarity": 0.5714285714285714,
+      "above_median": "True"
+    },
+    {
+      "analogy": "fire:water::sun:moon",
+      "target_prime": 310916086602449849602012746241649144814039714717199156458326493600830,
+      "correct_answer": "moon",
+      "top1": "run",
+      "top5": [
+        "run",
+        "winter",
+        "teacher",
+        "sad",
+        "spring"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.5952380952380952,
+      "median_similarity": 0.6136363636363636,
+      "above_median": "False"
+    },
+    {
+      "analogy": "morning:night::summer:winter",
+      "target_prime": 4887761719814072979540463081089713454226635832903610417673083527210,
+      "correct_answer": "winter",
+      "top1": "hope",
+      "top5": [
+        "hope",
+        "angry",
+        "flower",
+        "swim",
+        "scientist"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.7435897435897436,
+      "median_similarity": 0.7,
+      "above_median": "True"
+    },
+    {
+      "analogy": "friend:enemy::peace:war",
+      "target_prime": 4893284291740048798453945852416495523661923566037257873906809458570,
+      "correct_answer": "war",
+      "top1": "pain",
+      "top5": [
+        "pain",
+        "princess",
+        "fire",
+        "father",
+        "food"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.675,
+      "median_similarity": 0.6842105263157895,
+      "above_median": "False"
+    },
+    {
+      "analogy": "love:hate::peace:war",
+      "target_prime": 1374179986525040512570077261830751583336462322300548227185020809439690,
+      "correct_answer": "war",
+      "top1": "fire",
+      "top5": [
+        "fire",
+        "village",
+        "ocean",
+        "father",
+        "friend"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.7435897435897436,
+      "median_similarity": 0.7105263157894737,
+      "above_median": "True"
+    },
+    {
+      "analogy": "dog:cat::horse:cow",
+      "target_prime": 193783050184884931350003843964927390578478613580309681974437378819490,
+      "correct_answer": "cow",
+      "top1": "rain",
+      "top5": [
+        "rain",
+        "cruel",
+        "fire",
+        "kind",
+        "food"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.5952380952380952,
+      "median_similarity": 0.65,
+      "above_median": "False"
+    },
+    {
+      "analogy": "dog:cat::bird:fish",
+      "target_prime": 4995596807596648768950778956519298285463717744838707549209646249993050990,
+      "correct_answer": "fish",
+      "top1": "boy",
+      "top5": [
+        "boy",
+        "brave",
+        "kind",
+        "garden",
+        "game"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.6666666666666666,
+      "median_similarity": 0.6666666666666666,
+      "above_median": "False"
+    },
+    {
+      "analogy": "doctor:hospital::teacher:school",
+      "target_prime": 532709738746463354511083142665015121899522692772296557248385831364085,
+      "correct_answer": "school",
+      "top1": "fire",
+      "top5": [
+        "fire",
+        "village",
+        "tree",
+        "ocean",
+        "father"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.6153846153846154,
+      "median_similarity": 0.6944444444444444,
+      "above_median": "False"
+    },
+    {
+      "analogy": "king:castle::judge:church",
+      "target_prime": 446631063800477824561329604077390359552737533219199859213665352470,
+      "correct_answer": "church",
+      "top1": "jump",
+      "top5": [
+        "jump",
+        "water",
+        "father",
+        "lamp",
+        "apple"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.7368421052631579,
+      "median_similarity": 0.75,
+      "above_median": "False"
+    },
+    {
+      "analogy": "run:walk::swim:float",
+      "target_prime": 1496070182284134594751384319227375457614677536848450238162216214170,
+      "correct_answer": "float",
+      "top1": "angry",
+      "top5": [
+        "angry",
+        "church",
+        "hope",
+        "woman",
+        "red"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.65,
+      "median_similarity": 0.717948717948718,
+      "above_median": "False"
+    },
+    {
+      "analogy": "jump:fall::climb:sleep",
+      "target_prime": 677515603604432822470861556875133735407652941527169874089010,
+      "correct_answer": "sleep",
+      "top1": "cloud",
+      "top5": [
+        "cloud",
+        "doctor",
+        "star",
+        "brother",
+        "city"
+      ],
+      "is_top1": false,
+      "is_top5": false,
+      "d_similarity": 0.6857142857142857,
+      "median_similarity": 0.717948717948718,
+      "above_median": "False"
+    }
+  ]
+}

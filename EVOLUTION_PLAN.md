@@ -304,6 +304,43 @@ This is the strongest result of the entire project.
 
 ---
 
+## Phase 7: Staged Training & Beyond (Run 29 COMPLETE — Negative Result)
+**Objective**: Validate staged MSE→InfoNCE training and scale triadic heads to larger models.
+
+### 7.1 Staged MSE→InfoNCE (Run 29) — NEGATIVE RESULT
+**Hypothesis**: MSE works with weak embeddings (early training), InfoNCE works with rich embeddings (late training). Switching mid-training should combine the best of both.
+
+**Implementation**: `--staged-align` flag in torch_train.py
+- First 50% of steps: `align_mode = 'mse'` (dense local gradients for weak embeddings)
+- Last 50% of steps: `align_mode = 'infonce'` (structured contrastive for mature embeddings)
+
+**Results**: Ordering preserved (K↔Q 65.7% > K↔D 57.9%) but weaker than pure MSE (K↔Q 89% > K↔D 60%). Best perplexity of all triadic runs (7.39). **Does NOT meet success criteria** — gap (+7.8pt) is worse than Run 15 (+29pt).
+
+**Conclusion**: The loss-embedding interaction is about embedding space structure, not training stage. InfoNCE cannot leverage TinyStories embeddings even after MSE priming. To make InfoNCE work from-scratch, you need richer data or larger model capacity.
+
+### 7.2 GPT-2 Medium/Large Transfer
+Experiment 10 used GPT-2 Small (124M, 768D). Scaling to Medium (355M, 1024D) and Large (774M, 1280D) should further close the gap to Engine PCA. Hypothesis: richer embeddings → higher semantic gap with InfoNCE.
+
+### 7.3 PyPI Package: `triadic-head`
+Publish the triadic projection head as a drop-in module for any HuggingFace transformer:
+```python
+from triadic_head import TriadicWrapper
+model = TriadicWrapper(any_hf_model, n_bits=64, align_mode='infonce')
+```
+
+### 7.4 Sentence-Level Aggregation
+Current projections are token-level. Add attention-weighted pooling for sentence-level signatures to enable:
+- Practical subsumption (currently 0% at k=64)
+- Domain clustering (currently sep ratio ~1.0)
+
+### 7.5 triadic-cloud Integration
+Add `/encode` endpoint to the cloud API returning prime signatures alongside generated text — neurosymbolic inference as a service.
+
+### 7.6 Scale to LLaMA/Mistral (7B+)
+Triadic head on 7B+ parameter models. If semantic gap continues scaling with embedding quality, this yields a second publication.
+
+---
+
 ## Execution Priority
 
 ```
@@ -312,7 +349,8 @@ Phase 2 (Language Benchmarks) ████████████████�
 Phase 3 (Triadic Benchmarks)  ████████████████████  COMPLETE — 3 benchmarks executed
 Phase 4 (Scaling Study)       ████████████████████  COMPLETE — emergent semantic ordering found
 Phase 5 (Transfer + Loss)     ████████████████████  COMPLETE — InfoNCE closes 72% gap to Engine PCA
-Phase 6 (Paper)               ████████████░░░░░░░░  NEXT — all data collected, strongest result in hand
+Phase 6 (Paper)               ████████████████░░░░  IN PROGRESS — draft complete with Phase 5
+Phase 7 (Staged + Scale)      ██████░░░░░░░░░░░░░░  Run 29 COMPLETE (negative) — scale experiments pending
 ```
 
 ---
@@ -337,4 +375,5 @@ Phase 6 (Paper)               ████████████░░░░�
 | **v3.0-scaling** | **2026-03-07** | **Phase 4 complete: 4-point scaling study, emergent semantic ordering** |
 | **v4.0-transfer** | **2026-03-08** | **Experiment 10: GPT-2 transfer, InfoNCE closes 72% gap to Engine PCA** |
 | v4.1-from-scratch | 2026-03-08 | Runs 27-28: InfoNCE/Rank fail from-scratch, MSE confirmed best for weak embeddings |
+| v4.2-staged | 2026-03-09 | Run 29: Staged MSE→InfoNCE — negative result, confirms loss-embedding interaction is structural |
 | **v5.0** | TBD | Paper submission |

@@ -224,7 +224,11 @@ def train(args):
     print(f"  Batch size: {args.batch_size}")
     print(f"  Triadic activation: step {triadic_warmup}")
     print(f"  Entropy weight: {args.entropy_weight}")
-    print(f"  Alignment weight: {args.align_weight} (mode: {args.align_mode})")
+    if args.staged_align:
+        switch_step = int(args.steps * args.staged_switch_pct)
+        print(f"  Alignment weight: {args.align_weight} (STAGED: MSE→InfoNCE at step {switch_step})")
+    else:
+        print(f"  Alignment weight: {args.align_weight} (mode: {args.align_mode})")
     print(f"  Distillation weight: {args.dist_weight}x alpha")
     print("-" * 64)
 
@@ -281,9 +285,18 @@ def train(args):
                 alpha_factor = min(1.0, (step - triadic_warmup + 1) / alpha_warmup_steps)
                 current_alpha = args.alpha * alpha_factor
                 
+                # Determine alignment mode (staged or fixed)
+                if args.staged_align:
+                    switch_step = int(args.steps * args.staged_switch_pct)
+                    current_align_mode = 'mse' if step < switch_step else 'infonce'
+                    if step == switch_step:
+                        print(f"\n  >>> STAGED SWITCH: MSE → InfoNCE at step {step}\n")
+                else:
+                    current_align_mode = args.align_mode
+
                 tri_loss = model.triadic_loss(triadic_proj, entropy_weight=args.entropy_weight,
                                               input_ids=x, align_weight=args.align_weight,
-                                              align_mode=args.align_mode)
+                                              align_mode=current_align_mode)
                 total_loss = lang_loss + current_alpha * tri_loss
                 tri_loss_val = tri_loss.item()
                 
@@ -350,6 +363,9 @@ def train(args):
             msg += f" | loss {lang_loss.item():.4f}"
             if step >= triadic_warmup:
                 msg += f" | tri {tri_loss_val:.4f}"
+                if args.staged_align:
+                    switch_step = int(args.steps * args.staged_switch_pct)
+                    msg += f" | {'MSE' if step < switch_step else 'InfoNCE'}"
                 if gold_sequences:
                     msg += f" | dist {dist_loss_val:.4f}"
             msg += f" | {sps:.1f} stp/s"
@@ -440,6 +456,10 @@ if __name__ == '__main__':
     parser.add_argument('--dist-weight', type=float, default=1.0, help='Distillation multiplier on alpha (was 5.0, now default 1.0)')
     parser.add_argument('--align-mode', default='mse', choices=['mse', 'rank', 'infonce'],
                         help='Alignment loss mode: mse (original), rank (margin ranking), infonce (contrastive)')
+    parser.add_argument('--staged-align', action='store_true',
+                        help='Staged training: MSE for first half, InfoNCE for second half')
+    parser.add_argument('--staged-switch-pct', type=float, default=0.5,
+                        help='Fraction of training steps at which to switch from MSE to InfoNCE (default 0.5)')
     parser.add_argument('--triadic-warmup-pct', type=float, default=0.8, help='Warmup fraction')
     parser.add_argument('--print-every', type=int, default=50, help='Print frequency')
     parser.add_argument('--save-every', type=int, default=1000, help='Save frequency')
