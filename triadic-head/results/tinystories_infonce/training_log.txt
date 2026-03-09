@@ -1,0 +1,357 @@
+
+============================================================
+  TRIADIC HEAD TRAINING
+============================================================
+  Model:      gpt2
+  Device:     cuda
+  Bits:       64
+  Align mode: infonce
+  Output:     C:\Github\triadic-microgpt\triadic-head\results\tinystories_infonce
+============================================================
+
+Loading gpt2...
+  Backbone:      124,488,960 params
+  Triadic head:  49,152 params
+
+Preparing training data...
+  Reading up to 71M chars from ../data/TinyStories-train.txt...
+  Tokenizing 71,680,000 chars...
+  Loaded 17,458,531 tokens from ../data/TinyStories-train.txt
+
+============================================================
+  PHASE 1: Frozen backbone (2000 steps)
+  Trainable: 49,152 params (triadic head only)
+============================================================
+  step     1/2000 | tri_loss 0.9268
+  step   200/2000 | tri_loss 0.6059
+  step   400/2000 | tri_loss 0.5938
+  step   600/2000 | tri_loss 0.4618
+  step   800/2000 | tri_loss 0.4452
+  step  1000/2000 | tri_loss 0.4253
+  step  1200/2000 | tri_loss 0.4382
+  step  1400/2000 | tri_loss 0.4086
+  step  1600/2000 | tri_loss 0.4167
+  step  1800/2000 | tri_loss 0.5136
+  step  2000/2000 | tri_loss 0.3519
+
+============================================================
+  PHASE 2: Unfreeze last 2 layers (5000 steps)
+  Trainable: 14,226,432 params
+============================================================
+  step     1/5000 | lang 2.591 | tri 0.3582
+  step   500/5000 | lang 2.426 | tri 0.4254
+  step  1000/5000 | lang 2.374 | tri 0.3470
+  step  1500/5000 | lang 2.422 | tri 0.2953
+  step  2000/5000 | lang 2.381 | tri 0.3937
+  step  2500/5000 | lang 2.391 | tri 0.4060
+  step  3000/5000 | lang 2.255 | tri 0.3900
+  step  3500/5000 | lang 2.101 | tri 0.3574
+  step  4000/5000 | lang 2.012 | tri 0.3230
+  step  4500/5000 | lang 2.377 | tri 0.3022
+  step  5000/5000 | lang 2.086 | tri 0.2892
+
+Saved triadic head to results/tinystories_infonce\triadic_head.pt
+
+============================================================
+  TRIADIC HEAD — VALIDATION REPORT
+============================================================
+  Config: 64 bits | align_mode=infonce | 49,152 triadic params
+------------------------------------------------------------
+  [PASS] diversity: 16/16 unique signatures (100%)
+  [PASS] active_bits: 30.7/64 bits active on avg (48%)
+  [PASS] semantic_ordering: within-group 54.2% vs between-group 47.3% (gap +6.9%)
+
+  PER-GROUP BREAKDOWN:
+    [PASS] royalty: intra 50% vs inter 45% (gap +5.7%) — ['king', 'queen', 'prince', 'throne']
+    [PASS] animals: intra 58% vs inter 51% (gap +7.1%) — ['dog', 'cat', 'fish', 'bird']
+    [PASS] emotions: intra 51% vs inter 46% (gap +5.0%) — ['happy', 'sad', 'angry', 'love']
+    [PASS] food: intra 58% vs inter 48% (gap +9.9%) — ['bread', 'water', 'rice', 'fruit']
+
+  PER-WORD ACTIVE BITS:
+            king: 33/64 bits active
+           queen: 28/64 bits active
+          prince: 27/64 bits active
+          throne: 29/64 bits active
+             dog: 33/64 bits active
+             cat: 36/64 bits active
+            fish: 36/64 bits active
+            bird: 32/64 bits active
+           happy: 26/64 bits active
+             sad: 29/64 bits active
+           angry: 31/64 bits active
+            love: 31/64 bits active
+           bread: 30/64 bits active
+           water: 34/64 bits active
+            rice: 30/64 bits active
+           fruit: 26/64 bits active
+------------------------------------------------------------
+  RESULT: PASS — Triadic head is producing meaningful signatures.
+============================================================
+
+============================================================
+  SIMILARITY MATRIX
+============================================================
+           king  queen prince    dog    cat  happy    sad    red   blue
+  king      ---   49%    46%    50%    50%    40%    32%    49%    51% 
+ queen     49%     ---   53%    36%    45%    42%    50%    38%    34% 
+prince     46%    53%     ---   43%    54%    36%    47%    33%    38% 
+   dog     50%    36%    43%     ---   60%    51%    32%    49%    58% 
+   cat     50%    45%    54%    60%     ---   44%    44%    62%    51% 
+ happy     40%    42%    36%    51%    44%     ---   34%    43%    42% 
+   sad     32%    50%    47%    32%    44%    34%     ---   35%    33% 
+   red     49%    38%    33%    49%    62%    43%    35%     ---   71% 
+  blue     51%    34%    38%    58%    51%    42%    33%    71%     ---
+
+  ALL PAIRS (ranked by similarity):
+             red <-> blue        : 71% (30 shared, 7 only-a, 5 only-b)
+                                          shared=[2, 3, 5, 17, 19, 29, 31, 53, 61, 73, 89, 101, 113, 127, 131, 139, 149, 151, 191, 193, 211, 223, 233, 239, 251, 257, 263, 281, 293, 311]
+                                          only-red=[13, 43, 67, 137, 173, 197, 269]
+                                          only-blue=[37, 83, 109, 241, 307]
+             cat <-> red         : 62% (28 shared, 8 only-a, 9 only-b)
+                                          shared=[3, 5, 13, 19, 31, 43, 67, 73, 101, 127, 131, 137, 139, 149, 173, 191, 193, 211, 223, 233, 239, 251, 257, 263, 269, 281, 293, 311]
+                                          only-cat=[11, 41, 71, 79, 83, 109, 179, 277]
+                                          only-red=[2, 17, 29, 53, 61, 89, 113, 151, 197]
+             dog <-> cat         : 60% (26 shared, 7 only-a, 10 only-b)
+                                          shared=[3, 11, 19, 31, 41, 43, 71, 73, 83, 101, 109, 127, 131, 139, 149, 173, 191, 193, 211, 233, 239, 251, 257, 281, 293, 311]
+                                          only-dog=[23, 29, 37, 151, 167, 227, 307]
+                                          only-cat=[5, 13, 67, 79, 137, 179, 223, 263, 269, 277]
+             dog <-> blue        : 58% (25 shared, 8 only-a, 10 only-b)
+                                          shared=[3, 19, 29, 31, 37, 73, 83, 101, 109, 127, 131, 139, 149, 151, 191, 193, 211, 233, 239, 251, 257, 281, 293, 307, 311]
+                                          only-dog=[11, 23, 41, 43, 71, 167, 173, 227]
+                                          only-blue=[2, 5, 17, 53, 61, 89, 113, 223, 241, 263]
+          prince <-> cat         : 54% (22 shared, 5 only-a, 14 only-b)
+                                          shared=[3, 5, 11, 13, 67, 71, 79, 83, 101, 109, 131, 139, 193, 211, 223, 233, 239, 257, 263, 277, 281, 311]
+                                          only-prince=[23, 181, 199, 227, 307]
+                                          only-cat=[19, 31, 41, 43, 73, 127, 137, 149, 173, 179, 191, 251, 269, 293]
+           queen <-> prince      : 53% (19 shared, 9 only-a, 8 only-b)
+                                          shared=[3, 5, 11, 13, 23, 67, 79, 101, 131, 181, 199, 211, 223, 233, 239, 257, 277, 281, 307]
+                                          only-queen=[17, 19, 59, 73, 97, 107, 173, 251, 293]
+                                          only-prince=[71, 83, 109, 139, 193, 227, 263, 311]
+             dog <-> happy       : 51% (20 shared, 13 only-a, 6 only-b)
+                                          shared=[3, 19, 29, 37, 73, 101, 127, 131, 151, 173, 191, 211, 227, 233, 239, 251, 257, 281, 307, 311]
+                                          only-dog=[11, 23, 31, 41, 43, 71, 83, 109, 139, 149, 167, 193, 293]
+                                          only-happy=[7, 67, 79, 229, 269, 277]
+            king <-> blue        : 51% (23 shared, 10 only-a, 12 only-b)
+                                          shared=[5, 19, 37, 53, 73, 83, 89, 101, 109, 113, 139, 149, 151, 191, 211, 223, 233, 239, 251, 257, 281, 307, 311]
+                                          only-king=[11, 13, 23, 43, 47, 67, 79, 107, 173, 181]
+                                          only-blue=[2, 3, 17, 29, 31, 61, 127, 131, 193, 241, 263, 293]
+             cat <-> blue        : 51% (24 shared, 12 only-a, 11 only-b)
+                                          shared=[3, 5, 19, 31, 73, 83, 101, 109, 127, 131, 139, 149, 191, 193, 211, 223, 233, 239, 251, 257, 263, 281, 293, 311]
+                                          only-cat=[11, 13, 41, 43, 67, 71, 79, 137, 173, 179, 269, 277]
+                                          only-blue=[2, 17, 29, 37, 53, 61, 89, 113, 151, 241, 307]
+            king <-> dog         : 50% (22 shared, 11 only-a, 11 only-b)
+                                          shared=[11, 19, 23, 37, 43, 73, 83, 101, 109, 139, 149, 151, 173, 191, 211, 233, 239, 251, 257, 281, 307, 311]
+                                          only-king=[5, 13, 47, 53, 67, 79, 89, 107, 113, 181, 223]
+                                          only-dog=[3, 29, 31, 41, 71, 127, 131, 167, 193, 227, 293]
+            king <-> cat         : 50% (23 shared, 10 only-a, 13 only-b)
+                                          shared=[5, 11, 13, 19, 43, 67, 73, 79, 83, 101, 109, 139, 149, 173, 191, 211, 223, 233, 239, 251, 257, 281, 311]
+                                          only-king=[23, 37, 47, 53, 89, 107, 113, 151, 181, 307]
+                                          only-cat=[3, 31, 41, 71, 127, 131, 137, 179, 193, 263, 269, 277, 293]
+           queen <-> sad         : 50% (19 shared, 9 only-a, 10 only-b)
+                                          shared=[3, 13, 17, 67, 73, 79, 97, 101, 173, 181, 199, 211, 223, 233, 239, 257, 277, 293, 307]
+                                          only-queen=[5, 11, 19, 23, 59, 107, 131, 251, 281]
+                                          only-sad=[29, 71, 83, 109, 137, 167, 241, 263, 269, 283]
+            king <-> red         : 49% (23 shared, 10 only-a, 14 only-b)
+                                          shared=[5, 13, 19, 43, 53, 67, 73, 89, 101, 113, 139, 149, 151, 173, 191, 211, 223, 233, 239, 251, 257, 281, 311]
+                                          only-king=[11, 23, 37, 47, 79, 83, 107, 109, 181, 307]
+                                          only-red=[2, 3, 17, 29, 31, 61, 127, 131, 137, 193, 197, 263, 269, 293]
+             dog <-> red         : 49% (23 shared, 10 only-a, 14 only-b)
+                                          shared=[3, 19, 29, 31, 43, 73, 101, 127, 131, 139, 149, 151, 173, 191, 193, 211, 233, 239, 251, 257, 281, 293, 311]
+                                          only-dog=[11, 23, 37, 41, 71, 83, 109, 167, 227, 307]
+                                          only-red=[2, 5, 13, 17, 53, 61, 67, 89, 113, 137, 197, 223, 263, 269]
+            king <-> queen       : 49% (20 shared, 13 only-a, 8 only-b)
+                                          shared=[5, 11, 13, 19, 23, 67, 73, 79, 101, 107, 173, 181, 211, 223, 233, 239, 251, 257, 281, 307]
+                                          only-king=[37, 43, 47, 53, 83, 89, 109, 113, 139, 149, 151, 191, 311]
+                                          only-queen=[3, 17, 59, 97, 131, 199, 277, 293]
+          prince <-> sad         : 47% (18 shared, 9 only-a, 11 only-b)
+                                          shared=[3, 13, 67, 71, 79, 83, 101, 109, 181, 199, 211, 223, 233, 239, 257, 263, 277, 307]
+                                          only-prince=[5, 11, 23, 131, 139, 193, 227, 281, 311]
+                                          only-sad=[17, 29, 73, 97, 137, 167, 173, 241, 269, 283, 293]
+            king <-> prince      : 46% (19 shared, 14 only-a, 8 only-b)
+                                          shared=[5, 11, 13, 23, 67, 79, 83, 101, 109, 139, 181, 211, 223, 233, 239, 257, 281, 307, 311]
+                                          only-king=[19, 37, 43, 47, 53, 73, 89, 107, 113, 149, 151, 173, 191, 251]
+                                          only-prince=[3, 71, 131, 193, 199, 227, 263, 277]
+           queen <-> cat         : 45% (20 shared, 8 only-a, 16 only-b)
+                                          shared=[3, 5, 11, 13, 19, 67, 73, 79, 101, 131, 173, 211, 223, 233, 239, 251, 257, 277, 281, 293]
+                                          only-queen=[17, 23, 59, 97, 107, 181, 199, 307]
+                                          only-cat=[31, 41, 43, 71, 83, 109, 127, 137, 139, 149, 179, 191, 193, 263, 269, 311]
+             cat <-> sad         : 44% (20 shared, 16 only-a, 9 only-b)
+                                          shared=[3, 13, 67, 71, 73, 79, 83, 101, 109, 137, 173, 211, 223, 233, 239, 257, 263, 269, 277, 293]
+                                          only-cat=[5, 11, 19, 31, 41, 43, 127, 131, 139, 149, 179, 191, 193, 251, 281, 311]
+                                          only-sad=[17, 29, 97, 167, 181, 199, 241, 283, 307]
+             cat <-> happy       : 44% (19 shared, 17 only-a, 7 only-b)
+                                          shared=[3, 19, 67, 73, 79, 101, 127, 131, 173, 191, 211, 233, 239, 251, 257, 269, 277, 281, 311]
+                                          only-cat=[5, 11, 13, 31, 41, 43, 71, 83, 109, 137, 139, 149, 179, 193, 223, 263, 293]
+                                          only-happy=[7, 29, 37, 151, 227, 229, 307]
+           happy <-> red         : 43% (19 shared, 7 only-a, 18 only-b)
+                                          shared=[3, 19, 29, 67, 73, 101, 127, 131, 151, 173, 191, 211, 233, 239, 251, 257, 269, 281, 311]
+                                          only-happy=[7, 37, 79, 227, 229, 277, 307]
+                                          only-red=[2, 5, 13, 17, 31, 43, 53, 61, 89, 113, 137, 139, 149, 193, 197, 223, 263, 293]
+          prince <-> dog         : 43% (18 shared, 9 only-a, 15 only-b)
+                                          shared=[3, 11, 23, 71, 83, 101, 109, 131, 139, 193, 211, 227, 233, 239, 257, 281, 307, 311]
+                                          only-prince=[5, 13, 67, 79, 181, 199, 223, 263, 277]
+                                          only-dog=[19, 29, 31, 37, 41, 43, 73, 127, 149, 151, 167, 173, 191, 251, 293]
+           queen <-> happy       : 42% (16 shared, 12 only-a, 10 only-b)
+                                          shared=[3, 19, 67, 73, 79, 101, 131, 173, 211, 233, 239, 251, 257, 277, 281, 307]
+                                          only-queen=[5, 11, 13, 17, 23, 59, 97, 107, 181, 199, 223, 293]
+                                          only-happy=[7, 29, 37, 127, 151, 191, 227, 229, 269, 311]
+           happy <-> blue        : 42% (18 shared, 8 only-a, 17 only-b)
+                                          shared=[3, 19, 29, 37, 73, 101, 127, 131, 151, 191, 211, 233, 239, 251, 257, 281, 307, 311]
+                                          only-happy=[7, 67, 79, 173, 227, 229, 269, 277]
+                                          only-blue=[2, 5, 17, 31, 53, 61, 83, 89, 109, 113, 139, 149, 193, 223, 241, 263, 293]
+            king <-> happy       : 40% (17 shared, 16 only-a, 9 only-b)
+                                          shared=[19, 37, 67, 73, 79, 101, 151, 173, 191, 211, 233, 239, 251, 257, 281, 307, 311]
+                                          only-king=[5, 11, 13, 23, 43, 47, 53, 83, 89, 107, 109, 113, 139, 149, 181, 223]
+                                          only-happy=[3, 7, 29, 127, 131, 227, 229, 269, 277]
+           queen <-> red         : 38% (18 shared, 10 only-a, 19 only-b)
+                                          shared=[3, 5, 13, 17, 19, 67, 73, 101, 131, 173, 211, 223, 233, 239, 251, 257, 281, 293]
+                                          only-queen=[11, 23, 59, 79, 97, 107, 181, 199, 277, 307]
+                                          only-red=[2, 29, 31, 43, 53, 61, 89, 113, 127, 137, 139, 149, 151, 191, 193, 197, 263, 269, 311]
+          prince <-> blue        : 38% (17 shared, 10 only-a, 18 only-b)
+                                          shared=[3, 5, 83, 101, 109, 131, 139, 193, 211, 223, 233, 239, 257, 263, 281, 307, 311]
+                                          only-prince=[11, 13, 23, 67, 71, 79, 181, 199, 227, 277]
+                                          only-blue=[2, 17, 19, 29, 31, 37, 53, 61, 73, 89, 113, 127, 149, 151, 191, 241, 251, 293]
+          prince <-> happy       : 36% (14 shared, 13 only-a, 12 only-b)
+                                          shared=[3, 67, 79, 101, 131, 211, 227, 233, 239, 257, 277, 281, 307, 311]
+                                          only-prince=[5, 11, 13, 23, 71, 83, 109, 139, 181, 193, 199, 223, 263]
+                                          only-happy=[7, 19, 29, 37, 73, 127, 151, 173, 191, 229, 251, 269]
+           queen <-> dog         : 36% (16 shared, 12 only-a, 17 only-b)
+                                          shared=[3, 11, 19, 23, 73, 101, 131, 173, 211, 233, 239, 251, 257, 281, 293, 307]
+                                          only-queen=[5, 13, 17, 59, 67, 79, 97, 107, 181, 199, 223, 277]
+                                          only-dog=[29, 31, 37, 41, 43, 71, 83, 109, 127, 139, 149, 151, 167, 191, 193, 227, 311]
+             sad <-> red         : 35% (17 shared, 12 only-a, 20 only-b)
+                                          shared=[3, 13, 17, 29, 67, 73, 101, 137, 173, 211, 223, 233, 239, 257, 263, 269, 293]
+                                          only-sad=[71, 79, 83, 97, 109, 167, 181, 199, 241, 277, 283, 307]
+                                          only-red=[2, 5, 19, 31, 43, 53, 61, 89, 113, 127, 131, 139, 149, 151, 191, 193, 197, 251, 281, 311]
+           happy <-> sad         : 34% (14 shared, 12 only-a, 15 only-b)
+                                          shared=[3, 29, 67, 73, 79, 101, 173, 211, 233, 239, 257, 269, 277, 307]
+                                          only-happy=[7, 19, 37, 127, 131, 151, 191, 227, 229, 251, 281, 311]
+                                          only-sad=[13, 17, 71, 83, 97, 109, 137, 167, 181, 199, 223, 241, 263, 283, 293]
+           queen <-> blue        : 34% (16 shared, 12 only-a, 19 only-b)
+                                          shared=[3, 5, 17, 19, 73, 101, 131, 211, 223, 233, 239, 251, 257, 281, 293, 307]
+                                          only-queen=[11, 13, 23, 59, 67, 79, 97, 107, 173, 181, 199, 277]
+                                          only-blue=[2, 29, 31, 37, 53, 61, 83, 89, 109, 113, 127, 139, 149, 151, 191, 193, 241, 263, 311]
+          prince <-> red         : 33% (16 shared, 11 only-a, 21 only-b)
+                                          shared=[3, 5, 13, 67, 101, 131, 139, 193, 211, 223, 233, 239, 257, 263, 281, 311]
+                                          only-prince=[11, 23, 71, 79, 83, 109, 181, 199, 227, 277, 307]
+                                          only-red=[2, 17, 19, 29, 31, 43, 53, 61, 73, 89, 113, 127, 137, 149, 151, 173, 191, 197, 251, 269, 293]
+             sad <-> blue        : 33% (16 shared, 13 only-a, 19 only-b)
+                                          shared=[3, 17, 29, 73, 83, 101, 109, 211, 223, 233, 239, 241, 257, 263, 293, 307]
+                                          only-sad=[13, 67, 71, 79, 97, 137, 167, 173, 181, 199, 269, 277, 283]
+                                          only-blue=[2, 5, 19, 31, 37, 53, 61, 89, 113, 127, 131, 139, 149, 151, 191, 193, 251, 281, 311]
+            king <-> sad         : 32% (15 shared, 18 only-a, 14 only-b)
+                                          shared=[13, 67, 73, 79, 83, 101, 109, 173, 181, 211, 223, 233, 239, 257, 307]
+                                          only-king=[5, 11, 19, 23, 37, 43, 47, 53, 89, 107, 113, 139, 149, 151, 191, 251, 281, 311]
+                                          only-sad=[3, 17, 29, 71, 97, 137, 167, 199, 241, 263, 269, 277, 283, 293]
+             dog <-> sad         : 32% (15 shared, 18 only-a, 14 only-b)
+                                          shared=[3, 29, 71, 73, 83, 101, 109, 167, 173, 211, 233, 239, 257, 293, 307]
+                                          only-dog=[11, 19, 23, 31, 37, 41, 43, 127, 131, 139, 149, 151, 191, 193, 227, 251, 281, 311]
+                                          only-sad=[13, 17, 67, 79, 97, 137, 181, 199, 223, 241, 263, 269, 277, 283]
+
+  FLAGGED (similarity >= 80%): 0 pairs
+    (none)
+
+  PER-WORD SIGNATURES:
+            king: 33 bits | avg sim 46% | closest: blue (51%) | furthest: sad (32%)
+                primes=[5, 11, 13, 19, 23, 37, 43, 47, 53, 67, 73, 79, 83, 89, 101, 107, 109, 113, 139, 149, 151, 173, 181, 191, 211, 223, 233, 239, 251, 257, 281, 307, 311]
+           queen: 28 bits | avg sim 43% | closest: prince (53%) | furthest: blue (34%)
+                primes=[3, 5, 11, 13, 17, 19, 23, 59, 67, 73, 79, 97, 101, 107, 131, 173, 181, 199, 211, 223, 233, 239, 251, 257, 277, 281, 293, 307]
+          prince: 27 bits | avg sim 44% | closest: cat (54%) | furthest: red (33%)
+                primes=[3, 5, 11, 13, 23, 67, 71, 79, 83, 101, 109, 131, 139, 181, 193, 199, 211, 223, 227, 233, 239, 257, 263, 277, 281, 307, 311]
+             dog: 33 bits | avg sim 47% | closest: cat (60%) | furthest: sad (32%)
+                primes=[3, 11, 19, 23, 29, 31, 37, 41, 43, 71, 73, 83, 101, 109, 127, 131, 139, 149, 151, 167, 173, 191, 193, 211, 227, 233, 239, 251, 257, 281, 293, 307, 311]
+             cat: 36 bits | avg sim 51% | closest: red (62%) | furthest: happy (44%)
+                primes=[3, 5, 11, 13, 19, 31, 41, 43, 67, 71, 73, 79, 83, 101, 109, 127, 131, 137, 139, 149, 173, 179, 191, 193, 211, 223, 233, 239, 251, 257, 263, 269, 277, 281, 293, 311]
+           happy: 26 bits | avg sim 42% | closest: dog (51%) | furthest: sad (34%)
+                primes=[3, 7, 19, 29, 37, 67, 73, 79, 101, 127, 131, 151, 173, 191, 211, 227, 229, 233, 239, 251, 257, 269, 277, 281, 307, 311]
+             sad: 29 bits | avg sim 38% | closest: queen (50%) | furthest: king (32%)
+                primes=[3, 13, 17, 29, 67, 71, 73, 79, 83, 97, 101, 109, 137, 167, 173, 181, 199, 211, 223, 233, 239, 241, 257, 263, 269, 277, 283, 293, 307]
+             red: 37 bits | avg sim 48% | closest: blue (71%) | furthest: prince (33%)
+                primes=[2, 3, 5, 13, 17, 19, 29, 31, 43, 53, 61, 67, 73, 89, 101, 113, 127, 131, 137, 139, 149, 151, 173, 191, 193, 197, 211, 223, 233, 239, 251, 257, 263, 269, 281, 293, 311]
+            blue: 35 bits | avg sim 47% | closest: red (71%) | furthest: sad (33%)
+                primes=[2, 3, 5, 17, 19, 29, 31, 37, 53, 61, 73, 83, 89, 101, 109, 113, 127, 131, 139, 149, 151, 191, 193, 211, 223, 233, 239, 241, 251, 257, 263, 281, 293, 307, 311]
+
+  FACTOR INDEX (what each prime means):
+       prime  bit  words  shared by
+    --------  ---  -----  ------------------------------
+         101   25      9  king, queen, prince, dog, cat, happy, sad, red, blue  [UNIVERSAL]
+         211   46      9  king, queen, prince, dog, cat, happy, sad, red, blue  [UNIVERSAL]
+         233   50      9  king, queen, prince, dog, cat, happy, sad, red, blue  [UNIVERSAL]
+         239   51      9  king, queen, prince, dog, cat, happy, sad, red, blue  [UNIVERSAL]
+         257   54      9  king, queen, prince, dog, cat, happy, sad, red, blue  [UNIVERSAL]
+          73   20      8  king, queen, dog, cat, happy, sad, red, blue
+         281   59      8  king, queen, prince, dog, cat, happy, red, blue
+           3    1      8  queen, prince, dog, cat, happy, sad, red, blue
+          19    7      7  king, queen, dog, cat, happy, red, blue
+          67   18      7  king, queen, prince, cat, happy, sad, red
+         173   39      7  king, queen, dog, cat, happy, sad, red
+         223   47      7  king, queen, prince, cat, sad, red, blue
+         251   53      7  king, queen, dog, cat, happy, red, blue
+         307   62      7  king, queen, prince, dog, happy, sad, blue
+         311   63      7  king, prince, dog, cat, happy, red, blue
+         131   31      7  queen, prince, dog, cat, happy, red, blue
+           5    2      6  king, queen, prince, cat, red, blue
+          13    5      6  king, queen, prince, cat, sad, red
+          79   21      6  king, queen, prince, cat, happy, sad
+          83   22      6  king, prince, dog, cat, sad, blue
+         109   28      6  king, prince, dog, cat, sad, blue
+         139   33      6  king, prince, dog, cat, red, blue
+         191   42      6  king, dog, cat, happy, red, blue
+         293   61      6  queen, dog, cat, sad, red, blue
+          11    4      5  king, queen, prince, dog, cat
+         149   34      5  king, dog, cat, red, blue
+         151   35      5  king, dog, happy, red, blue
+         277   58      5  queen, prince, cat, happy, sad
+         193   43      5  prince, dog, cat, red, blue
+         263   55      5  prince, cat, sad, red, blue
+          29    9      5  dog, happy, sad, red, blue
+         127   30      5  dog, cat, happy, red, blue
+          23    8      4  king, queen, prince, dog
+          37   11      4  king, dog, happy, blue
+          43   13      4  king, dog, cat, red
+         181   41      4  king, queen, prince, sad
+          17    6      4  queen, sad, red, blue
+          71   19      4  prince, dog, cat, sad
+          31   10      4  dog, cat, red, blue
+         269   56      4  cat, happy, sad, red
+          53   15      3  king, red, blue
+          89   23      3  king, red, blue
+         113   29      3  king, red, blue
+         199   45      3  queen, prince, sad
+         227   48      3  prince, dog, happy
+         137   32      3  cat, sad, red
+         107   27      2  king, queen
+          97   24      2  queen, sad
+          41   12      2  dog, cat
+         167   38      2  dog, sad
+         241   52      2  sad, blue
+           2    0      2  red, blue
+          61   17      2  red, blue
+          47   14      1  king  [UNIQUE]
+          59   16      1  queen  [UNIQUE]
+         179   40      1  cat  [UNIQUE]
+           7    3      1  happy  [UNIQUE]
+         229   49      1  happy  [UNIQUE]
+         283   60      1  sad  [UNIQUE]
+         197   44      1  red  [UNIQUE]
+============================================================
+
+============================================================
+  OUTPUT FILES (C:\Github\triadic-microgpt\triadic-head\results\tinystories_infonce):
+    triadic_head.pt     — trained model checkpoint
+    validation.json     — PASS/FAIL checks + per-group breakdown
+    explore.json        — similarity matrix + factor index
+    training_log.json   — per-step loss values
+    training_log.txt    — full console output
+------------------------------------------------------------
+  Training SUCCESSFUL — your triadic head is ready to use!
+  Next steps:
+    model.config()                         # view/change settings
+    model.config(align_mode='rank')         # switch alignment mode
+    model.validate(word_groups={...})       # test your own domains
+    model.explore(['your', 'words'])        # discover relationships
+    model.explore([...], show_factors=True) # full factor audit
+    model.explore([...], threshold=0.7)     # flag high-similarity pairs
+    model.compare('word1', 'word2')         # deep-dive on one pair
+============================================================
+

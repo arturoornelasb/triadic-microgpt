@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "triadic-head"
+version = "0.1.0"
+description = "Drop-in triadic projection head for any HuggingFace transformer. Adds interpretable prime-factor semantic signatures at zero language cost."
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+authors = [
+    {name = "Arturo Ornelas Brand", email = "arturoornelas62@gmail.com"},
+]
+keywords = ["neurosymbolic", "interpretability", "transformers", "prime-factorization", "triadic"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "torch>=2.0",
+    "transformers>=4.30",
+]
+
+[project.urls]
+Homepage = "https://github.com/arturoornelasb/triadic-microgpt"
+Repository = "https://github.com/arturoornelasb/triadic-microgpt/tree/master/triadic-head"
+
+[tool.setuptools.packages.find]
+include = ["triadic_head*"]
