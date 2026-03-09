@@ -221,24 +221,50 @@ Engine wins on raw metrics (uses pre-trained MiniLM-L6-v2 with 1B sentence pairs
 
 ---
 
-## Phase 5: Data & Training Improvements
-**Objective**: Improve training data and methodology for publication-quality results.
+## Phase 5: Transfer Experiment & Loss Ablation (COMPLETE — MAJOR BREAKTHROUGH)
+**Objective**: Validate triadic architecture on pre-trained model; identify alignment loss bottleneck.
 
-### 5.1 Curated Concept Training Data
-- [ ] Extend beyond TinyStories: add Wikipedia Simple English, children's encyclopedias
-- [ ] Create concept-enriched training examples that naturally expose semantic relationships
-- [ ] Build evaluation-only held-out sets (never seen during training)
+### 5.1 Experiment 10: GPT-2 + Triadic Head (Transfer)
+Added triadic projection head (49K params) to GPT-2 small (124M params, 768D, 12L).
+Two-phase training: frozen backbone (5K steps) → unfreeze last 2 layers (10K steps).
 
-### 5.2 Training Methodology
-- [ ] Proper train/val/test split (80/10/10)
-- [ ] Learning rate finder experiment
-- [ ] Gradient accumulation for effective larger batch sizes
-- [ ] Mixed-precision profiling and optimization
+### 5.2 Alignment Loss Ablation (3 modes × 2 embedding sources)
 
-### 5.3 Reproducibility
+**GPT-2 Transfer (rich 768D embeddings, WebText 8M pages):**
+
+| Mode | Semantic Gap | Analogy | Bit Entropy | Key |
+|------|:-----------:|:-------:|:-----------:|-----|
+| MSE (10a) | +0.011 | 75.0% | 0.601 | Baseline — MSE fails with rich embeddings |
+| Rank (10b) | +0.047 | **83.3%** | 0.542 | 4x improvement, best analogies |
+| **InfoNCE (10c)** | **+0.099** | 66.7% | **0.729** | **Closes 72% gap to Engine PCA (+0.136)** |
+
+**From-Scratch (weak 512D embeddings, TinyStories 50K stories):**
+
+| Mode | Semantic Ordering | PPL | Key |
+|------|:----------------:|:---:|-----|
+| **MSE (Run 15)** | **CORRECT** (K↔Q 89% >> K↔D 60%) | 7.69 | **Best from-scratch** |
+| InfoNCE (Run 27) | BROKEN (K↔Q 66% < K↔D 67%) | 7.30 | Fails — can't mine good pos/neg |
+| Rank (Run 28) | BROKEN (K↔Q 49% < K↔D 55%) | 7.76 | Fails — margin satisfied trivially |
+
+### 5.3 Key Discovery: Loss-Embedding Interaction
+
+| Embedding Quality | Best Loss | Why |
+|-------------------|-----------|-----|
+| Rich (GPT-2 768D) | InfoNCE | Clear pos/neg structure for contrastive learning |
+| Weak (512D from-scratch) | MSE | Dense local matching works despite noisy embeddings |
+
+**The bottleneck was the alignment loss formulation, not embedding quality.**
+GPT-2 + InfoNCE achieves gap +0.099, closing 72% of the gap to Engine PCA's +0.136.
+This is the strongest result of the entire project.
+
+### 5.4 Code & Infrastructure
+- `experiment10/` folder with model.py, train.py, evaluate.py
+- `--align-mode mse|rank|infonce` added to both torch_train.py and experiment10
+- All results in experiment_log.md (Exp 10a/b/c, Runs 27-28)
+
+### 5.5 Reproducibility (from original Phase 5)
 - [ ] Fix all random seeds (torch, numpy, python random)
 - [ ] Log full environment (conda list, pip freeze, GPU info, CUDA version)
-- [ ] Deterministic DataLoader (num_workers=0 or seed workers)
 - [ ] Publish training configs as YAML files
 
 ---
@@ -285,8 +311,8 @@ Phase 1 (Triadic Quality)    █████████████████
 Phase 2 (Language Benchmarks) ████████████████████  COMPLETE — ablation proves zero cost
 Phase 3 (Triadic Benchmarks)  ████████████████████  COMPLETE — 3 benchmarks executed
 Phase 4 (Scaling Study)       ████████████████████  COMPLETE — emergent semantic ordering found
-Phase 5 (Data/Training)       ██████████░░░░░░░░░░  Optional — improves results
-Phase 6 (Paper)               ████████████░░░░░░░░  NEXT — all data collected
+Phase 5 (Transfer + Loss)     ████████████████████  COMPLETE — InfoNCE closes 72% gap to Engine PCA
+Phase 6 (Paper)               ████████████░░░░░░░░  NEXT — all data collected, strongest result in hand
 ```
 
 ---
@@ -309,4 +335,6 @@ Phase 6 (Paper)               ████████████░░░░�
 | **v2.0-ablation** | **2026-03-07** | **Run 18: ablation baseline, proves zero language cost** |
 | **v2.0-benchmarks** | **2026-03-07** | **Phase 3 complete: subsumption, analogy, probe benchmarks** |
 | **v3.0-scaling** | **2026-03-07** | **Phase 4 complete: 4-point scaling study, emergent semantic ordering** |
-| **v4.0** | TBD | Paper submission |
+| **v4.0-transfer** | **2026-03-08** | **Experiment 10: GPT-2 transfer, InfoNCE closes 72% gap to Engine PCA** |
+| v4.1-from-scratch | 2026-03-08 | Runs 27-28: InfoNCE/Rank fail from-scratch, MSE confirmed best for weak embeddings |
+| **v5.0** | TBD | Paper submission |
