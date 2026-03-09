@@ -220,13 +220,17 @@ class TriadicGPT(nn.Module):
 
         return logits, triadic_proj, loss
 
-    def triadic_loss(self, triadic_proj, entropy_weight=0.0, input_ids=None, align_weight=0.0):
+    def triadic_loss(self, triadic_proj, entropy_weight=0.0, input_ids=None,
+                     align_weight=0.0, align_mode='mse'):
         """
         Compute triadic loss with up to four objectives:
           1. Diversity: bits should be diverse across the batch (not all same)
           2. Contrastive: different sequences should have different projections
           3. Entropy: each bit should have high entropy across the batch (prevent dead bits)
-          4. Embedding alignment: triadic similarity should match embedding similarity
+          4. Embedding alignment (configurable mode):
+             - 'mse': MSE on absolute similarity values (original)
+             - 'rank': Margin ranking loss — preserve similarity ordering
+             - 'infonce': InfoNCE contrastive with embedding-mined positives
 
         NOTE: Coherence loss (adjacent tokens agree) was REMOVED in Run 13.
         It caused triadic collapse by pushing all tokens toward the same projection.
@@ -236,6 +240,7 @@ class TriadicGPT(nn.Module):
             entropy_weight: weight for entropy regularization term (0 = disabled)
             input_ids: (B, T) token IDs — needed for embedding alignment
             align_weight: weight for embedding alignment loss (0 = disabled)
+            align_mode: 'mse' | 'rank' | 'infonce'
 
         Returns:
             loss: scalar
@@ -270,34 +275,18 @@ class TriadicGPT(nn.Module):
             bit_entropy = -(probs * probs.log() + (1 - probs) * (1 - probs).log())
             entropy_loss = (1.0 - bit_entropy / math.log(2)).mean()
 
-        # 4. Embedding alignment: use the model's own embeddings as semantic teacher
-        #    Sample random token pairs, align triadic similarity with embedding similarity
+        # 4. Embedding alignment
         alignment_loss = torch.tensor(0.0, device=triadic_proj.device)
         if align_weight > 0 and input_ids is not None:
-            n_pairs = 64  # pairs per sequence
             with torch.no_grad():
-                embeds = self.wte(input_ids).detach()  # (B, T, n_embd) — no grad to embeddings
+                embeds = self.wte(input_ids).detach()  # (B, T, n_embd)
 
-            # Sample random pair indices: (B, n_pairs, 2)
-            idx = torch.randint(0, T, (B, n_pairs, 2), device=triadic_proj.device)
-            idx_i = idx[:, :, 0]  # (B, n_pairs)
-            idx_j = idx[:, :, 1]  # (B, n_pairs)
-
-            # Gather embeddings for sampled pairs
-            idx_i_e = idx_i.unsqueeze(-1).expand(-1, -1, embeds.size(-1))
-            idx_j_e = idx_j.unsqueeze(-1).expand(-1, -1, embeds.size(-1))
-            e_i = torch.gather(embeds, 1, idx_i_e)  # (B, n_pairs, n_embd)
-            e_j = torch.gather(embeds, 1, idx_j_e)
-            embed_sim = F.cosine_similarity(e_i, e_j, dim=-1)  # (B, n_pairs)
-
-            # Gather triadic projections for sampled pairs
-            idx_i_p = idx_i.unsqueeze(-1).expand(-1, -1, n_bits)
-            idx_j_p = idx_j.unsqueeze(-1).expand(-1, -1, n_bits)
-            p_i = torch.gather(triadic_proj, 1, idx_i_p)  # (B, n_pairs, n_bits)
-            p_j = torch.gather(triadic_proj, 1, idx_j_p)
-            triadic_sim = F.cosine_similarity(p_i, p_j, dim=-1)  # (B, n_pairs)
-
-            alignment_loss = F.mse_loss(triadic_sim, embed_sim)
+            if align_mode == 'mse':
+                alignment_loss = self._align_mse(triadic_proj, embeds, B, T, n_bits)
+            elif align_mode == 'rank':
+                alignment_loss = self._align_rank(triadic_proj, embeds, B, T, n_bits)
+            elif align_mode == 'infonce':
+                alignment_loss = self._align_infonce(triadic_proj, embeds, B, T, n_bits)
 
         # Combined loss
         loss = diversity_loss + contrastive_loss
@@ -306,6 +295,89 @@ class TriadicGPT(nn.Module):
         if align_weight > 0:
             loss = loss + align_weight * alignment_loss
         return loss
+
+    def _align_mse(self, triadic_proj, embeds, B, T, n_bits):
+        """Original MSE alignment: match absolute similarity values."""
+        n_pairs = 64
+        idx = torch.randint(0, T, (B, n_pairs, 2), device=triadic_proj.device)
+        idx_i, idx_j = idx[:, :, 0], idx[:, :, 1]
+
+        idx_i_e = idx_i.unsqueeze(-1).expand(-1, -1, embeds.size(-1))
+        idx_j_e = idx_j.unsqueeze(-1).expand(-1, -1, embeds.size(-1))
+        e_i = torch.gather(embeds, 1, idx_i_e)
+        e_j = torch.gather(embeds, 1, idx_j_e)
+        embed_sim = F.cosine_similarity(e_i, e_j, dim=-1)
+
+        idx_i_p = idx_i.unsqueeze(-1).expand(-1, -1, n_bits)
+        idx_j_p = idx_j.unsqueeze(-1).expand(-1, -1, n_bits)
+        p_i = torch.gather(triadic_proj, 1, idx_i_p)
+        p_j = torch.gather(triadic_proj, 1, idx_j_p)
+        triadic_sim = F.cosine_similarity(p_i, p_j, dim=-1)
+
+        return F.mse_loss(triadic_sim, embed_sim)
+
+    def _align_rank(self, triadic_proj, embeds, B, T, n_bits, margin=0.1):
+        """Margin ranking loss: preserve similarity ORDERING, ignore absolute values."""
+        n_anchors = 32
+        n_candidates = 16
+
+        anchor_idx = torch.randint(0, T, (B, n_anchors), device=triadic_proj.device)
+        cand_idx = torch.randint(0, T, (B, n_anchors, n_candidates), device=triadic_proj.device)
+
+        anchor_e = torch.gather(embeds, 1,
+                                anchor_idx.unsqueeze(-1).expand(-1, -1, embeds.size(-1)))
+        cand_e = torch.gather(embeds, 1,
+                              cand_idx.reshape(B, -1).unsqueeze(-1).expand(-1, -1, embeds.size(-1))
+                              ).reshape(B, n_anchors, n_candidates, embeds.size(-1))
+
+        embed_sim = F.cosine_similarity(anchor_e.unsqueeze(2), cand_e, dim=-1)
+
+        pos_idx_local = embed_sim.argmax(dim=-1)
+        neg_idx_local = embed_sim.argmin(dim=-1)
+
+        pos_idx = torch.gather(cand_idx, 2, pos_idx_local.unsqueeze(-1)).squeeze(-1)
+        neg_idx = torch.gather(cand_idx, 2, neg_idx_local.unsqueeze(-1)).squeeze(-1)
+
+        anchor_p = torch.gather(triadic_proj, 1,
+                                anchor_idx.unsqueeze(-1).expand(-1, -1, n_bits))
+        pos_p = torch.gather(triadic_proj, 1,
+                             pos_idx.unsqueeze(-1).expand(-1, -1, n_bits))
+        neg_p = torch.gather(triadic_proj, 1,
+                             neg_idx.unsqueeze(-1).expand(-1, -1, n_bits))
+
+        pos_sim = F.cosine_similarity(anchor_p, pos_p, dim=-1)
+        neg_sim = F.cosine_similarity(anchor_p, neg_p, dim=-1)
+
+        return F.relu(margin - (pos_sim - neg_sim)).mean()
+
+    def _align_infonce(self, triadic_proj, embeds, B, T, n_bits, temperature=0.1):
+        """InfoNCE contrastive alignment with embedding-mined positives."""
+        n_anchors = 32
+
+        anchor_idx = torch.randint(0, T, (B, n_anchors), device=triadic_proj.device)
+        pool_idx = torch.randint(0, T, (B, n_anchors), device=triadic_proj.device)
+
+        anchor_e = torch.gather(embeds, 1,
+                                anchor_idx.unsqueeze(-1).expand(-1, -1, embeds.size(-1)))
+        pool_e = torch.gather(embeds, 1,
+                              pool_idx.unsqueeze(-1).expand(-1, -1, embeds.size(-1)))
+        anchor_e_norm = F.normalize(anchor_e, dim=-1)
+        pool_e_norm = F.normalize(pool_e, dim=-1)
+
+        embed_sim_matrix = torch.bmm(anchor_e_norm, pool_e_norm.transpose(1, 2))
+        pos_labels = embed_sim_matrix.argmax(dim=-1)
+
+        anchor_p = torch.gather(triadic_proj, 1,
+                                anchor_idx.unsqueeze(-1).expand(-1, -1, n_bits))
+        pool_p = torch.gather(triadic_proj, 1,
+                              pool_idx.unsqueeze(-1).expand(-1, -1, n_bits))
+        anchor_p_norm = F.normalize(anchor_p, dim=-1)
+        pool_p_norm = F.normalize(pool_p, dim=-1)
+
+        triadic_sim_matrix = torch.bmm(anchor_p_norm, pool_p_norm.transpose(1, 2))
+
+        logits = triadic_sim_matrix / temperature
+        return F.cross_entropy(logits.reshape(-1, n_anchors), pos_labels.reshape(-1))
 
     def distillation_loss(self, triadic_proj, targets_proj, mask):
         """

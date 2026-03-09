@@ -224,7 +224,7 @@ def train(args):
     print(f"  Batch size: {args.batch_size}")
     print(f"  Triadic activation: step {triadic_warmup}")
     print(f"  Entropy weight: {args.entropy_weight}")
-    print(f"  Alignment weight: {args.align_weight}")
+    print(f"  Alignment weight: {args.align_weight} (mode: {args.align_mode})")
     print(f"  Distillation weight: {args.dist_weight}x alpha")
     print("-" * 64)
 
@@ -282,7 +282,8 @@ def train(args):
                 current_alpha = args.alpha * alpha_factor
                 
                 tri_loss = model.triadic_loss(triadic_proj, entropy_weight=args.entropy_weight,
-                                              input_ids=x, align_weight=args.align_weight)
+                                              input_ids=x, align_weight=args.align_weight,
+                                              align_mode=args.align_mode)
                 total_loss = lang_loss + current_alpha * tri_loss
                 tri_loss_val = tri_loss.item()
                 
@@ -437,6 +438,8 @@ if __name__ == '__main__':
     parser.add_argument('--entropy-weight', type=float, default=0.0, help='Entropy regularization weight (0=off, try 1.0-2.0)')
     parser.add_argument('--align-weight', type=float, default=0.0, help='Embedding alignment weight (0=off, try 1.0-3.0)')
     parser.add_argument('--dist-weight', type=float, default=1.0, help='Distillation multiplier on alpha (was 5.0, now default 1.0)')
+    parser.add_argument('--align-mode', default='mse', choices=['mse', 'rank', 'infonce'],
+                        help='Alignment loss mode: mse (original), rank (margin ranking), infonce (contrastive)')
     parser.add_argument('--triadic-warmup-pct', type=float, default=0.8, help='Warmup fraction')
     parser.add_argument('--print-every', type=int, default=50, help='Print frequency')
     parser.add_argument('--save-every', type=int, default=1000, help='Save frequency')

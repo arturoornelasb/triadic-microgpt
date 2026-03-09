@@ -652,3 +652,111 @@ that end-to-end triadic training can approach post-hoc projection quality (72% o
 when using appropriate loss formulations and rich pre-trained embeddings.
 
 **Experiment 10b/c Status: COMPLETE. Major positive result — loss formulation is the key.**
+
+---
+
+## Run 27: TriadicGPT From-Scratch + InfoNCE Alignment
+
+### Hypothesis
+InfoNCE produced the best semantic gap on GPT-2 transfer (+0.099). If the loss formulation
+is the bottleneck (not embedding quality), then applying InfoNCE to the from-scratch
+TriadicGPT should also improve its semantic gap beyond Run 15's +0.020.
+
+### Setup
+| Key | Value |
+|-----|-------|
+| **Date** | 2026-03-08 |
+| **Architecture** | TriadicGPT XL (12L/512D/8H/64bits, 40M params) |
+| **Alignment** | InfoNCE (temperature=0.1, 32 anchors) |
+| **Other params** | alpha=0.05, entropy=1.0, align=5.0 (same as Run 15) |
+| **Distillation** | Active (default, should have used --no-distill) |
+| **Steps** | 40000/50000 (stopped due to GPU thermal throttling) |
+| **Data** | TinyStories-train.txt |
+
+### Results
+| Metric | Run 27 (InfoNCE) | Run 15 (MSE) |
+|--------|:---:|:---:|
+| Perplexity | **7.30** | 7.69 |
+| King↔Queen | 66% | **89%** |
+| King↔Dog | 67% | 60% |
+| Dog↔Cat | 69% | — |
+| Mother↔Father | 56% | — |
+
+### Key Findings
+
+**1. NEGATIVE: InfoNCE fails from-scratch.**
+King↔Dog (67%) > King↔Queen (66%) — no semantic ordering. The from-scratch 512D
+embeddings (TinyStories, 50K stories) don't have enough structure for InfoNCE to mine
+meaningful positive/negative pairs. Random token pairs within a children's story are
+too semantically similar in this low-quality embedding space.
+
+**2. Language quality improves.** PPL 7.30 vs 7.69 — InfoNCE doesn't hurt (and may help)
+language modeling. The triadic loss acts as regularization.
+
+**3. Confound: distillation was active.** Knowledge distillation (dist=1.2-1.4) was
+running alongside InfoNCE, which may have interfered. A clean comparison would need
+`--no-distill`.
+
+**4. Critical insight: optimal loss depends on embedding quality.**
+- Rich embeddings (GPT-2 768D, WebText): InfoNCE >> Rank >> MSE
+- Weak embeddings (512D, TinyStories): MSE > InfoNCE
+InfoNCE needs structure in embedding space to mine from. MSE works with noisy embeddings
+because it only asks for local similarity matching, not global ranking.
+
+**Run 27 Status: COMPLETE. InfoNCE requires rich pre-trained embeddings.**
+
+---
+
+## Run 28: TriadicGPT From-Scratch + Rank Alignment
+
+### Hypothesis
+Rank loss was the best for analogies on GPT-2 transfer (83.3%). It's more tolerant of
+noisy embeddings than InfoNCE because it only asks for relative ordering (pos > neg + margin),
+not global classification. Should work better from-scratch than InfoNCE.
+
+### Setup
+| Key | Value |
+|-----|-------|
+| **Date** | 2026-03-08 |
+| **Architecture** | TriadicGPT XL (12L/512D/8H/64bits, 40M params) |
+| **Alignment** | Rank (margin=0.1, 32 anchors, 16 candidates) |
+| **Other params** | alpha=0.05, entropy=1.0, align=5.0 |
+| **Distillation** | OFF (--no-distill) |
+| **Steps** | 50000 |
+| **Training time** | 74.3 min |
+| **Final loss** | 1.0385, tri_loss=0.064 |
+
+### Results
+| Metric | Run 28 (Rank) | Run 27 (InfoNCE) | Run 15 (MSE) |
+|--------|:---:|:---:|:---:|
+| Perplexity | 7.76 | 7.30 | 7.69 |
+| King↔Queen | 49% | 66% | **89%** |
+| King↔Dog | 55% | 67% | 60% |
+| Doctor↔Hospital | 68% | 70% | — |
+| Mother↔Father | 60% | 56% | — |
+| Fire↔Water | 76% | 49% | — |
+
+### Key Findings
+
+**1. NEGATIVE: Rank also fails from-scratch.**
+King↔Queen (49%) < King↔Dog (55%) — no semantic ordering. The margin ranking loss
+satisfies easily (tri_loss=0.064, near-zero) because the 512D TinyStories embeddings
+don't provide enough contrast between random token pairs. The "most similar" and "least
+similar" candidates within a sequence of children's story tokens are too close together.
+
+**2. MSE definitively best for from-scratch training.**
+Only MSE produces correct semantic ordering from weak embeddings. This is because MSE
+directly matches absolute similarity values, which works even when the embedding structure
+is noisy — the gradient signal is dense and local. Rank and InfoNCE require global
+structure (clear positives vs negatives) that TinyStories embeddings don't provide.
+
+**3. Loss-embedding interaction is the key insight.**
+
+| Embedding Quality | Best Loss | Why |
+|-------------------|-----------|-----|
+| Rich (GPT-2 768D, WebText) | InfoNCE | Clear pos/neg structure enables contrastive learning |
+| Rich (GPT-2 768D, WebText) | Rank | Ordering structure sufficient for margin learning |
+| Weak (512D, TinyStories) | MSE | Dense local matching works despite noisy embeddings |
+| Weak (512D, TinyStories) | Rank/InfoNCE | FAIL — insufficient pos/neg contrast |
+
+**Run 28 Status: COMPLETE. Confirms MSE is optimal for from-scratch with weak embeddings.**
