@@ -217,5 +217,47 @@ class TestTriadicWrapper:
         assert wrapper.config()['align_mode'] == 'rank'
 
 
+    def test_compare(self, tiny_model_full_vocab):
+        """compare() returns similarity and factor breakdown."""
+        from transformers import AutoTokenizer
+        wrapper = TriadicWrapper(tiny_model_full_vocab, n_bits=16)
+        tokenizer = AutoTokenizer.from_pretrained('gpt2')
+        tokenizer.pad_token = tokenizer.eos_token
+
+        result = wrapper.compare('king', 'queen', tokenizer=tokenizer)
+        assert 'similarity' in result
+        assert 0.0 <= result['similarity'] <= 1.0
+        assert 'shared_factors' in result
+        assert 'only_in_a_factors' in result
+        assert 'only_in_b_factors' in result
+
+    def test_encode_single_string(self, tiny_model_full_vocab):
+        """encode() accepts a single string, not just a list."""
+        from transformers import AutoTokenizer
+        wrapper = TriadicWrapper(tiny_model_full_vocab, n_bits=16)
+        tokenizer = AutoTokenizer.from_pretrained('gpt2')
+        tokenizer.pad_token = tokenizer.eos_token
+
+        result = wrapper.encode('hello', tokenizer=tokenizer)
+        assert 'hello' in result
+        assert 'composite' in result['hello']
+        assert 'bits' in result['hello']
+        assert result['hello']['n_active'] >= 0
+
+    def test_config_invalid_mode(self, tiny_model):
+        """config() rejects invalid align_mode."""
+        wrapper = TriadicWrapper(tiny_model, n_bits=16)
+        with pytest.raises(ValueError, match="align_mode"):
+            wrapper.config(align_mode='invalid')
+
+    def test_triadic_loss_short_sequence(self, tiny_model):
+        """triadic_loss handles sequences of length 1 gracefully."""
+        wrapper = TriadicWrapper(tiny_model, n_bits=16)
+        ids = torch.randint(0, 100, (2, 1))  # T=1
+        _, proj, _ = wrapper(ids)
+        loss = wrapper.triadic_loss(proj, input_ids=ids)
+        assert loss.item() == 0.0  # returns 0 for T<2
+
+
 if __name__ == '__main__':
     pytest.main([__file__, '-v'])
