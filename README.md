@@ -108,14 +108,14 @@ python src/chat.py
 
 ### Desktop Explorer (GUI)
 
-A full desktop UI for exploring, auditing, and chatting with TriadicGPT interactively.
+A full desktop UI for exploring, auditing, and chatting with TriadicGPT interactively. Supports three backends: native `.pt` checkpoints, GPT-2 Transfer (Experiment 10), and any HuggingFace model.
 
 ```bash
 pip install PySide6
 python ui/app.py
 ```
 
-See **[Desktop Explorer docs →](ui/README.md)** for the full feature reference.
+7 tabs: Encoder, Compare (with clickable prime chips + Prime Inspector), Explore (heatmap), Analogy, Validate, Chat, and Benchmarks. See **[Desktop Explorer docs →](ui/README.md)** for the full feature reference.
 
 ## Repository Structure
 
@@ -158,17 +158,21 @@ scripts/
 tests/
   test_all.py              # 37 unit tests
 
+triadic-head/              # Standalone PyPI package (triadic algebra + HF wrapper)
+  triadic_head/            # triadic_head.TriadicHead, TriadicWrapper, algebra
+  tests/                   # 33 unit tests
+
 ui/
   app.py                   # Entry point: python ui/app.py
-  model_interface.py       # Unified API for native .pt and HF TriadicWrapper
-  model_panel.py           # Top bar: load any model or HF checkpoint
+  model_interface.py       # Unified API for native .pt, GPT-2 Transfer, and HF TriadicWrapper
+  model_panel.py           # Top bar: 3 backends (native, GPT-2 transfer, HuggingFace)
   main_window.py           # QMainWindow + 7-tab interface
   tabs/                    # Encoder, Compare, Explore, Analogy, Validate, Chat, Benchmarks
-  widgets/                 # BitVectorWidget, PrimeDisplayWidget, MplCanvas
+  widgets/                 # BitVectorWidget, PrimeDisplayWidget, PrimeInspectorDialog, MplCanvas
   workers/                 # Async QThread workers for inference
   resources/style.qss      # Dark theme (Catppuccin Mocha)
 
-experiment_log.md          # Complete record of all 26 training runs
+experiment_log.md          # Complete record of all 29 training runs
 EVOLUTION_PLAN.md          # Research roadmap and phase tracking
 ```
 
