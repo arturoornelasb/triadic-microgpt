@@ -19,6 +19,7 @@ experiment10/checkpoints/
 experiment10/checkpoints_rank/
 experiment10/checkpoints_infonce/
 newplan.md
+masterplan.md
 
 # LaTeX build artifacts
 paper/*.aux
