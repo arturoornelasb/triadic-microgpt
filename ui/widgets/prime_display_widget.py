@@ -1,10 +1,5 @@
 """
 PrimeDisplayWidget — Shows a prime composite number with its factors.
-
-Layout:
-  PRIME COMPOSITE (large monospace)
-  = 2 × 3 × 7 × 11 × ...
-  [n_active / n_total bits active]  [Copiar]
 """
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QApplication, QFrame
@@ -48,11 +43,11 @@ class PrimeDisplayWidget(QWidget):
         # Bottom row: stats + copy button
         bottom = QHBoxLayout()
         bottom.setContentsMargins(0, 0, 0, 0)
-        self._lbl_stats = QLabel("0 / 0 bits activos")
+        self._lbl_stats = QLabel("0 / 0 active bits")
         self._lbl_stats.setObjectName("statsLabel")
         bottom.addWidget(self._lbl_stats)
         bottom.addStretch()
-        btn_copy = QPushButton("Copiar Φ")
+        btn_copy = QPushButton("Copy Φ")
         btn_copy.setObjectName("smallButton")
         btn_copy.clicked.connect(self._copy)
         bottom.addWidget(btn_copy)
@@ -71,17 +66,17 @@ class PrimeDisplayWidget(QWidget):
         if factors:
             factor_str = " × ".join(str(p) for p in factors[:20])
             if len(factors) > 20:
-                factor_str += f" × ... ({len(factors)} primos)"
+                factor_str += f" × ... ({len(factors)} factors)"
         else:
-            factor_str = "(sin factores)"
+            factor_str = "(no factors)"
         self._lbl_factors.setText(f"= {factor_str}")
-        self._lbl_stats.setText(f"{n_active} / {self.n_bits} bits activos")
+        self._lbl_stats.setText(f"{n_active} / {self.n_bits} active bits")
 
     def reset(self) -> None:
         self._composite = 0
         self._lbl_composite.setText("—")
         self._lbl_factors.setText("—")
-        self._lbl_stats.setText(f"0 / {self.n_bits} bits activos")
+        self._lbl_stats.setText(f"0 / {self.n_bits} active bits")
 
     def _copy(self):
         if self._composite:

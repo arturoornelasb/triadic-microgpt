@@ -26,29 +26,29 @@ class ExploreTab(QWidget):
         layout.setContentsMargins(12, 12, 12, 12)
         layout.setSpacing(10)
 
-        lbl_title = QLabel("EXPLORE — Matriz de similitud entre N conceptos")
+        lbl_title = QLabel("EXPLORE — Similarity matrix across N concepts")
         lbl_title.setObjectName("sectionLabel")
         layout.addWidget(lbl_title)
 
         # ── Word list controls ────────────────────────────
         ctrl_row = QHBoxLayout()
         self._txt_add = QLineEdit()
-        self._txt_add.setPlaceholderText("Agregar palabra...")
+        self._txt_add.setPlaceholderText("Add word...")
         self._txt_add.setFixedWidth(160)
         self._txt_add.returnPressed.connect(self._add_word)
         ctrl_row.addWidget(self._txt_add)
 
-        btn_add = QPushButton("+ Agregar")
+        btn_add = QPushButton("+ Add")
         btn_add.setObjectName("smallButton")
         btn_add.clicked.connect(self._add_word)
         ctrl_row.addWidget(btn_add)
 
-        btn_del = QPushButton("Eliminar")
+        btn_del = QPushButton("Remove")
         btn_del.setObjectName("smallButton")
         btn_del.clicked.connect(self._del_word)
         ctrl_row.addWidget(btn_del)
 
-        btn_clear = QPushButton("Limpiar")
+        btn_clear = QPushButton("Clear")
         btn_clear.setObjectName("smallButton")
         btn_clear.clicked.connect(self._clear_words)
         ctrl_row.addWidget(btn_clear)
@@ -92,12 +92,12 @@ class ExploreTab(QWidget):
         right = QWidget()
         right_l = QVBoxLayout(right)
         right_l.setContentsMargins(8, 0, 0, 0)
-        lbl_tbl = QLabel("PARES RANKEADOS")
+        lbl_tbl = QLabel("RANKED PAIRS")
         lbl_tbl.setObjectName("sectionLabel")
         right_l.addWidget(lbl_tbl)
 
         self._table = QTableWidget(0, 4)
-        self._table.setHorizontalHeaderLabels(['A', 'B', 'Similitud', 'Compartidos'])
+        self._table.setHorizontalHeaderLabels(['A', 'B', 'Similarity', 'Shared'])
         self._table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self._table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self._table.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -129,9 +129,9 @@ class ExploreTab(QWidget):
 
     def _run_explore(self):
         if len(self._words) < 2:
-            self._lbl_status.setText("Agrega al menos 2 palabras.")
+            self._lbl_status.setText("Add at least 2 words.")
             return
-        self._lbl_status.setText("Calculando matriz...")
+        self._lbl_status.setText("Computing matrix...")
         self._worker = TaskWorker(self._iface.explore, list(self._words))
         self._worker.result_ready.connect(self._on_result)
         self._worker.error_occurred.connect(self._on_error)
@@ -143,7 +143,7 @@ class ExploreTab(QWidget):
         ranked = result.get('pairs', [])
 
         self._lbl_status.setText(
-            f"{len(words)} conceptos | {len(ranked)} pares"
+            f"{len(words)} concepts | {len(ranked)} pairs"
         )
         self._draw_heatmap(words, matrix)
         self._populate_table(ranked)
@@ -162,7 +162,7 @@ class ExploreTab(QWidget):
 
         mat = np.array(matrix)
         n = len(words)
-        im = ax.imshow(mat, cmap='RdYlGn', vmin=0, vmax=1, aspect='auto')
+        im = ax.imshow(mat, cmap='YlOrRd', vmin=0, vmax=1, aspect='auto')
         ax.set_xticks(range(n))
         ax.set_yticks(range(n))
         ax.set_xticklabels(words, rotation=45, ha='right', fontsize=8, color='#cdd6f4')
@@ -171,11 +171,13 @@ class ExploreTab(QWidget):
         for spine in ax.spines.values():
             spine.set_edgecolor('#45475a')
 
-        # Annotate cells
+        # Annotate cells — white text with dark outline for readability
         for i in range(n):
             for j in range(n):
-                ax.text(j, i, f"{mat[i, j]:.2f}", ha='center', va='center',
-                        fontsize=7, color='#1e1e2e' if mat[i, j] > 0.5 else '#cdd6f4')
+                val = mat[i, j]
+                txt_color = '#1e1e2e' if val > 0.65 else '#f0f0f0'
+                ax.text(j, i, f"{val:.2f}", ha='center', va='center',
+                        fontsize=7, fontweight='bold', color=txt_color)
 
         self._canvas.fig.tight_layout(pad=0.3)
         self._canvas.draw()

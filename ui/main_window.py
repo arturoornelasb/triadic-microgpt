@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 
 from ui.model_panel import ModelPanel
+from ui.workers.model_worker import TaskWorker
 
 # Lazy tab imports (avoid torch import before model is loaded)
 def _import_tabs():
@@ -29,7 +30,7 @@ class _NoModelTab(QWidget):
         super().__init__(parent)
         layout = QVBoxLayout(self)
         layout.setAlignment(Qt.AlignCenter)
-        lbl = QLabel(f"Carga un modelo para usar la pestaña «{tab_name}»")
+        lbl = QLabel(f"Load a model to use the «{tab_name}» tab")
         lbl.setObjectName("noModelLabel")
         lbl.setAlignment(Qt.AlignCenter)
         layout.addWidget(lbl)
@@ -41,6 +42,7 @@ class MainWindow(QMainWindow):
         self.project_root = project_root
         self._iface = None  # ModelInterface, set after loading
         self._tabs: list = []  # actual tab widgets
+        self._warm_worker: TaskWorker | None = None
         self.setWindowTitle("TriadicGPT Explorer")
         self.resize(1280, 820)
         self._setup_ui()
@@ -62,7 +64,7 @@ class MainWindow(QMainWindow):
         self._tabs_widget = QTabWidget()
         self._tabs_widget.setDocumentMode(True)
 
-        tab_names = ['Encoder', 'Comparar', 'Explorar', 'Analogía', 'Validar', 'Chat', 'Benchmarks']
+        tab_names = ['Encoder', 'Compare', 'Explore', 'Analogy', 'Validate', 'Chat', 'Benchmarks']
         for name in tab_names:
             placeholder = _NoModelTab(name)
             self._tabs_widget.addTab(placeholder, name)
@@ -72,7 +74,7 @@ class MainWindow(QMainWindow):
         # ── Status bar ─────────────────────────────────────────
         self._status_bar = QStatusBar()
         self.setStatusBar(self._status_bar)
-        self._status_bar.showMessage("Sin modelo cargado. Configura y carga un modelo en la barra superior.")
+        self._status_bar.showMessage("No model loaded. Configure and load a model from the top bar.")
 
     # ------------------------------------------------------------------
     # Model loaded — replace placeholder tabs with real tabs
@@ -92,7 +94,7 @@ class MainWindow(QMainWindow):
             ChatTab(iface),
             BenchmarksTab(self.project_root),   # no model needed
         ]
-        tab_names = ['Encoder', 'Comparar', 'Explorar', 'Analogía', 'Validar', 'Chat', 'Benchmarks']
+        tab_names = ['Encoder', 'Compare', 'Explore', 'Analogy', 'Validate', 'Chat', 'Benchmarks']
 
         current = self._tabs_widget.currentIndex()
         for i, (tab, name) in enumerate(zip(real_tabs, tab_names)):
@@ -102,7 +104,18 @@ class MainWindow(QMainWindow):
         self._tabs = real_tabs
         self._tabs_widget.setCurrentIndex(current)
         self._status_bar.showMessage(
-            f"Modelo cargado: {iface.info_str} | {iface.device_str} | {iface.param_count/1e6:.1f}M params"
+            f"Model loaded: {iface.info_str} | {iface.device_str} | {iface.param_count/1e6:.1f}M params"
+        )
+        # Warm probe vocabulary in background
+        self._warm_worker = TaskWorker(iface.warm_vocab)
+        self._warm_worker.result_ready.connect(self._on_vocab_warmed)
+        self._warm_worker.start()
+
+    def _on_vocab_warmed(self, result):
+        n = result.get('n_words', 0)
+        n_probes = result.get('n_probes', 0)
+        self._status_bar.showMessage(
+            f"Model ready -- {n_probes} probe words indexed -- click any prime to inspect"
         )
 
     def _set_status(self, msg: str):

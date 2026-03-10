@@ -36,7 +36,7 @@ class AnalogyTab(QWidget):
         layout.setContentsMargins(12, 12, 12, 12)
         layout.setSpacing(12)
 
-        lbl_title = QLabel("ANALOGY — A:B::C:? razonamiento algebraico")
+        lbl_title = QLabel("ANALOGY — A:B::C:? algebraic reasoning")
         lbl_title.setObjectName("sectionLabel")
         layout.addWidget(lbl_title)
 
@@ -59,19 +59,19 @@ class AnalogyTab(QWidget):
 
         input_layout.addWidget(QLabel("A:"))
         input_layout.addWidget(self._txt_a)
-        input_layout.addWidget(QLabel("es a"))
+        input_layout.addWidget(QLabel("is to"))
         input_layout.addWidget(QLabel("B:"))
         input_layout.addWidget(self._txt_b)
-        input_layout.addWidget(QLabel("como"))
+        input_layout.addWidget(QLabel("as"))
         input_layout.addWidget(QLabel("C:"))
         input_layout.addWidget(self._txt_c)
-        input_layout.addWidget(QLabel("es a"))
+        input_layout.addWidget(QLabel("is to"))
         lbl_q = QLabel("?")
         lbl_q.setObjectName("titleLabel")
         input_layout.addWidget(lbl_q)
         input_layout.addStretch()
 
-        btn = QPushButton("Calcular →")
+        btn = QPushButton("Compute →")
         btn.setMinimumWidth(120)
         btn.clicked.connect(self._run_analogy)
         input_layout.addWidget(btn)
@@ -88,12 +88,12 @@ class AnalogyTab(QWidget):
         trans_layout = QVBoxLayout(trans_frame)
         trans_layout.setContentsMargins(12, 10, 12, 10)
 
-        lbl_trans = QLabel("TRANSFORMACIÓN A→B")
+        lbl_trans = QLabel("TRANSFORMATION A→B")
         lbl_trans.setObjectName("sectionLabel")
         trans_layout.addWidget(lbl_trans)
 
         removed_row = QHBoxLayout()
-        removed_row.addWidget(QLabel("Eliminados:"))
+        removed_row.addWidget(QLabel("Removed:"))
         self._lbl_removed = QLabel("—")
         self._lbl_removed.setObjectName("primeFactors")
         self._lbl_removed.setStyleSheet("color: #f38ba8;")
@@ -102,7 +102,7 @@ class AnalogyTab(QWidget):
         trans_layout.addLayout(removed_row)
 
         added_row = QHBoxLayout()
-        added_row.addWidget(QLabel("Añadidos:"))
+        added_row.addWidget(QLabel("Added:"))
         self._lbl_added = QLabel("—")
         self._lbl_added.setObjectName("primeFactors")
         self._lbl_added.setStyleSheet("color: #a6e3a1;")
@@ -120,12 +120,12 @@ class AnalogyTab(QWidget):
         layout.addWidget(trans_frame)
 
         # ── Results table ─────────────────────────────────
-        lbl_results = QLabel("RESULTADO (matches en vocabulario)")
+        lbl_results = QLabel("RESULTS (vocabulary matches)")
         lbl_results.setObjectName("sectionLabel")
         layout.addWidget(lbl_results)
 
         self._table = QTableWidget(0, 4)
-        self._table.setHorizontalHeaderLabels(['Rank', 'Palabra', 'Similitud', 'Verif.'])
+        self._table.setHorizontalHeaderLabels(['Rank', 'Word', 'Similarity', 'Verif.'])
         self._table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self._table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self._table.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -134,7 +134,7 @@ class AnalogyTab(QWidget):
 
         # ── Verification summary ──────────────────────────
         verif_row = QHBoxLayout()
-        lbl_verif = QLabel("VERIFICACIÓN:")
+        lbl_verif = QLabel("VERIFICATION:")
         lbl_verif.setObjectName("sectionLabel")
         verif_row.addWidget(lbl_verif)
         self._lbl_verif = QLabel("—")
@@ -152,7 +152,7 @@ class AnalogyTab(QWidget):
         c = self._txt_c.text().strip()
         if not all([a, b, c]):
             return
-        self._lbl_status.setText("Calculando analogía...")
+        self._lbl_status.setText("Computing analogy...")
         self._worker = TaskWorker(self._iface.analogy, a, b, c)
         self._worker.result_ready.connect(self._on_result)
         self._worker.error_occurred.connect(self._on_error)
@@ -168,10 +168,10 @@ class AnalogyTab(QWidget):
         verified = top_sim >= median_sim
 
         self._lbl_removed.setText(
-            ' '.join(str(p) for p in removed[:16]) if removed else '(ninguno)'
+            ' '.join(str(p) for p in removed[:16]) if removed else '(none)'
         )
         self._lbl_added.setText(
-            ' '.join(str(p) for p in added[:16]) if added else '(ninguno)'
+            ' '.join(str(p) for p in added[:16]) if added else '(none)'
         )
         t_str = str(target)
         if len(t_str) > 30:
@@ -196,14 +196,14 @@ class AnalogyTab(QWidget):
             self._table.setItem(row, 3, item)
 
         verif_str = (
-            f"Top-1 sim={top_sim*100:.1f}% | mediana={median_sim*100:.1f}% | "
-            f"{'✓ VERIFICA' if verified else '✗ NO verifica'}"
+            f"Top-1 sim={top_sim*100:.1f}% | median={median_sim*100:.1f}% | "
+            f"{'✓ VERIFIED' if verified else '✗ NOT verified'}"
         )
         self._lbl_verif.setObjectName('passLabel' if verified else 'failLabel')
         self._lbl_verif.setText(verif_str)
         self._lbl_verif.style().unpolish(self._lbl_verif)
         self._lbl_verif.style().polish(self._lbl_verif)
-        self._lbl_status.setText(f"{len(matches)} candidatos encontrados")
+        self._lbl_status.setText(f"{len(matches)} candidates found")
 
     def _on_error(self, msg: str):
         self._lbl_status.setText(f"Error: {msg.split(chr(10))[0]}")

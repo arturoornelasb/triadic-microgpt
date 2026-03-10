@@ -264,7 +264,7 @@ This is the strongest result of the entire project.
 
 ### 5.5 Reproducibility (from original Phase 5)
 - [ ] Fix all random seeds (torch, numpy, python random)
-- [ ] Log full environment (conda list, pip freeze, GPU info, CUDA version)
+- [x] Log full environment → `environment.yml` created (conda + pip PyTorch CUDA 12.8)
 - [ ] Publish training configs as YAML files
 
 ---
@@ -297,10 +297,12 @@ This is the strongest result of the entire project.
 - Comparison table: end-to-end vs post-hoc
 
 ### 6.3 Code Release
-- Clean repository with reproducible training scripts
-- Pre-trained model weights on HuggingFace Hub
-- Benchmark suite as standalone scripts
-- Docker/conda environment file
+- [x] Clean repository with reproducible training scripts
+- ~~Pre-trained model weights on HuggingFace Hub~~ — NOT NEEDED (technique > weights)
+- [x] Benchmark suite as standalone scripts (`benchmarks/scripts/`)
+- [x] Conda environment file (`environment.yml`)
+- [x] `triadic-head` PyPI package built (v0.1.0, validated with 50K training — gap +8.7%, signal +8.5%)
+- [ ] `triadic-head` published to PyPI (twine upload pending)
 
 ---
 
@@ -349,8 +351,8 @@ Phase 2 (Language Benchmarks) ████████████████�
 Phase 3 (Triadic Benchmarks)  ████████████████████  COMPLETE — 3 benchmarks executed
 Phase 4 (Scaling Study)       ████████████████████  COMPLETE — emergent semantic ordering found
 Phase 5 (Transfer + Loss)     ████████████████████  COMPLETE — InfoNCE closes 72% gap to Engine PCA
-Phase 6 (Paper)               ████████████████░░░░  IN PROGRESS — draft complete with Phase 5
-Phase 7 (Staged + Scale)      ██████░░░░░░░░░░░░░░  Run 29 COMPLETE (negative) — scale experiments pending
+Phase 6 (Paper)               ████████████████████  COMPLETE — 15-page paper compiled, all results included
+Phase 7 (Staged + Scale)      ████████░░░░░░░░░░░░  Run 29 COMPLETE (negative) — triadic-head package validated (50K PASS)
 ```
 
 ---
@@ -376,4 +378,5 @@ Phase 7 (Staged + Scale)      ██████░░░░░░░░░░�
 | **v4.0-transfer** | **2026-03-08** | **Experiment 10: GPT-2 transfer, InfoNCE closes 72% gap to Engine PCA** |
 | v4.1-from-scratch | 2026-03-08 | Runs 27-28: InfoNCE/Rank fail from-scratch, MSE confirmed best for weak embeddings |
 | v4.2-staged | 2026-03-09 | Run 29: Staged MSE→InfoNCE — negative result, confirms loss-embedding interaction is structural |
-| **v5.0** | TBD | Paper submission |
+| v5.0-package | 2026-03-09 | triadic-head package validated (50K GPT-2+InfoNCE: gap +8.7%, signal +8.5%) |
+| **v5.1** | TBD | Paper upload to Zenodo + triadic-head to PyPI |

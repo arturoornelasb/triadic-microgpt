@@ -45,6 +45,28 @@ def _encode_with_native(model, tokenizer, text: str, device, mapper: PrimeMapper
     }
 
 
+def _encode_with_transfer(model, tokenizer, text: str, device, mapper: PrimeMapper) -> dict:
+    """Encode text using GPT-2 Transfer model (experiment10)."""
+    ids = tokenizer.encode(text)
+    if not ids:
+        ids = [tokenizer.eos_token_id or 50256]
+    ids = ids[:1024]  # GPT-2 block size
+    x = torch.tensor([ids], dtype=torch.long, device=device)
+    with torch.no_grad():
+        _, triadic_proj, _ = model(x)
+    proj = triadic_proj[0].mean(dim=0).cpu().numpy()
+    bits = mapper.get_bits(proj)
+    composite = mapper.map(proj)
+    return {
+        'composite': composite,
+        'bits': bits,
+        'projection': proj.tolist(),
+        'n_active': int(sum(bits)),
+        'factors': prime_factors(composite),
+        'text': text,
+    }
+
+
 def _encode_with_hf(wrapper, text: str) -> dict:
     """Encode text using HuggingFace TriadicWrapper."""
     results = wrapper.encode(text)
@@ -69,7 +91,7 @@ class ModelInterface:
     Created by ModelPanel after loading; shared across all tabs.
     """
 
-    BACKENDS = ('native', 'hf')
+    BACKENDS = ('native', 'transfer', 'hf')
 
     def __init__(self, backend: str, model, tokenizer, mapper: PrimeMapper,
                  validator: TriadicValidator, device, config=None, hf_wrapper=None):
@@ -82,6 +104,8 @@ class ModelInterface:
         self.config = config            # TriadicGPTConfig | None
         self.hf_wrapper = hf_wrapper    # TriadicWrapper | None
         self._session_vocab: dict[str, dict] = {}  # cache of encoded words
+        self._probe_words: list[str] = []          # user-editable probe vocabulary
+        self._vocab_warmed: bool = False
 
     # ------------------------------------------------------------------
     # Info properties
@@ -93,13 +117,18 @@ class ModelInterface:
             return self.config.n_triadic_bits
         if self.hf_wrapper:
             return self.hf_wrapper.n_bits
-        return 64
+        if self.backend == 'transfer' and hasattr(self.model, 'n_triadic_bits'):
+            return self.model.n_triadic_bits
+        return self.mapper.n_bits if hasattr(self.mapper, 'n_bits') else 64
 
     @property
     def info_str(self) -> str:
         if self.config:
             cfg = self.config
             return f"{cfg.n_layer}L/{cfg.n_embd}D/{cfg.n_head}H/{cfg.n_triadic_bits}bits"
+        if self.backend == 'transfer':
+            n_bits = self.n_bits
+            return f"GPT-2 Transfer/{n_bits}bits"
         if self.hf_wrapper:
             return f"HF/{self.n_bits}bits"
         return "Unknown config"
@@ -130,6 +159,11 @@ class ModelInterface:
             result = _encode_with_native(
                 self.model, self.tokenizer, text,
                 self.device, self.mapper, block_size
+            )
+        elif self.backend == 'transfer':
+            result = _encode_with_transfer(
+                self.model, self.tokenizer, text,
+                self.device, self.mapper
             )
         else:
             result = _encode_with_hf(self.hf_wrapper, text)
@@ -208,7 +242,7 @@ class ModelInterface:
         gap_ab = self.validator.explain_gap(enc_a['composite'], enc_b['composite'])
 
         # Build pool to search
-        pool = vocab_pool or self._get_default_vocab()
+        pool = vocab_pool or self._probe_words or self._default_probe_words()
         pool = [w for w in pool if w not in (word_a, word_b, word_c)]
 
         matches = []
@@ -325,8 +359,10 @@ class ModelInterface:
         Generate response + triadic analysis.
         Returns response text, prompt/response prime signatures, similarity.
         """
+        if self.backend == 'transfer':
+            return self._chat_transfer(prompt, max_tokens, temperature)
         if self.backend != 'native':
-            raise NotImplementedError("Chat is only supported for native TriadicGPT backend.")
+            raise NotImplementedError("Chat is only supported for native and transfer backends.")
 
         from src.chat import generate_response
         response_text, h_prompt, h_resp = generate_response(
@@ -361,34 +397,151 @@ class ModelInterface:
             'prompt_extra_factors': gap['only_in_b_factors'],
         }
 
+    def _chat_transfer(self, prompt: str, max_tokens: int, temperature: float) -> dict:
+        """Generate response using GPT-2 Transfer model."""
+        prompt_ids = self.tokenizer.encode(prompt)
+        input_ids = torch.tensor([prompt_ids], dtype=torch.long, device=self.device)
+
+        with torch.no_grad():
+            # Get prompt triadic projection
+            _, p_triadic, _ = self.model(input_ids)
+            p_proj = p_triadic[0].mean(dim=0).cpu().numpy()
+
+            # Generate response
+            output_ids = self.model.generate(
+                input_ids, max_new_tokens=max_tokens, temperature=temperature
+            )
+            response_ids = output_ids[0, len(prompt_ids):].tolist()
+            response_text = self.tokenizer.decode(response_ids, skip_special_tokens=True)
+
+            # Get response triadic projection
+            _, r_triadic, _ = self.model(output_ids)
+            r_proj = r_triadic[0, len(prompt_ids):].mean(dim=0).cpu().numpy()
+
+        prime_p = self.mapper.map(p_proj)
+        prime_r = self.mapper.map(r_proj)
+        bits_p = self.mapper.get_bits(p_proj)
+        bits_r = self.mapper.get_bits(r_proj)
+
+        gap = self.validator.explain_gap(prime_r, prime_p)
+        sim = self.validator.similarity(prime_r, prime_p)
+
+        return {
+            'response': response_text,
+            'prompt_prime': prime_p,
+            'prompt_bits': bits_p,
+            'prompt_projection': p_proj.tolist(),
+            'response_prime': prime_r,
+            'response_bits': bits_r,
+            'response_projection': r_proj.tolist(),
+            'similarity': sim,
+            'resp_subsumes_prompt': self.validator.subsumes(prime_r, prime_p),
+            'shared_factors': gap['shared_factors'],
+            'resp_extra_factors': gap['only_in_a_factors'],
+            'prompt_extra_factors': gap['only_in_b_factors'],
+        }
+
     # ------------------------------------------------------------------
-    # Helpers
+    # Probe vocabulary (for prime inspection)
     # ------------------------------------------------------------------
 
-    def _get_default_vocab(self) -> list[str]:
-        """Return a default vocabulary pool for analogy search."""
-        vocab_path = PROJECT_ROOT / 'data' / 'core_concepts.txt'
-        if vocab_path.exists():
-            with open(vocab_path) as f:
-                return [line.strip() for line in f if line.strip()]
-        # Fallback built-in
-        return [
-            'king', 'queen', 'man', 'woman', 'prince', 'princess', 'boy', 'girl',
+    def get_probe_words(self) -> list[str]:
+        """Return current probe vocabulary."""
+        return list(self._probe_words)
+
+    def set_probe_words(self, words: list[str]) -> None:
+        """Replace probe vocabulary and re-encode new words."""
+        self._probe_words = list(words)
+        for w in words:
+            if w and w not in self._session_vocab:
+                self.encode(w)
+
+    def warm_vocab(self) -> dict:
+        """Pre-encode default probe vocabulary. Safe for background thread."""
+        if self._vocab_warmed:
+            return {'n_words': len(self._session_vocab), 'already_warm': True}
+        words = self._default_probe_words()
+        self._probe_words = words
+        for w in words:
+            if w not in self._session_vocab:
+                self.encode(w)
+        self._vocab_warmed = True
+        return {'n_words': len(self._session_vocab), 'n_probes': len(words)}
+
+    def prime_to_words(self) -> dict[int, list[str]]:
+        """Reverse index: prime -> list of probe words that have it active."""
+        index: dict[int, list[str]] = {}
+        for word in self._probe_words:
+            enc = self._session_vocab.get(word)
+            if not enc:
+                continue
+            for factor in enc.get('factors', []):
+                if factor not in index:
+                    index[factor] = []
+                index[factor].append(word)
+        return index
+
+    def words_for_prime(self, prime: int) -> list[str]:
+        """Return all probe words that have this prime factor active."""
+        result = []
+        for word in self._probe_words:
+            enc = self._session_vocab.get(word)
+            if enc and prime in enc.get('factors', []):
+                result.append(word)
+        return sorted(result)
+
+    def _default_probe_words(self) -> list[str]:
+        """Broad semantic probe set -- same words, any model, emergent labels."""
+        seed = [
+            'king', 'queen', 'prince', 'princess', 'knight', 'emperor', 'lord',
+            'servant', 'soldier', 'warrior', 'priest', 'monk', 'wizard',
             'father', 'mother', 'brother', 'sister', 'son', 'daughter',
+            'husband', 'wife', 'child', 'baby', 'uncle', 'aunt', 'cousin',
+            'man', 'woman', 'boy', 'girl', 'person', 'human', 'stranger',
+            'friend', 'enemy', 'hero', 'villain', 'giant', 'dwarf',
             'dog', 'cat', 'fish', 'bird', 'horse', 'cow', 'sheep', 'lion',
-            'happy', 'sad', 'angry', 'love', 'hate', 'hope', 'fear', 'peace', 'war',
-            'fire', 'water', 'sun', 'moon', 'earth', 'wind', 'rain', 'snow',
-            'big', 'small', 'fast', 'slow', 'old', 'young', 'hot', 'cold',
-            'doctor', 'teacher', 'hospital', 'school', 'castle', 'church', 'garden',
+            'wolf', 'bear', 'eagle', 'snake', 'rabbit', 'mouse', 'deer',
+            'whale', 'shark', 'dragon', 'spider', 'butterfly',
+            'happy', 'sad', 'angry', 'love', 'hate', 'hope', 'fear',
+            'peace', 'war', 'joy', 'pain', 'proud', 'shame', 'brave',
+            'lonely', 'kind', 'cruel', 'gentle', 'fierce', 'calm',
+            'fire', 'water', 'earth', 'wind', 'rain', 'snow', 'ice',
+            'sun', 'moon', 'star', 'cloud', 'storm', 'thunder', 'lightning',
+            'river', 'ocean', 'mountain', 'forest', 'desert', 'island',
+            'tree', 'flower', 'grass', 'seed', 'leaf', 'rose', 'garden',
+            'bread', 'milk', 'apple', 'cake', 'meat', 'rice',
+            'wine', 'honey', 'salt', 'sugar', 'cheese', 'butter', 'soup',
+            'head', 'heart', 'hand', 'foot', 'blood', 'bone', 'skin',
+            'brain', 'face', 'mouth', 'tooth', 'finger', 'shoulder',
+            'house', 'castle', 'church', 'school', 'hospital', 'prison',
+            'temple', 'palace', 'tower', 'bridge', 'village', 'city',
+            'sword', 'shield', 'crown', 'ring', 'key', 'door', 'window',
+            'table', 'chair', 'book', 'stone', 'gold', 'silver', 'iron',
+            'wheel', 'rope', 'mirror', 'candle', 'bell', 'clock',
+            'car', 'boat', 'ship', 'train', 'wagon', 'plane',
+            'dress', 'shirt', 'boot', 'cloak', 'armor', 'hat', 'glove',
+            'red', 'blue', 'green', 'white', 'black', 'dark', 'light',
+            'bright', 'golden', 'pale', 'deep',
+            'big', 'small', 'tall', 'short', 'fast', 'slow', 'old', 'young',
+            'hot', 'cold', 'hard', 'soft', 'heavy', 'sharp', 'smooth',
+            'clean', 'dirty', 'rich', 'poor', 'strong', 'weak',
+            'morning', 'night', 'summer', 'winter', 'spring', 'autumn',
+            'dawn', 'dusk', 'ancient', 'modern', 'forever', 'moment',
             'run', 'walk', 'swim', 'fly', 'jump', 'fall', 'sleep', 'eat',
-            'red', 'blue', 'green', 'white', 'black', 'gold', 'silver',
-            'friend', 'enemy', 'morning', 'night', 'summer', 'winter',
-            'book', 'tree', 'flower', 'cake', 'bread', 'milk', 'apple',
-            'table', 'chair', 'door', 'window', 'car', 'boat', 'bridge',
-            'music', 'dance', 'song', 'game', 'dream', 'cloud', 'star',
+            'fight', 'sing', 'dance', 'laugh', 'cry', 'speak', 'listen',
+            'think', 'dream', 'build', 'break', 'burn', 'grow', 'die',
+            'kill', 'heal', 'teach', 'learn', 'give', 'take', 'hide',
+            'truth', 'lie', 'power', 'magic', 'fate', 'death', 'life',
+            'soul', 'spirit', 'wisdom', 'knowledge', 'freedom', 'justice',
+            'honor', 'glory', 'secret', 'mystery', 'silence', 'shadow',
+            'doctor', 'teacher', 'farmer', 'hunter', 'merchant', 'smith',
+            'music', 'song', 'story', 'poem', 'game',
         ]
-
-    def add_to_vocab(self, word: str) -> None:
-        """Pre-encode and cache a word in the session vocabulary."""
-        if word and word not in self._session_vocab:
-            self.encode(word)
+        seen = set()
+        unique = []
+        for w in seed:
+            wl = w.lower()
+            if wl not in seen:
+                seen.add(wl)
+                unique.append(wl)
+        return unique

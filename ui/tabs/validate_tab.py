@@ -71,7 +71,7 @@ class ValidateTab(QWidget):
         layout.setContentsMargins(12, 12, 12, 12)
         layout.setSpacing(10)
 
-        lbl_title = QLabel("VALIDATE — Auditoría de calidad semántica")
+        lbl_title = QLabel("VALIDATE — Semantic quality audit")
         lbl_title.setObjectName("sectionLabel")
         layout.addWidget(lbl_title)
 
@@ -88,13 +88,13 @@ class ValidateTab(QWidget):
         # Add group row
         add_row = QHBoxLayout()
         self._txt_group_name = QLineEdit()
-        self._txt_group_name.setPlaceholderText("Nombre del grupo...")
+        self._txt_group_name.setPlaceholderText("Group name...")
         self._txt_group_name.setFixedWidth(140)
         add_row.addWidget(self._txt_group_name)
         self._txt_group_words = QLineEdit()
-        self._txt_group_words.setPlaceholderText("palabras separadas por coma...")
+        self._txt_group_words.setPlaceholderText("comma-separated words...")
         add_row.addWidget(self._txt_group_words)
-        btn_add_group = QPushButton("+ Grupo")
+        btn_add_group = QPushButton("+ Group")
         btn_add_group.setObjectName("smallButton")
         btn_add_group.clicked.connect(self._add_group)
         add_row.addWidget(btn_add_group)
@@ -106,7 +106,7 @@ class ValidateTab(QWidget):
 
         # Groups table
         self._tbl_groups = QTableWidget(0, 3)
-        self._tbl_groups.setHorizontalHeaderLabels(['Grupo', 'Palabras', ''])
+        self._tbl_groups.setHorizontalHeaderLabels(['Group', 'Words', ''])
         self._tbl_groups.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         self._tbl_groups.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         self._tbl_groups.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
@@ -136,20 +136,20 @@ class ValidateTab(QWidget):
         layout.addWidget(self._lbl_global)
 
         # ── Check cards ───────────────────────────────────
-        self._card_diversity = _CheckCard("Diversity: firmas únicas")
-        self._card_bits = _CheckCard("Active Bits: media de bits activos")
+        self._card_diversity = _CheckCard("Diversity: unique signatures")
+        self._card_bits = _CheckCard("Active Bits: mean active bits")
         self._card_ordering = _CheckCard("Semantic Ordering: intra > inter gap")
         for c in (self._card_diversity, self._card_bits, self._card_ordering):
             layout.addWidget(c)
 
         # ── Per-group table ───────────────────────────────
-        lbl_per = QLabel("RESULTADOS POR GRUPO")
+        lbl_per = QLabel("PER-GROUP RESULTS")
         lbl_per.setObjectName("sectionLabel")
         layout.addWidget(lbl_per)
 
         self._tbl_results = QTableWidget(0, 5)
         self._tbl_results.setHorizontalHeaderLabels(
-            ['Grupo', 'Intra', 'Inter', 'Gap', 'Status']
+            ['Group', 'Intra', 'Inter', 'Gap', 'Status']
         )
         self._tbl_results.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self._tbl_results.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -191,9 +191,9 @@ class ValidateTab(QWidget):
 
     def _run_validate(self):
         if not self._groups:
-            self._lbl_status.setText("Agrega al menos un grupo.")
+            self._lbl_status.setText("Add at least one group.")
             return
-        self._lbl_status.setText("Ejecutando validación...")
+        self._lbl_status.setText("Running validation...")
         self._worker = TaskWorker(self._iface.validate, dict(self._groups))
         self._worker.result_ready.connect(self._on_result)
         self._worker.error_occurred.connect(self._on_error)
@@ -209,8 +209,8 @@ class ValidateTab(QWidget):
         n_unique = result.get('unique_signatures', 0)
         n_total = result.get('n_concepts', 0)
 
-        self._lbl_global.setText("✓ PASS — El modelo supera todos los checks" if passed_all
-                                 else "✗ FAIL — Hay checks fallidos")
+        self._lbl_global.setText("✓ PASS — Model passes all checks" if passed_all
+                                 else "✗ FAIL — Some checks failed")
         self._lbl_global.setObjectName("passLabel" if passed_all else "failLabel")
         self._lbl_global.style().unpolish(self._lbl_global)
         self._lbl_global.style().polish(self._lbl_global)
@@ -218,7 +218,7 @@ class ValidateTab(QWidget):
         # Diversity
         self._card_diversity.set_result(
             diversity.get('pass', False),
-            f"{n_unique}/{n_total} firmas únicas"
+            f"{n_unique}/{n_total} unique signatures"
         )
 
         # Active bits — value is a ratio (0-1)
@@ -227,7 +227,7 @@ class ValidateTab(QWidget):
         mean_active = avg_ratio * n_bits
         self._card_bits.set_result(
             active_bits.get('pass', False),
-            f"{mean_active:.1f}/{n_bits} bits activos ({avg_ratio*100:.0f}%)"
+            f"{mean_active:.1f}/{n_bits} active bits ({avg_ratio*100:.0f}%)"
         )
 
         # Semantic ordering
@@ -253,7 +253,7 @@ class ValidateTab(QWidget):
             self._tbl_results.setItem(row, 4, status_item)
 
         self._lbl_status.setText(
-            f"Validación completa — {'PASS' if passed_all else 'FAIL'} | {n_total} conceptos"
+            f"Validation complete — {'PASS' if passed_all else 'FAIL'} | {n_total} concepts"
         )
 
     def _on_error(self, msg: str):

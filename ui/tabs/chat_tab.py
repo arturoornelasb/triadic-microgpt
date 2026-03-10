@@ -50,17 +50,17 @@ class ChatTab(QWidget):
         # Input row
         input_row = QHBoxLayout()
         self._txt_input = QLineEdit()
-        self._txt_input.setPlaceholderText("Escribe tu mensaje...")
+        self._txt_input.setPlaceholderText("Type your message...")
         self._txt_input.returnPressed.connect(self._send)
         input_row.addWidget(self._txt_input)
 
-        self._btn_send = QPushButton("Enviar")
+        self._btn_send = QPushButton("Send")
         self._btn_send.setObjectName("sendButton")
         self._btn_send.setMinimumWidth(80)
         self._btn_send.clicked.connect(self._send)
         input_row.addWidget(self._btn_send)
 
-        btn_clear = QPushButton("Limpiar")
+        btn_clear = QPushButton("Clear")
         btn_clear.setObjectName("smallButton")
         btn_clear.clicked.connect(self._clear_chat)
         input_row.addWidget(btn_clear)
@@ -78,7 +78,7 @@ class ChatTab(QWidget):
         right_l.setContentsMargins(6, 12, 12, 12)
         right_l.setSpacing(8)
 
-        lbl_panel = QLabel("ANÁLISIS TRIÁDICO (último turno)")
+        lbl_panel = QLabel("TRIADIC ANALYSIS (last turn)")
         lbl_panel.setObjectName("sectionLabel")
         right_l.addWidget(lbl_panel)
 
@@ -93,7 +93,7 @@ class ChatTab(QWidget):
         panel_l.setSpacing(8)
 
         # Prompt analysis
-        lbl_prompt = QLabel("PREGUNTA")
+        lbl_prompt = QLabel("PROMPT")
         lbl_prompt.setObjectName("sectionLabel")
         panel_l.addWidget(lbl_prompt)
 
@@ -106,7 +106,7 @@ class ChatTab(QWidget):
         panel_l.addWidget(self._bv_prompt)
 
         # Response analysis
-        lbl_resp = QLabel("RESPUESTA")
+        lbl_resp = QLabel("RESPONSE")
         lbl_resp.setObjectName("sectionLabel")
         panel_l.addWidget(lbl_resp)
 
@@ -123,16 +123,16 @@ class ChatTab(QWidget):
         sim_frame.setObjectName("card")
         sim_l = QVBoxLayout(sim_frame)
         sim_l.setContentsMargins(8, 6, 8, 6)
-        self._lbl_sim = QLabel("SIMILITUD: —")
+        self._lbl_sim = QLabel("SIMILARITY: —")
         self._lbl_sim.setObjectName("statusLabel")
         sim_l.addWidget(self._lbl_sim)
-        self._lbl_subsumes = QLabel("RESP ⊇ PREG: —")
+        self._lbl_subsumes = QLabel("RESP ⊇ PROMPT: —")
         self._lbl_subsumes.setObjectName("statsLabel")
         sim_l.addWidget(self._lbl_subsumes)
         panel_l.addWidget(sim_frame)
 
         # Shared + gap
-        lbl_shared = QLabel("COMPARTIDOS:")
+        lbl_shared = QLabel("SHARED:")
         lbl_shared.setObjectName("sectionLabel")
         panel_l.addWidget(lbl_shared)
         self._lbl_shared_factors = QLabel("—")
@@ -140,7 +140,7 @@ class ChatTab(QWidget):
         self._lbl_shared_factors.setWordWrap(True)
         panel_l.addWidget(self._lbl_shared_factors)
 
-        lbl_gap = QLabel("RESP tiene de más:")
+        lbl_gap = QLabel("RESP extra factors:")
         lbl_gap.setObjectName("sectionLabel")
         panel_l.addWidget(lbl_gap)
         self._lbl_gap_factors = QLabel("—")
@@ -164,8 +164,8 @@ class ChatTab(QWidget):
             return
         self._txt_input.clear()
         self._btn_send.setEnabled(False)
-        self._lbl_status.setText("Generando respuesta...")
-        self._append_message("Usuario", text, '#89b4fa')
+        self._lbl_status.setText("Generating response...")
+        self._append_message("User", text, '#89b4fa')
 
         self._worker = TaskWorker(self._iface.chat, text)
         self._worker.result_ready.connect(self._on_chat_result)
@@ -176,9 +176,16 @@ class ChatTab(QWidget):
         cursor = self._chat_display.textCursor()
         cursor.movePosition(QTextCursor.End)
         self._chat_display.setTextCursor(cursor)
+        escaped = text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+        body = escaped.replace(chr(10), '<br>')
         html = (
-            f'<p><span style="color:{color}; font-weight:bold;">{role}:</span> '
-            f'<span style="color:#cdd6f4;">{text.replace(chr(10), "<br>")}</span></p>'
+            f'<div style="margin: 6px 0; padding: 8px 12px; '
+            f'border-left: 3px solid {color}; '
+            f'background-color: #1e1e2e; border-radius: 4px;">'
+            f'<span style="color:{color}; font-weight:bold; font-size:10pt;">{role}</span>'
+            f'<br>'
+            f'<span style="color:#cdd6f4; font-size:10pt;">{body}</span>'
+            f'</div><br>'
         )
         self._chat_display.insertHtml(html)
         self._chat_display.ensureCursorVisible()
@@ -190,14 +197,14 @@ class ChatTab(QWidget):
         self._bv_resp.reset()
         self._lbl_prompt_phi.setText("Φ: —")
         self._lbl_resp_phi.setText("Φ: —")
-        self._lbl_sim.setText("SIMILITUD: —")
-        self._lbl_subsumes.setText("RESP ⊇ PREG: —")
+        self._lbl_sim.setText("SIMILARITY: —")
+        self._lbl_subsumes.setText("RESP ⊇ PROMPT: —")
         self._lbl_shared_factors.setText("—")
         self._lbl_gap_factors.setText("—")
 
     def _on_chat_result(self, result: dict):
         response = result.get('response', '')
-        self._append_message("IA", response, '#a6e3a1')
+        self._append_message("AI", response, '#a6e3a1')
 
         # Update triadic panel — interface returns flat dict
         p_phi = result.get('prompt_prime', 0)
@@ -227,8 +234,8 @@ class ChatTab(QWidget):
         shared = result.get('shared_factors', [])
         gap = result.get('resp_extra_factors', [])
 
-        self._lbl_sim.setText(f"SIMILITUD: {sim*100:.1f}%")
-        self._lbl_subsumes.setText(f"RESP ⊇ PREG: {'✓ Sí' if sub else '✗ No'}")
+        self._lbl_sim.setText(f"SIMILARITY: {sim*100:.1f}%")
+        self._lbl_subsumes.setText(f"RESP ⊇ PROMPT: {'✓ Yes' if sub else '✗ No'}")
         self._lbl_shared_factors.setText(
             ' '.join(str(p) for p in shared[:20]) if shared else '—'
         )

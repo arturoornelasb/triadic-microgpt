@@ -29,6 +29,7 @@ class ModelPanel(QWidget):
     # Default paths relative to project root
     _DEFAULT_CKPT = 'checkpoints/torch_run15_strongalign/model_L12_D512_B64_best.pt'
     _DEFAULT_TOKN = 'checkpoints/torch_run15_strongalign/tokenizer.json'
+    _DEFAULT_TRANSFER_CKPT = 'experiment10/checkpoints_infonce/phase_2_(unfreeze_last_layers)_final.pt'
 
     def __init__(self, project_root: Path, parent=None):
         super().__init__(parent)
@@ -47,7 +48,7 @@ class ModelPanel(QWidget):
         lbl_title.setObjectName("titleLabel")
         title_row.addWidget(lbl_title)
         title_row.addStretch()
-        self._lbl_status = QLabel("Sin modelo cargado")
+        self._lbl_status = QLabel("No model loaded")
         self._lbl_status.setObjectName("statusWarning")
         title_row.addWidget(self._lbl_status)
         outer.addLayout(title_row)
@@ -59,7 +60,8 @@ class ModelPanel(QWidget):
         # Backend selector
         row.addWidget(QLabel("Backend:"))
         self._cmb_backend = QComboBox()
-        self._cmb_backend.addItem("TriadicGPT nativo (.pt)", 'native')
+        self._cmb_backend.addItem("TriadicGPT Native (.pt)", 'native')
+        self._cmb_backend.addItem("GPT-2 Transfer (Exp10)", 'transfer')
         self._cmb_backend.addItem("HuggingFace (TriadicWrapper)", 'hf')
         self._cmb_backend.setFixedWidth(200)
         self._cmb_backend.currentIndexChanged.connect(self._on_backend_changed)
@@ -100,7 +102,7 @@ class ModelPanel(QWidget):
         self._spn_bits.setValue(64)
         self._spn_bits.setSingleStep(8)
         self._spn_bits.setFixedWidth(60)
-        self._spn_bits.setToolTip("Número de bits triádicos (solo para backend HF)")
+        self._spn_bits.setToolTip("Number of triadic bits (HF backend only)")
         row.addWidget(self._spn_bits)
 
         # align_mode (HF only)
@@ -109,13 +111,13 @@ class ModelPanel(QWidget):
         self._cmb_align = QComboBox()
         self._cmb_align.addItems(['infonce', 'rank', 'mse'])
         self._cmb_align.setFixedWidth(90)
-        self._cmb_align.setToolTip("Modo de alignment loss (infonce=embeddings ricos, mse=from-scratch)")
+        self._cmb_align.setToolTip("Alignment loss mode (infonce=rich embeddings, mse=from-scratch)")
         row.addWidget(self._cmb_align)
 
         row.addStretch()
 
         # Load button
-        self._btn_load = QPushButton("Cargar Modelo")
+        self._btn_load = QPushButton("Load Model")
         self._btn_load.clicked.connect(self._load_model)
         self._btn_load.setMinimumWidth(120)
         row.addWidget(self._btn_load)
@@ -139,17 +141,28 @@ class ModelPanel(QWidget):
     def _on_backend_changed(self, idx: int):
         backend = self._cmb_backend.itemData(idx)
         is_native = (backend == 'native')
-        self._lbl_ckpt.setText("Checkpoint:" if is_native else "Modelo HF o .pt:")
-        self._txt_ckpt.setPlaceholderText(
-            str(self.project_root / self._DEFAULT_CKPT) if is_native else "gpt2 / gpt2-medium / ..."
-        )
+        is_transfer = (backend == 'transfer')
+        is_hf = (backend == 'hf')
+
+        if is_native:
+            self._lbl_ckpt.setText("Checkpoint:")
+            self._txt_ckpt.setPlaceholderText(str(self.project_root / self._DEFAULT_CKPT))
+            self._txt_ckpt.setText(str(self.project_root / self._DEFAULT_CKPT))
+        elif is_transfer:
+            self._lbl_ckpt.setText("Transfer .pt:")
+            self._txt_ckpt.setPlaceholderText(str(self.project_root / self._DEFAULT_TRANSFER_CKPT))
+            self._txt_ckpt.setText(str(self.project_root / self._DEFAULT_TRANSFER_CKPT))
+        else:
+            self._lbl_ckpt.setText("HF model or .pt:")
+            self._txt_ckpt.setPlaceholderText("gpt2 / gpt2-medium / ...")
+
         # Show/hide tokenizer (only for native)
         self._lbl_tok.setVisible(is_native)
         self._txt_tok.setVisible(is_native)
         self._btn_browse_tok.setVisible(is_native)
         # HF-only controls
-        self._lbl_align.setVisible(not is_native)
-        self._cmb_align.setVisible(not is_native)
+        self._lbl_align.setVisible(is_hf)
+        self._cmb_align.setVisible(is_hf)
         self._spn_bits.setEnabled(not is_native)
 
     # ------------------------------------------------------------------
@@ -158,16 +171,16 @@ class ModelPanel(QWidget):
 
     def _browse_ckpt(self):
         path, _ = QFileDialog.getOpenFileName(
-            self, "Seleccionar checkpoint", str(self.project_root / "checkpoints"),
-            "PyTorch checkpoint (*.pt *.pth);;Todos (*)"
+            self, "Select checkpoint", str(self.project_root / "checkpoints"),
+            "PyTorch checkpoint (*.pt *.pth);;All (*)"
         )
         if path:
             self._txt_ckpt.setText(path)
 
     def _browse_tok(self):
         path, _ = QFileDialog.getOpenFileName(
-            self, "Seleccionar tokenizer", str(self.project_root / "checkpoints"),
-            "Tokenizer JSON (*.json);;Todos (*)"
+            self, "Select tokenizer", str(self.project_root / "checkpoints"),
+            "Tokenizer JSON (*.json);;All (*)"
         )
         if path:
             self._txt_tok.setText(path)
@@ -183,20 +196,21 @@ class ModelPanel(QWidget):
         n_bits = self._spn_bits.value()
         align_mode = self._cmb_align.currentText()
 
-        # Validate paths for native backend
-        if backend == 'native':
+        # Validate paths for native and transfer backends
+        if backend in ('native', 'transfer'):
             if not ckpt_path or not Path(ckpt_path).exists():
-                self._set_status("❌ Checkpoint no encontrado", error=True)
+                self._set_status("Checkpoint not found", error=True)
                 return
+        if backend == 'native':
             if not tok_path or not Path(tok_path).exists():
-                self._set_status("❌ Tokenizer no encontrado", error=True)
+                self._set_status("Tokenizer not found", error=True)
                 return
 
         self._btn_load.setEnabled(False)
         self._progress.setVisible(True)
-        self._set_status("Cargando...", warning=True)
+        self._set_status("Loading...", warning=True)
 
-        if backend == 'native':
+        if backend in ('native', 'transfer'):
             hf_name = ''
         else:
             hf_name = ckpt_path if not Path(ckpt_path).exists() else ''
@@ -222,7 +236,7 @@ class ModelPanel(QWidget):
         device = iface.device_str
         params = f"{iface.param_count / 1e6:.1f}M params"
         self._set_status(f"✓ {info} | {device} | {params}", ok=True)
-        self.status_message.emit(f"Modelo cargado: {info} | {device} | {params}")
+        self.status_message.emit(f"Model loaded: {info} | {device} | {params}")
         self.model_loaded.emit(iface)
 
     def _on_progress(self, msg: str):

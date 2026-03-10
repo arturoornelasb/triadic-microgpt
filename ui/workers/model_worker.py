@@ -42,7 +42,7 @@ class ModelLoadWorker(QThread):
             validator = TriadicValidator()
 
             if self.backend == 'native':
-                self.progress.emit(f'Cargando modelo nativo desde {Path(self.checkpoint_path).name}...')
+                self.progress.emit(f'Loading native model from {Path(self.checkpoint_path).name}...')
                 from src.evaluate import load_model
                 model, tokenizer, config = load_model(
                     self.checkpoint_path, self.tokenizer_path, device
@@ -59,11 +59,49 @@ class ModelLoadWorker(QThread):
                     device=device,
                     config=config,
                 )
-                self.progress.emit('Modelo nativo cargado.')
+                self.progress.emit('Native model loaded.')
+                self.loaded.emit(iface)
+
+            elif self.backend == 'transfer':
+                self.progress.emit('Loading GPT-2 base model...')
+                from transformers import GPT2LMHeadModel, GPT2Tokenizer
+                gpt2_model = GPT2LMHeadModel.from_pretrained('gpt2')
+
+                self.progress.emit('Building GPT2TriadicModel...')
+                sys.path.insert(0, str(PROJECT_ROOT / 'experiment10' / 'src'))
+                from model import GPT2TriadicModel
+                model = GPT2TriadicModel(gpt2_model, n_triadic_bits=self.n_bits)
+
+                self.progress.emit(f'Loading transfer weights from {Path(self.checkpoint_path).name}...')
+                state = torch.load(self.checkpoint_path, map_location=device, weights_only=False)
+                if 'model_state_dict' in state:
+                    model.load_state_dict(state['model_state_dict'], strict=False)
+                    n_bits = state.get('n_triadic_bits', self.n_bits)
+                    if n_bits != self.n_bits:
+                        self.n_bits = n_bits
+                        mapper = PrimeMapper(n_bits)
+                else:
+                    model.load_state_dict(state, strict=False)
+                model.to(device)
+                model.eval()
+
+                tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
+                mapper = PrimeMapper(self.n_bits)
+
+                from ui.model_interface import ModelInterface
+                iface = ModelInterface(
+                    backend='transfer',
+                    model=model,
+                    tokenizer=tokenizer,
+                    mapper=mapper,
+                    validator=validator,
+                    device=device,
+                )
+                self.progress.emit('GPT-2 Transfer model loaded.')
                 self.loaded.emit(iface)
 
             else:  # 'hf'
-                self.progress.emit(f'Cargando TriadicWrapper sobre {self.hf_model_name}...')
+                self.progress.emit(f'Loading TriadicWrapper on {self.hf_model_name}...')
                 from triadic_head import TriadicWrapper
                 wrapper = TriadicWrapper(
                     self.hf_model_name,
@@ -72,7 +110,7 @@ class ModelLoadWorker(QThread):
                     device=str(device),
                 )
                 if self.checkpoint_path and Path(self.checkpoint_path).exists():
-                    self.progress.emit('Cargando pesos entrenados del wrapper...')
+                    self.progress.emit('Loading trained wrapper weights...')
                     state = torch.load(self.checkpoint_path, map_location=device)
                     wrapper.triadic_head.load_state_dict(state)
                 wrapper.model.eval()
@@ -88,7 +126,7 @@ class ModelLoadWorker(QThread):
                     device=device,
                     hf_wrapper=wrapper,
                 )
-                self.progress.emit('TriadicWrapper cargado.')
+                self.progress.emit('TriadicWrapper loaded.')
                 self.loaded.emit(iface)
 
         except Exception as e:
@@ -97,7 +135,7 @@ class ModelLoadWorker(QThread):
 
 class TaskWorker(QThread):
     """Generic worker for running any callable in a background thread."""
-    result_ready = Signal(dict)
+    result_ready = Signal(object)   # object avoids PySide6 int64 overflow on big primes
     error_occurred = Signal(str)
 
     def __init__(self, fn, *args, **kwargs):

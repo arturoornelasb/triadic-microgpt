@@ -38,23 +38,63 @@ The application has a persistent **model panel** at the top and **7 tabs** below
 
 ---
 
-## Model Panel
+## Model Panel — Loading a Model
 
-Located at the top of the window. Supports two backends:
+Located at the top of the window. **You must load a model before using any tab** (except Benchmarks). The app supports three backends:
 
-| Field | Native `.pt` | HuggingFace |
-|-------|-------------|-------------|
-| Backend | TriadicGPT nativo (.pt) | HuggingFace (TriadicWrapper) |
-| Checkpoint | Path to `.pt` file | HF model name or `.pt` weights path |
-| Tokenizer | Path to `tokenizer.json` | Hidden (HF handles it) |
-| Bits (n_bits) | Fixed from checkpoint config | 8–128, default 64 |
-| Align mode | — | `infonce` / `rank` / `mse` |
+### Backend 1: TriadicGPT Native (.pt)
 
-**Default paths:**
-- Checkpoint: `checkpoints/torch_run15_strongalign/model_L12_D512_B64_best.pt`
-- Tokenizer: `checkpoints/torch/tokenizer.json`
+This loads a from-scratch TriadicGPT model trained with `src/torch_train.py`.
 
-After clicking **Cargar Modelo**, a background thread loads the checkpoint (UI stays responsive). The status label turns green on success and shows model info.
+| Field | Value |
+|-------|-------|
+| Backend | `TriadicGPT Native (.pt)` |
+| Checkpoint | Path to `.pt` file (e.g. `checkpoints/torch_run15_strongalign/model_L12_D512_B64_best.pt`) |
+| Tokenizer | Path to `tokenizer.json` (e.g. `checkpoints/torch/tokenizer.json`) |
+| Bits | Fixed from checkpoint config (not editable) |
+
+**When to use:** You trained your own TriadicGPT from scratch and have both a `.pt` checkpoint and a `tokenizer.json`.
+
+> **Note:** The tokenizer must match the training run. All runs ≥ Run 7 use `checkpoints/torch/tokenizer.json`. The Run 15 tokenizer was deleted — use the one from `checkpoints/torch/`.
+
+### Backend 2: GPT-2 Transfer (Exp10)
+
+This loads a pre-trained GPT-2 with a triadic projection head fine-tuned on top (Experiment 10).
+
+| Field | Value |
+|-------|-------|
+| Backend | `GPT-2 Transfer (Exp10)` |
+| Transfer .pt | Path to the transfer checkpoint (e.g. `experiment10/checkpoints_infonce/phase_2_(unfreeze_last_layers)_final.pt`) |
+| Bits | Editable (default 64) |
+
+**When to use:** You want the best triadic quality. The InfoNCE transfer model closes 72% of the gap to Engine PCA and has the strongest semantic signal.
+
+> **Note:** This backend uses GPT-2's tokenizer (downloaded automatically from HuggingFace on first use). The text generation in the Chat tab will produce TinyStories-style output because GPT-2 was fine-tuned on that dataset.
+
+### Backend 3: HuggingFace (TriadicWrapper)
+
+This wraps any HuggingFace causal LM with a post-hoc triadic projection (no trained head — uses PCA/random projection).
+
+| Field | Value |
+|-------|-------|
+| Backend | `HuggingFace (TriadicWrapper)` |
+| HF model or .pt | HF model name (`gpt2`, `gpt2-medium`, etc.) or path to saved weights |
+| Bits | Editable (8–128, default 64) |
+| Align mode | `infonce` / `rank` / `mse` |
+
+**When to use:** Quick exploration with any HuggingFace model. Lower triadic quality than a trained head but works with any model out of the box.
+
+> **Note:** Chat is not available with this backend.
+
+### Loading process
+
+1. Select a backend from the dropdown
+2. The checkpoint/tokenizer fields auto-fill with defaults (edit if needed)
+3. Click **Load Model**
+4. A progress bar appears while the model loads in a background thread
+5. Status turns green: `✓ GPT-2 Transfer/64bits | CUDA | 124.5M params`
+6. After loading, 280 probe words are indexed in the background for the Prime Inspector
+7. Status bar shows: `Model ready -- 280 probe words indexed -- click any prime to inspect`
 
 ---
 
@@ -83,15 +123,39 @@ After clicking **Cargar Modelo**, a background thread loads the checkpoint (UI s
 2. Click **Compare →**
 
 **Output:**
-- **Similitud %** — Jaccard similarity over prime factor sets
+- **Similarity %** — Jaccard similarity over prime factor sets, with visual bar
 - **A ⊇ B / B ⊇ A** — Subsumption (divisibility check)
-- **Factor rows** — Shared factors (green), only in A (yellow), only in B (peach)
+- **Factor chips** — Clickable prime number buttons organized by category:
+  - **Shared** (green) — primes present in both A and B
+  - **Only in A** (yellow) — primes unique to A
+  - **Only in B** (peach) — primes unique to B
+  - **Click any chip** to open the **Prime Inspector** (see below)
 - **LCM composition** — A∪B = lcm(Φ_A, Φ_B)
 - **Bit vectors** — Side-by-side comparison. Color encoding:
   - Green = shared active bit
   - Yellow = only A active
   - Peach = only B active
   - Dark = both inactive
+
+### Prime Inspector (dialog)
+
+When you click any prime chip in the Compare tab, a **Prime Inspector** dialog opens. This is the key tool for understanding what each prime "means" — since primes are learned features, their meaning is discovered empirically by looking at which words share them.
+
+**Left panel — Words sharing this prime:**
+- Shows all probe words whose encoding includes this prime factor
+- Displays count: `N / 280 words share prime P`
+
+**Right panel — Editable probe vocabulary:**
+- Text area with one word per line (default: 280 words across 20+ semantic domains)
+- Edit the list to add domain-specific words, remove irrelevant ones, or focus on a topic
+- Click **Apply Vocabulary** to re-encode and refresh the word list
+
+**How to interpret primes:**
+- A prime shared by `king, queen, prince, emperor, lord` likely encodes "royalty" or "authority"
+- A prime shared by `dog, cat, horse, bird, fish` likely encodes "animal"
+- A prime shared by `red, blue, green, white, black` likely encodes "color"
+- Some primes may encode more abstract features (e.g., "concrete noun" or "positive valence")
+- The system does NOT claim to know what a prime means — it shows you the data and you interpret the pattern
 
 ---
 
@@ -126,7 +190,7 @@ After clicking **Cargar Modelo**, a background thread loads the checkpoint (UI s
 - **Results table** — Top-10 vocabulary matches ranked by similarity to Φ_target. ✓ = similarity ≥ median pool similarity
 - **Verification** — Top-1 similarity vs median; shows VERIFICA / NO verifica
 
-**Note:** The default vocabulary pool is ~100 common English words from `data/core_concepts.txt` (or built-in fallback). For larger search, add a `data/core_concepts.txt` with one word per line.
+**Note:** The search pool uses the 280-word probe vocabulary (same words used by the Prime Inspector). If the vocabulary has been warmed in the background, results are near-instant since encodings are cached.
 
 ---
 
@@ -158,7 +222,7 @@ After clicking **Cargar Modelo**, a background thread loads the checkpoint (UI s
 
 **Purpose:** Converse with TriadicGPT and inspect the triadic signature of each turn in real time.
 
-> **Note:** Chat is only available with the native `.pt` backend. HuggingFace mode will return an error.
+> **Note:** Chat works with the **Native** and **GPT-2 Transfer** backends. HuggingFace mode will return an error. The Transfer backend generates TinyStories-style text (it was fine-tuned on that dataset).
 
 **Layout (horizontal splitter):**
 
@@ -217,9 +281,10 @@ ui/
 │   └── model_worker.py     # ModelLoadWorker (load .pt or HF) + TaskWorker (generic)
 │
 ├── widgets/
-│   ├── bit_vector_widget.py    # Custom QWidget: N colored squares (binary/gradient/compare)
-│   ├── prime_display_widget.py # Prime composite label + factors + copy button
-│   └── mpl_canvas.py           # FigureCanvasQTAgg wrapper with dark theme
+│   ├── bit_vector_widget.py       # Custom QWidget: N colored squares (binary/gradient/compare)
+│   ├── prime_display_widget.py    # Prime composite label + factors + copy button
+│   ├── prime_inspector_dialog.py  # Click a prime → see all words sharing it + edit vocabulary
+│   └── mpl_canvas.py              # FigureCanvasQTAgg wrapper with dark theme
 │
 ├── tabs/
 │   ├── encoder_tab.py      # Tab 1
@@ -250,6 +315,7 @@ worker.start()
 ### ModelInterface API
 
 ```python
+# Core operations (all backends)
 iface.encode(text)          -> {composite, bits, projection, n_active, factors}
 iface.compare(a, b)         -> {similarity, shared_factors, only_a_factors, only_b_factors,
                                 a_subsumes_b, b_subsumes_a, composition, enc_a, enc_b}
@@ -261,9 +327,15 @@ iface.validate({groups})    -> {checks, overall_pass, group_details, n_concepts,
 iface.chat(prompt)          -> {response, prompt_prime, prompt_bits, response_prime,
                                 response_bits, similarity, resp_subsumes_prompt,
                                 shared_factors, resp_extra_factors}
+
+# Probe vocabulary (for Prime Inspector)
+iface.get_probe_words()     -> list[str]
+iface.set_probe_words(ws)   -> None  (re-encodes new words)
+iface.words_for_prime(p)    -> list[str]  (words sharing prime p)
+iface.warm_vocab()          -> {n_words, n_probes}  (background pre-encoding)
 ```
 
-Both native `.pt` and HuggingFace (`TriadicWrapper`) backends expose the same API. Chat is native-only.
+All three backends (Native, Transfer, HuggingFace) expose the same API. Chat requires Native or Transfer.
 
 ---
 
@@ -279,9 +351,16 @@ Switch Backend to **HuggingFace (TriadicWrapper)** and enter a HF model name (e.
 - **Bits (n_bits):** Number of triadic bits (8–128)
 - **Align:** Alignment loss mode used during training (`infonce` recommended for pre-trained models)
 
-### Extending the vocabulary pool (Analogy tab)
+### Editing the probe vocabulary
 
-Create `data/core_concepts.txt` with one concept per line. The Analogy tab will use this file as the search pool instead of the ~100-word built-in fallback.
+The probe vocabulary (280 default words) is used by the **Prime Inspector** and **Analogy** tabs. You can edit it at runtime:
+
+1. Go to the **Compare** tab, compare any two words
+2. Click any prime chip to open the **Prime Inspector**
+3. Edit the word list in the right panel (one word per line)
+4. Click **Apply Vocabulary** — all new words are encoded and the inspector refreshes
+
+Changes persist for the session. Restarting the app resets to the default 280-word list.
 
 ---
 
@@ -290,8 +369,11 @@ Create `data/core_concepts.txt` with one concept per line. The Analogy tab will 
 | Issue | Fix |
 |-------|-----|
 | `ModuleNotFoundError: PySide6` | `pip install PySide6` |
-| `Checkpoint no encontrado` | Use the Browse button to select the `.pt` file |
-| `Tokenizer no encontrado` | Use `checkpoints/torch/tokenizer.json` (works for all runs ≥ 7) |
-| Chat returns error on HF backend | Chat requires native `.pt` backend |
+| `Checkpoint not found` | Use the Browse (...) button to select the `.pt` file |
+| `Tokenizer not found` | Use `checkpoints/torch/tokenizer.json` (works for all runs ≥ 7) |
+| Chat returns error on HF backend | Chat requires Native or GPT-2 Transfer backend |
 | Heatmap is blank | Add ≥ 2 words to the Explore list before clicking Explore |
 | App launches but tabs are grey | Load a model first via the top bar |
+| Analogy returns `AttributeError` | Make sure the model is loaded and probe vocab has warmed (check status bar) |
+| Prime Inspector shows 0 words | Wait for "280 probe words indexed" in the status bar before clicking chips |
+| GPT-2 Transfer gives children's stories | Expected — the backbone was fine-tuned on TinyStories. The triadic analysis (right panel) is what matters |

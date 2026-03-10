@@ -204,6 +204,31 @@ class TriadicValidator:
         }
 
     @staticmethod
+    def analogy(a, b, c):
+        """
+        Algebraic Analogy: A is to B as C is to ?
+
+        Computes the transformation from A→B (factors removed/added),
+        then applies it to C to find D.
+
+        D = (C / GCD(C, only_in_a)) * only_in_b
+        where only_in_a = A/GCD(A,B) and only_in_b = B/GCD(A,B)
+
+        Example: king:queen::man:?
+            shared(king,queen) = GCD → only_in_king=male, only_in_queen=female
+            target = (man / male_factors) * female_factors = woman
+        """
+        shared_ab = math.gcd(a, b)
+        only_in_a = a // shared_ab  # factors to remove
+        only_in_b = b // shared_ab  # factors to add
+
+        # Remove A-specific factors from C (where they overlap)
+        c_reduced = c // math.gcd(c, only_in_a)
+        # Add B-specific factors
+        target = (c_reduced * only_in_b) // math.gcd(c_reduced, only_in_b)
+        return target
+
+    @staticmethod
     def similarity(a, b):
         """
         Semantic similarity based on shared prime factors.

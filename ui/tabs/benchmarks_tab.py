@@ -55,7 +55,7 @@ class BenchmarksTab(QWidget):
         layout.setContentsMargins(12, 12, 12, 12)
         layout.setSpacing(10)
 
-        lbl_title = QLabel("BENCHMARKS — Browser de resultados JSON")
+        lbl_title = QLabel("BENCHMARKS — JSON results browser")
         lbl_title.setObjectName("sectionLabel")
         layout.addWidget(lbl_title)
 
@@ -100,7 +100,7 @@ class BenchmarksTab(QWidget):
         # Metric cards row
         cards_row = QHBoxLayout()
         self._cards: list[_MetricCard] = []
-        for label in ['Métrica 1', 'Métrica 2', 'Métrica 3', 'Métrica 4']:
+        for label in ['Metric 1', 'Metric 2', 'Metric 3', 'Metric 4']:
             card = _MetricCard(label)
             self._cards.append(card)
             cards_row.addWidget(card)
@@ -108,7 +108,7 @@ class BenchmarksTab(QWidget):
         right_l.addLayout(cards_row)
 
         # Details table
-        lbl_details = QLabel("DETALLES")
+        lbl_details = QLabel("DETAILS")
         lbl_details.setObjectName("sectionLabel")
         right_l.addWidget(lbl_details)
 
@@ -199,10 +199,10 @@ class BenchmarksTab(QWidget):
             ('Top-1 Acc', f"{metrics.get('top1_accuracy', 0)*100:.1f}%"),
             ('Top-5 Acc', f"{metrics.get('top5_accuracy', 0)*100:.1f}%"),
             ('Verif. Acc', f"{metrics.get('verification_accuracy', 0)*100:.1f}%"),
-            ('N Analogías', str(len(details))),
+            ('N Analogies', str(len(details))),
         ])
 
-        headers = ['Analogía', 'Correcto', 'Top-1', 'Top-5', 'Verif.']
+        headers = ['Analogy', 'Correct', 'Top-1', 'Top-5', 'Verif.']
         self._tbl_details.setColumnCount(len(headers))
         self._tbl_details.setHorizontalHeaderLabels(headers)
         self._tbl_details.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
@@ -259,7 +259,7 @@ class BenchmarksTab(QWidget):
         ])
 
         self._tbl_details.setColumnCount(2)
-        self._tbl_details.setHorizontalHeaderLabels(['Métrica', 'Valor'])
+        self._tbl_details.setHorizontalHeaderLabels(['Metric', 'Value'])
         self._tbl_details.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self._tbl_details.setRowCount(0)
         for k, v in metrics.items():
@@ -348,7 +348,7 @@ class BenchmarksTab(QWidget):
         else:
             # Metrics as rows
             self._tbl_details.setColumnCount(2)
-            self._tbl_details.setHorizontalHeaderLabels(['Métrica', 'Valor'])
+            self._tbl_details.setHorizontalHeaderLabels(['Metric', 'Value'])
             self._tbl_details.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
             self._tbl_details.setRowCount(0)
             for k, v in metrics.items():

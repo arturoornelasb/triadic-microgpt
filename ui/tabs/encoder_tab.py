@@ -35,14 +35,14 @@ class EncoderTab(QWidget):
         layout.setSpacing(10)
 
         # ── Section title ─────────────────────────────────
-        lbl_title = QLabel("ENCODER — Texto → Prime Signature")
+        lbl_title = QLabel("ENCODER — Text → Prime Signature")
         lbl_title.setObjectName("sectionLabel")
         layout.addWidget(lbl_title)
 
         # ── Input row ─────────────────────────────────────
         input_row = QHBoxLayout()
         self._txt_input = QTextEdit()
-        self._txt_input.setPlaceholderText("Escribe un concepto o texto (e.g. 'king', 'medicine', 'love')…")
+        self._txt_input.setPlaceholderText("Enter a concept or text (e.g. 'king', 'medicine', 'love')…")
         self._txt_input.setFixedHeight(70)
         input_row.addWidget(self._txt_input)
 
@@ -107,7 +107,7 @@ class EncoderTab(QWidget):
         text = self._txt_input.toPlainText().strip()
         if not text:
             return
-        self._lbl_status.setText("Codificando...")
+        self._lbl_status.setText("Encoding...")
         self._worker = TaskWorker(self._iface.encode, text)
         self._worker.result_ready.connect(self._on_result)
         self._worker.error_occurred.connect(self._on_error)
@@ -123,7 +123,7 @@ class EncoderTab(QWidget):
         self._bit_widget.set_bits(bits, projections=projection if len(projection) else None)
         self._prime_widget.set_prime(composite, factors, n_active)
         self._lbl_status.setText(
-            f"{n_active}/{self._iface.n_bits} bits activos | {len(factors)} factores primos"
+            f"{n_active}/{self._iface.n_bits} active bits | {len(factors)} prime factors"
         )
         self._draw_projection(bits, projection)
 
