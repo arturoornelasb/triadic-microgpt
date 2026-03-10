@@ -24,6 +24,7 @@ Analogy:    factor transfer   king:queen :: man:woman
 | Semantic compression | **8x** (64 bits = 512D embedding probe accuracy) |
 | Signature uniqueness | **100%** across all evaluated concepts |
 | GPT-2 transfer (InfoNCE) | Gap **+0.099**, closing **72%** of gap to Engine PCA (+0.136) |
+| Domain separation (sentence-level) | **1.21** mean across 12 domains (+19% vs token-level) |
 
 ## Phase 5: Transfer Learning & Alignment Loss Ablation (Experiment 10)
 
@@ -46,6 +47,27 @@ formulations reveals a **loss-embedding interaction**: the optimal loss depends 
 
 The bottleneck is the **loss formulation**, not embedding quality: same model, same embeddings,
 9× gap difference from changing only the alignment loss (MSE→InfoNCE).
+
+## Experiment 11: Sentence-Level Domain Separation
+
+Token-level projections (isolated words) show separation ratio ~1.02 — domains are indistinguishable.
+Sentence-level aggregation (mean-pool triadic projections across 3 contextual sentences per concept)
+reveals that the model **does** encode domain structure:
+
+| Domain | Token | Sentence | Delta |
+|--------|-------|----------|-------|
+| family | 1.03 | **1.42** | +38% |
+| colors | 1.05 | **1.25** | +19% |
+| royalty | 1.04 | **1.24** | +19% |
+| food | 1.01 | **1.23** | +22% |
+| emotions | 1.00 | **1.11** | +11% |
+| **Mean** | **1.02** | **1.21** | **+19%** |
+
+```bash
+python benchmarks/scripts/geometric_topology.py \
+  --model checkpoints/torch_run15_strongalign/model_L12_D512_B64_best.pt \
+  --aggregate sentence --version v6.0-sentence
+```
 
 ## Architecture
 
@@ -143,8 +165,9 @@ benchmarks/
     subsumption_benchmark.py
     interpretability_probe.py
     language_quality.py
+    geometric_topology.py  # Domain clustering (--aggregate token|sentence)
   results/                 # All benchmark JSON results
-  plots/                   # Generated figures
+  figures/                 # Generated figures
 
 paper/
   triadic_microgpt.tex     # Full paper (LaTeX)
@@ -172,7 +195,7 @@ ui/
   workers/                 # Async QThread workers for inference
   resources/style.qss      # Dark theme (Catppuccin Mocha)
 
-experiment_log.md          # Complete record of all 29 training runs
+experiment_log.md          # Complete record of all 29 runs + 11 experiments
 EVOLUTION_PLAN.md          # Research roadmap and phase tracking
 ```
 

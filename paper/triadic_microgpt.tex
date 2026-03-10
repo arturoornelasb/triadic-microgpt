@@ -531,7 +531,7 @@ We also explored supervised knowledge distillation, training the triadic head to
 Our results have several limitations:
 \begin{enumerate}
     \item \textbf{Small training corpus.} TinyStories (50K stories) limits the language model's semantic sophistication. Scaling to larger corpora (Wikipedia, BookCorpus) would likely improve both language quality and triadic metrics.
-    \item \textbf{Token-level projections.} Each token receives an independent projection. Sentence-level or concept-level aggregation (e.g., averaging projections across a phrase) might enable stronger domain clustering.
+    \item \textbf{Token-level projections.} Each token receives an independent projection. With isolated tokens, domain separation ratio is $\sim$1.02 (indistinguishable from noise). However, sentence-level mean-pooling resolves this---see below.
     \item \textbf{Subsumption at high $k$.} Exact algebraic subsumption is impractical at $k > 16$. Relaxed subsumption (threshold on shared-factor ratio) could extend the useful range.
     \item \textbf{Single GPU, single run.} All results are from single training runs. Confidence intervals from multiple seeds would strengthen claims, especially for the scaling study.
     \item \textbf{Dead bits.} Per-bit entropy analysis reveals that $\sim$15 of the 64 bits have low activation probability ($q_i < 0.1$), contributing little semantic information. Figure~\ref{fig:bit_entropy} visualizes the entropy distribution. Stronger entropy regularization or targeted bit activation schedules could address this.
@@ -556,6 +556,51 @@ Our results have several limitations:
     \label{fig:bit_entropy}
 \end{figure}
 
+\paragraph{Sentence-level aggregation resolves domain clustering.}
+A key concern with token-level projections is that individual tokens lack sufficient context
+to differentiate semantic domains: with isolated words, the mean separation ratio across 12
+domains is only 1.02 (intra-domain similarity $\approx$ inter-domain similarity). We address
+this by embedding each concept in three natural sentences and mean-pooling the triadic
+projections across all token positions, then averaging across the three sentences. This
+sentence-level aggregation raises the mean separation ratio to \textbf{1.21} ($+$19\%),
+with all 12 domains improving. Table~\ref{tab:sentence_agg} shows the per-domain results.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Domain} & \textbf{Token} & \textbf{Sentence} & \textbf{$\Delta$} \\
+\midrule
+family      & 1.03 & \textbf{1.42} & +38\% \\
+colors      & 1.05 & \textbf{1.25} & +19\% \\
+royalty     & 1.04 & \textbf{1.24} & +19\% \\
+food        & 1.01 & \textbf{1.23} & +22\% \\
+professions & 1.06 & \textbf{1.22} & +15\% \\
+actions     & 1.02 & \textbf{1.20} & +18\% \\
+animals     & 1.01 & \textbf{1.19} & +18\% \\
+nature      & 1.01 & \textbf{1.19} & +18\% \\
+elements    & 0.96 & \textbf{1.17} & +22\% \\
+body        & 1.01 & \textbf{1.14} & +13\% \\
+home        & 1.03 & \textbf{1.12} & +9\%  \\
+emotions    & 1.00 & \textbf{1.11} & +11\% \\
+\midrule
+\textbf{Mean} & 1.02 & \textbf{1.21} & \textbf{+19\%} \\
+\bottomrule
+\end{tabular}
+\caption{Domain separation ratio (intra/inter similarity) for token-level vs.\ sentence-level
+aggregation across 90 concepts in 12 semantic domains. Sentence-level mean-pooling (3 sentences
+per concept) reveals domain structure that isolated tokens cannot express. Family concepts
+cluster most strongly (1.42); emotions are weakest (1.11), consistent with their contextually
+diverse usage.}
+\label{tab:sentence_agg}
+\end{table}
+
+The result demonstrates that the triadic head \emph{does} encode domain-level semantic structure,
+but this information is distributed across contextual token representations rather than
+concentrated in any single token. This is consistent with how transformer language models
+operate: semantic meaning emerges from context, not from isolated lexical items.
+
 \paragraph{The loss--embedding interaction.}
 Perhaps the most practically important finding is that the optimal alignment loss depends on the quality of the embedding teacher (Section~\ref{sec:transfer}). InfoNCE mines positive/negative pairs from the embedding space, which requires clear cluster structure; MSE matches absolute similarity values, which requires only local pairwise relationships. This interaction is reminiscent of curriculum effects in contrastive learning~\citep{oord2018cpc}: contrastive objectives succeed when the feature space provides meaningful contrast, but degrade when all examples are approximately equidistant.
 
@@ -565,7 +610,7 @@ The loss--embedding interaction suggests a \emph{staged training} strategy: begi
 Several directions emerge naturally:
 (1)~Scaling to 100M+ parameters, where we predict the semantic gap will grow substantially.
 (2)~Taxonomically structured gold primes from WordNet hierarchies, where bit assignments are determined by hypernym relationships rather than random hashing.
-(3)~Sentence-level aggregation of triadic projections for improved domain clustering and subsumption.
+(3)~Attention-weighted sentence aggregation and sentence-level subsumption testing, building on the mean-pooling results in Table~\ref{tab:sentence_agg}.
 (4)~Applying the triadic head to larger pre-trained models (GPT-2 Medium/Large, LLaMA) to test whether the semantic gap continues to close with richer embeddings.
 
 

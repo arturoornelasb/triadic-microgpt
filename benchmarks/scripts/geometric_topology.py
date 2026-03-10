@@ -16,10 +16,21 @@ This is an EXPLORATORY experiment. Results may or may not be meaningful.
 The hypothesis: semantically related concepts form dense simplicial complexes
 in prime space, while unrelated concepts remain topologically disconnected.
 
+Aggregation modes:
+  --aggregate token     (default) Encode each concept as an isolated word.
+  --aggregate sentence  Embed concepts inside full sentences, then mean-pool
+                        all token projections. This provides richer contextual
+                        representations that should cluster better by domain.
+
 Usage:
   python benchmarks/scripts/geometric_topology.py \
     --model checkpoints/torch/model_best.pt \
     --tokenizer checkpoints/torch/tokenizer.json
+
+  # Sentence-level aggregation:
+  python benchmarks/scripts/geometric_topology.py \
+    --model checkpoints/torch/model_best.pt \
+    --aggregate sentence
 """
 
 import os
@@ -63,8 +74,183 @@ SEMANTIC_DOMAINS = {
 
 
 # ============================================================
+# Sentence Templates — 3 per concept for robust aggregation
+# ============================================================
+# Each template is a natural TinyStories-style sentence.
+# The concept word appears in context so the model can leverage
+# its learned contextual representations.
+
+SENTENCE_TEMPLATES = {
+    "royalty": {
+        "king":      ["The king sat on his golden throne.", "Once upon a time there was a kind king.", "The king ruled the land with wisdom."],
+        "queen":     ["The queen wore a beautiful crown.", "The queen smiled at her people.", "Once there was a queen who loved music."],
+        "prince":    ["The young prince rode his horse.", "The prince dreamed of adventure.", "A brave prince saved the kingdom."],
+        "princess":  ["The princess danced in the garden.", "A little princess loved to read.", "The princess lived in a tall tower."],
+        "crown":     ["The golden crown sparkled in the sun.", "He placed the crown on her head.", "The crown was made of shining gold."],
+        "throne":    ["The throne stood in the great hall.", "She sat on the throne and smiled.", "The old throne was carved from wood."],
+    },
+    "animals": {
+        "dog":   ["The dog wagged its tail happily.", "A little dog ran in the park.", "The dog barked at the cat."],
+        "cat":   ["The cat slept on the warm bed.", "A small cat climbed the tree.", "The cat purred softly by the fire."],
+        "bird":  ["The bird sang a beautiful song.", "A little bird flew over the trees.", "The bird built a nest in the tree."],
+        "fish":  ["The fish swam in the clear water.", "A colorful fish jumped out of the pond.", "The fish lived in the blue ocean."],
+        "horse": ["The horse galloped through the field.", "A white horse ran very fast.", "The horse ate some fresh grass."],
+        "cow":   ["The cow gave fresh milk every day.", "A brown cow stood in the meadow.", "The cow chewed grass under the tree."],
+        "pig":   ["The pig rolled in the mud.", "A little pig ate an apple.", "The pig lived on a small farm."],
+        "sheep": ["The sheep had soft white wool.", "A little sheep followed its mother.", "The sheep grazed on the green hill."],
+    },
+    "family": {
+        "mother":   ["The mother hugged her child.", "A kind mother made breakfast.", "The mother sang a lullaby."],
+        "father":   ["The father played with his son.", "A tall father carried the baby.", "The father told a bedtime story."],
+        "brother":  ["The brother shared his toys.", "A big brother helped his sister.", "The brother and sister played together."],
+        "sister":   ["The sister drew a pretty picture.", "A little sister laughed and danced.", "The sister loved her baby brother."],
+        "son":      ["The son helped his father.", "A young son learned to ride a bike.", "The son was proud of his family."],
+        "daughter": ["The daughter gave flowers to her mom.", "A small daughter smiled brightly.", "The daughter loved playing in the garden."],
+    },
+    "emotions": {
+        "happy":  ["She felt so happy that she smiled.", "The happy boy played all day.", "They were happy to see each other."],
+        "sad":    ["He was very sad and cried.", "The sad girl looked out the window.", "She felt sad because her friend left."],
+        "angry":  ["The angry man shouted loudly.", "She was angry about the broken toy.", "He felt angry but tried to be calm."],
+        "afraid": ["The little boy was afraid of the dark.", "She was afraid of the thunder.", "He felt afraid but kept walking."],
+        "brave":  ["The brave girl faced her fear.", "He was brave and stood up tall.", "A brave child helped the lost puppy."],
+        "kind":   ["The kind woman gave him food.", "She was kind to everyone she met.", "A kind old man helped the children."],
+        "love":   ["She felt love in her heart.", "They showed love by helping others.", "Love made the family strong."],
+        "hate":   ["He did not want to feel hate.", "She tried not to hate the rain.", "Hate is not a good feeling."],
+    },
+    "nature": {
+        "sun":      ["The sun shone brightly in the sky.", "The warm sun made everyone happy.", "The sun set behind the mountains."],
+        "moon":     ["The moon glowed softly at night.", "A big round moon lit up the sky.", "The moon rose above the quiet lake."],
+        "star":     ["A bright star twinkled in the sky.", "She wished upon a star.", "The star shone like a diamond."],
+        "river":    ["The river flowed through the valley.", "A long river ran to the sea.", "The river was cool and clear."],
+        "mountain": ["The mountain was tall and covered in snow.", "They climbed the mountain together.", "The mountain touched the clouds above."],
+        "ocean":    ["The ocean was deep and blue.", "Waves crashed on the ocean shore.", "The ocean stretched as far as she could see."],
+        "tree":     ["The tree grew tall in the forest.", "A big tree gave shade in summer.", "The tree had many green leaves."],
+        "flower":   ["The flower bloomed in the spring.", "A pretty flower grew in the garden.", "The flower smelled sweet and fresh."],
+    },
+    "elements": {
+        "fire":  ["The fire burned bright and warm.", "A small fire crackled in the night.", "The fire kept them warm all night."],
+        "water": ["The water was clear and cold.", "She drank a glass of fresh water.", "The water flowed down the hill."],
+        "earth": ["The earth was soft and dark.", "Plants grew in the rich earth.", "The earth was covered with green grass."],
+        "air":   ["The cool air felt nice on his face.", "Fresh air filled the room.", "The air smelled like flowers."],
+        "rain":  ["The rain fell softly on the roof.", "A gentle rain watered the garden.", "The rain made puddles on the ground."],
+        "snow":  ["The snow covered everything in white.", "Soft snow fell from the sky.", "The children played in the snow."],
+        "cloud": ["A big cloud floated across the sky.", "The cloud looked like a bunny.", "Dark clouds meant rain was coming."],
+        "wind":  ["The wind blew through the trees.", "A cold wind made her shiver.", "The wind carried leaves across the road."],
+    },
+    "body": {
+        "hand":  ["She held his hand tightly.", "He waved his hand and smiled.", "The hand was warm and soft."],
+        "head":  ["He nodded his head slowly.", "She put a hat on her head.", "The head of the bear was very big."],
+        "eye":   ["Her eye was bright and blue.", "He closed his eye and made a wish.", "The eye of the owl was golden."],
+        "heart": ["Her heart was full of joy.", "His heart beat fast with excitement.", "A kind heart is the best treasure."],
+        "foot":  ["He hurt his foot on a rock.", "She put her foot in the cool water.", "The foot of the hill was covered in flowers."],
+        "mouth": ["She opened her mouth to speak.", "His mouth smiled wide.", "The mouth of the cave was dark."],
+        "ear":   ["She whispered in his ear.", "The rabbit had a long ear.", "He put his ear close to listen."],
+        "nose":  ["His nose was cold and red.", "She touched her nose and laughed.", "The dog sniffed with its wet nose."],
+    },
+    "home": {
+        "house":  ["The house was small and cozy.", "A red house stood on the hill.", "The house had a big garden."],
+        "door":   ["She opened the door and walked in.", "The door was painted bright blue.", "He knocked on the door softly."],
+        "window": ["She looked out the window.", "Sunlight came through the window.", "The window was open to let in fresh air."],
+        "table":  ["They sat around the table for dinner.", "A wooden table stood in the kitchen.", "She put the flowers on the table."],
+        "chair":  ["He sat in the big chair.", "A little chair was just his size.", "The chair was soft and comfortable."],
+        "bed":    ["She lay down on the soft bed.", "The bed was warm and cozy.", "He fell asleep in his bed."],
+        "lamp":   ["The lamp lit up the room.", "A small lamp sat on the table.", "She turned on the lamp to read."],
+        "room":   ["The room was bright and clean.", "A small room with a big window.", "The room was full of toys."],
+    },
+    "food": {
+        "bread": ["She baked fresh bread for breakfast.", "The bread was warm and soft.", "He ate a slice of bread with butter."],
+        "milk":  ["The milk was cold and fresh.", "She poured milk into a glass.", "The baby drank warm milk."],
+        "apple": ["The apple was red and sweet.", "He picked an apple from the tree.", "She ate a crunchy apple."],
+        "cake":  ["The cake was covered in chocolate.", "She made a birthday cake.", "The cake tasted so sweet and good."],
+        "egg":   ["She cracked an egg into the bowl.", "The egg was still warm.", "He boiled an egg for breakfast."],
+        "soup":  ["The soup was hot and delicious.", "She made soup for her family.", "A bowl of warm soup on a cold day."],
+        "rice":  ["The rice was fluffy and white.", "She cooked rice for dinner.", "He ate a bowl of rice."],
+        "meat":  ["The meat was cooked over the fire.", "She put meat on the plate.", "The meat smelled good."],
+    },
+    "actions": {
+        "run":   ["He started to run very fast.", "The children run and play every day.", "She liked to run in the morning."],
+        "walk":  ["They went for a walk in the park.", "She started to walk home slowly.", "He liked to walk by the river."],
+        "swim":  ["The boy learned to swim in the lake.", "Fish swim in the deep water.", "She loved to swim in the ocean."],
+        "fly":   ["The bird could fly high in the sky.", "She wished she could fly like a bird.", "Butterflies fly from flower to flower."],
+        "jump":  ["The frog could jump very high.", "She liked to jump in puddles.", "He tried to jump over the rock."],
+        "climb": ["The cat tried to climb the tall tree.", "They wanted to climb the mountain.", "He began to climb up the ladder."],
+        "fall":  ["The leaves fall from the trees.", "She was careful not to fall.", "The rain started to fall at night."],
+        "sleep": ["The baby was ready to sleep.", "The cat liked to sleep in the sun.", "She went to sleep early."],
+    },
+    "colors": {
+        "red":    ["The red balloon floated in the sky.", "She wore a pretty red dress.", "The apple was bright red."],
+        "blue":   ["The blue sky was clear today.", "He had a blue toy car.", "The ocean was deep blue."],
+        "green":  ["The green grass was soft and cool.", "She painted a green tree.", "The green frog sat on a leaf."],
+        "white":  ["The white snow covered the ground.", "A white rabbit hopped in the garden.", "The clouds were white and fluffy."],
+        "black":  ["The black cat sat on the fence.", "A black bird flew overhead.", "The night sky was very black."],
+        "yellow": ["The yellow sun made her smile.", "She picked a yellow flower.", "The yellow duckling swam in the pond."],
+        "pink":   ["The pink flowers bloomed in spring.", "She had a little pink bow.", "The sunset was bright pink."],
+        "gold":   ["The gold coin sparkled in the light.", "She found a gold ring.", "The gold leaves fell in autumn."],
+    },
+    "professions": {
+        "doctor":  ["The doctor helped the sick child.", "A kind doctor gave her medicine.", "The doctor worked at the hospital."],
+        "teacher": ["The teacher read a story to the class.", "A good teacher helps children learn.", "The teacher smiled at her students."],
+        "nurse":   ["The nurse took care of the baby.", "A gentle nurse bandaged his knee.", "The nurse worked all night."],
+        "farmer":  ["The farmer grew vegetables in his field.", "A happy farmer fed his animals.", "The farmer drove his tractor."],
+        "soldier": ["The brave soldier marched in the parade.", "A young soldier wrote a letter home.", "The soldier stood guard at the gate."],
+        "artist":  ["The artist painted a beautiful picture.", "A talented artist used bright colors.", "The artist drew a portrait."],
+    },
+}
+
+
+# ============================================================
 # Metric Functions
 # ============================================================
+
+def compute_sentence_projection(concept, domain, model, tokenizer, mapper, device):
+    """
+    Compute a concept's triadic projection via sentence-level aggregation.
+
+    For each of the 3 sentence templates containing the concept:
+      1. Tokenize the full sentence
+      2. Forward pass → get triadic projections for every token
+      3. Mean-pool across all token positions → one projection vector
+
+    Then average across the 3 sentences → final projection for this concept.
+    This gives the model full contextual information instead of isolated words.
+    """
+    templates = SENTENCE_TEMPLATES.get(domain, {}).get(concept)
+    if not templates:
+        return None, None
+
+    all_projs = []
+    for sentence in templates:
+        ids = tokenizer.encode(sentence, add_special=False)
+        if not ids:
+            continue
+        x = torch.tensor([ids], dtype=torch.long, device=device)
+        with torch.no_grad():
+            _, triadic_proj, _ = model(x)
+        # Mean-pool across all token positions in the sentence
+        proj = triadic_proj[0].mean(dim=0).cpu().numpy()
+        all_projs.append(proj)
+
+    if not all_projs:
+        return None, None
+
+    # Average across the 3 sentence templates
+    avg_proj = np.mean(all_projs, axis=0)
+    prime = mapper.map(avg_proj)
+    return avg_proj, prime
+
+
+def compute_token_projection(concept, model, tokenizer, mapper, device):
+    """Original token-level projection: encode isolated word, mean-pool tokens."""
+    ids = tokenizer.encode(concept, add_special=False)
+    if not ids:
+        return None, None
+    x = torch.tensor([ids], dtype=torch.long, device=device)
+    with torch.no_grad():
+        _, triadic_proj, _ = model(x)
+    proj = triadic_proj[0].mean(dim=0).cpu().numpy()
+    prime = mapper.map(proj)
+    return proj, prime
+
 
 def compute_ubs(prime_value, bits_array):
     """
@@ -346,25 +532,25 @@ def main(args):
             all_concepts.append(c)
             concept_to_domain[c] = domain
 
+    aggregate = getattr(args, 'aggregate', 'token')
     print(f"  Concepts: {len(all_concepts)} across {len(SEMANTIC_DOMAINS)} domains")
+    print(f"  Aggregation: {aggregate}")
     print()
 
     # Compute projections
-    print("  [1/5] Computing triadic projections...")
+    print(f"  [1/5] Computing triadic projections ({aggregate}-level)...")
     projections = []
     primes = []
     for concept in all_concepts:
-        ids = tokenizer.encode(concept, add_special=False)
-        if not ids:
-            projections.append(None)
-            primes.append(None)
-            continue
-        x = torch.tensor([ids], dtype=torch.long, device=device)
-        with torch.no_grad():
-            _, triadic_proj, _ = model(x)
-        proj = triadic_proj[0].mean(dim=0).cpu().numpy()
+        domain = concept_to_domain[concept]
+        if aggregate == 'sentence':
+            proj, prime = compute_sentence_projection(
+                concept, domain, model, tokenizer, mapper, device)
+        else:
+            proj, prime = compute_token_projection(
+                concept, model, tokenizer, mapper, device)
         projections.append(proj)
-        primes.append(mapper.map(proj))
+        primes.append(prime)
 
     # 0-simplex: Point analysis
     print("  [2/5] 0-simplex analysis (concept complexity)...")
@@ -410,7 +596,7 @@ def main(args):
     print("  [5/5] Semantic bubble analysis (domain clusters)...")
     bubbles = compute_bubbles(all_concepts, primes, SEMANTIC_DOMAINS)
     print(f"\n    {'Domain':>15s} | {'Intra':>6s} | {'Inter':>6s} | {'Sep.':>6s} | {'Entropy':>8s} | {'UBS':>8s}")
-    print(f"    {'─'*15} | {'─'*6} | {'─'*6} | {'─'*6} | {'─'*8} | {'─'*8}")
+    print(f"    {'-'*15} | {'-'*6} | {'-'*6} | {'-'*6} | {'-'*8} | {'-'*8}")
     for domain in sorted(bubbles.keys()):
         b = bubbles[domain]
         sep = f"{b['separation_ratio']:.2f}" if b['separation_ratio'] != float('inf') else "inf"
@@ -432,6 +618,7 @@ def main(args):
         "date": today,
         "model_checkpoint": args.model,
         "model_config": f"{config.n_layer}L/{config.n_embd}D/{config.n_head}H/{config.n_triadic_bits}bits",
+        "aggregation": aggregate,
         "hypothesis": "Semantically related concepts form dense simplicial complexes in prime space",
         "metrics": {
             "simplex_0": {
@@ -472,16 +659,21 @@ def main(args):
     # Verdict
     print()
     print("=" * 70)
+    print(f"  Aggregation: {aggregate}")
     if bubbles:
         mean_sep = np.mean([b["separation_ratio"] for b in bubbles.values()
                             if b["separation_ratio"] != float('inf')])
         print(f"  Mean Separation Ratio: {mean_sep:.2f}")
         if mean_sep > 1.5:
             print(f"  FINDING: Domains form distinct semantic bubbles in prime space!")
+        elif mean_sep > 1.1:
+            print(f"  FINDING: Moderate domain separation detected. Structure emerging.")
         elif mean_sep > 1.0:
             print(f"  FINDING: Weak domain separation detected. Some structure present.")
         else:
-            print(f"  FINDING: No meaningful domain separation. Triadic collapse likely active.")
+            print(f"  FINDING: No meaningful domain separation in prime space.")
+        if aggregate == 'token' and mean_sep < 1.1:
+            print(f"  TIP: Try --aggregate sentence for contextual projections.")
     coherence_rate = sum(1 for t in triangles if t["coherent"]) / max(len(triangles), 1)
     print(f"  Triangle Coherence: {coherence_rate:.0%} of intra-domain triples share factors")
     print("=" * 70)
@@ -492,6 +684,8 @@ if __name__ == '__main__':
     parser.add_argument('--model', required=True, help='Model checkpoint path')
     parser.add_argument('--tokenizer', default=None, help='Tokenizer path')
     parser.add_argument('--version', default='v1.1', help='Version tag')
+    parser.add_argument('--aggregate', default='token', choices=['token', 'sentence'],
+                        help='Aggregation level: token (isolated word) or sentence (contextual)')
     args = parser.parse_args()
 
     if args.tokenizer is None:

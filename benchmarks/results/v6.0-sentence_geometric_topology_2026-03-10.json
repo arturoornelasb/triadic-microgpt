@@ -1,0 +1,167 @@
+{
+  "benchmark": "geometric_topology",
+  "version": "v6.0-sentence",
+  "date": "2026-03-10",
+  "model_checkpoint": "checkpoints/torch_run15_strongalign/model_L12_D512_B64_best.pt",
+  "model_config": "12L/512D/8H/64bits",
+  "aggregation": "sentence",
+  "hypothesis": "Semantically related concepts form dense simplicial complexes in prime space",
+  "metrics": {
+    "simplex_0": {
+      "mean_ubs": 198.34060668945312,
+      "std_ubs": 22.065399169921875,
+      "unique_primes": 90,
+      "total_concepts": 90
+    },
+    "simplex_1": {
+      "connected_pairs": 4005,
+      "total_pairs": 4005,
+      "connectivity": 1.0,
+      "mean_similarity": 0.40707139673295645,
+      "subsumption_count": 0
+    },
+    "simplex_2": {
+      "total_triangles": 564,
+      "coherent_triangles": 564,
+      "coherence_rate": 1.0
+    },
+    "bubbles": {
+      "royalty": {
+        "n_concepts": 6,
+        "avg_intra_similarity": 0.49140741538001,
+        "bubble_entropy": 5.545162355320588,
+        "bubble_ubs": 366.6075506525681,
+        "shared_backbone_gcd": 76289351558681242157,
+        "n_shared_factors": 10,
+        "n_unique_factors": 55,
+        "avg_inter_similarity": 0.39747266559016114,
+        "separation_ratio": 1.2363300873794076
+      },
+      "animals": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 0.4976749299981535,
+        "bubble_entropy": 5.582905961299976,
+        "bubble_ubs": 375.9091095112901,
+        "shared_backbone_gcd": 39325065827,
+        "n_shared_factors": 5,
+        "n_unique_factors": 57,
+        "avg_inter_similarity": 0.41714354593017194,
+        "separation_ratio": 1.1930543690623518
+      },
+      "family": {
+        "n_concepts": 6,
+        "avg_intra_similarity": 0.5696350181179903,
+        "bubble_entropy": 5.343900410638668,
+        "bubble_ubs": 310.3690790145606,
+        "shared_backbone_gcd": 1366424884899376544935,
+        "n_shared_factors": 12,
+        "n_unique_factors": 48,
+        "avg_inter_similarity": 0.4014327356150486,
+        "separation_ratio": 1.4190048981561838
+      },
+      "emotions": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 0.4138653215350133,
+        "bubble_entropy": 5.721893980517899,
+        "bubble_ubs": 386.8686213399058,
+        "shared_backbone_gcd": 2629,
+        "n_shared_factors": 2,
+        "n_unique_factors": 59,
+        "avg_inter_similarity": 0.3723374102142794,
+        "separation_ratio": 1.1115330079156824
+      },
+      "nature": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 0.5118078778195729,
+        "bubble_entropy": 5.559897401406152,
+        "bubble_ubs": 355.9434535430098,
+        "shared_backbone_gcd": 9559878903719,
+        "n_shared_factors": 6,
+        "n_unique_factors": 54,
+        "avg_inter_similarity": 0.42917261035026955,
+        "separation_ratio": 1.1925455294126541
+      },
+      "elements": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 0.4618861067907944,
+        "bubble_entropy": 5.580801840724763,
+        "bubble_ubs": 361.2021483085809,
+        "shared_backbone_gcd": 1051242823,
+        "n_shared_factors": 4,
+        "n_unique_factors": 55,
+        "avg_inter_similarity": 0.39515325781477517,
+        "separation_ratio": 1.1688783975742894
+      },
+      "body": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 0.4362147663242592,
+        "bubble_entropy": 5.6883179430533195,
+        "bubble_ubs": 396.06667630055875,
+        "shared_backbone_gcd": 1370200145,
+        "n_shared_factors": 5,
+        "n_unique_factors": 60,
+        "avg_inter_similarity": 0.38175237417224045,
+        "separation_ratio": 1.1426641871451628
+      },
+      "home": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 0.4474313486280269,
+        "bubble_entropy": 5.647536775543356,
+        "bubble_ubs": 387.2172559042035,
+        "shared_backbone_gcd": 4029525131447,
+        "n_shared_factors": 6,
+        "n_unique_factors": 59,
+        "avg_inter_similarity": 0.3992590670428869,
+        "separation_ratio": 1.1206541956377551
+      },
+      "food": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 0.4927011846943909,
+        "bubble_entropy": 5.57838265034806,
+        "bubble_ubs": 368.711326200067,
+        "shared_backbone_gcd": 103121638310,
+        "n_shared_factors": 7,
+        "n_unique_factors": 56,
+        "avg_inter_similarity": 0.40211050808403365,
+        "separation_ratio": 1.2252880111042148
+      },
+      "actions": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 0.4902247925603331,
+        "bubble_entropy": 5.796065779394146,
+        "bubble_ubs": 408.22438996271023,
+        "shared_backbone_gcd": 1872889591397,
+        "n_shared_factors": 6,
+        "n_unique_factors": 62,
+        "avg_inter_similarity": 0.4096367972273983,
+        "separation_ratio": 1.1967303618190301
+      },
+      "colors": {
+        "n_concepts": 8,
+        "avg_intra_similarity": 0.5177845381726317,
+        "bubble_entropy": 5.47471841021848,
+        "bubble_ubs": 326.91802781571806,
+        "shared_backbone_gcd": 533767912056391,
+        "n_shared_factors": 7,
+        "n_unique_factors": 50,
+        "avg_inter_similarity": 0.4153160693480806,
+        "separation_ratio": 1.246724064843904
+      },
+      "professions": {
+        "n_concepts": 6,
+        "avg_intra_similarity": 0.4757553965683051,
+        "bubble_entropy": 5.497142375424234,
+        "bubble_ubs": 338.63882974473387,
+        "shared_backbone_gcd": 1706497808021545,
+        "n_shared_factors": 9,
+        "n_unique_factors": 52,
+        "avg_inter_similarity": 0.3905519568164191,
+        "separation_ratio": 1.2181615999223794
+      }
+    }
+  },
+  "interpretation": {
+    "note": "This is an EXPLORATORY experiment. High separation_ratio (intra >> inter) validates the hypothesis. separation_ratio ~1.0 means domains are NOT differentiated in prime space.",
+    "uhrt_origin": "Adapted from Unified Holographic Resonance Theory (UHRT) layered structure: point\u2192line\u2192triangle\u2192volume\u2192bubble"
+  }
+}

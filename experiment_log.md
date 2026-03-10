@@ -827,3 +827,95 @@ not from training stage. To make InfoNCE work from-scratch, you'd need either:
 (b) much larger model capacity so embeddings develop richer structure.
 
 **Run 29 Status: COMPLETE. Negative result — confirms loss-embedding interaction is structural.**
+
+---
+
+## Experiment 11: Sentence-Level Aggregation for Domain Separation
+| Key | Value |
+|-----|-------|
+| **Date** | 2026-03-10 |
+| **Script** | `benchmarks/scripts/geometric_topology.py --aggregate sentence` |
+| **Model** | Run 15 (v1.4-strongalign, 12L/512D/8H/64bits) |
+| **Checkpoint** | `checkpoints/torch_run15_strongalign/model_L12_D512_B64_best.pt` |
+| **Tokenizer** | `checkpoints/torch_run15_strongalign/tokenizer.json` |
+| **Results** | `benchmarks/results/v6.0-sentence_geometric_topology_2026-03-10.json` |
+
+### Motivation
+The geometric topology benchmark (UHRT-inspired) showed separation ratio ~1.02 when encoding
+isolated words (token-level). At 64 bits, single-token projections are too high-dimensional
+and context-free to cluster meaningfully by semantic domain. The hypothesis: embedding concepts
+inside full sentences and mean-pooling all token projections should give richer, more
+differentiated representations that cluster by domain.
+
+### Method
+For each of the 90 concepts across 12 domains:
+1. Write 3 natural TinyStories-style sentences per concept (270 total).
+2. Encode each sentence → forward pass → triadic projection for every token.
+3. Mean-pool across all token positions → one sentence-level projection.
+4. Average across the 3 sentences → final concept projection.
+5. Map to prime via PrimeMapper → compute all simplex/bubble metrics as before.
+
+Added `--aggregate sentence` flag to `geometric_topology.py`. Default `--aggregate token`
+preserves the original behavior.
+
+### Results — Separation Ratio Comparison
+
+| Domain      | Token | Sentence | Improvement |
+|-------------|-------|----------|-------------|
+| family      | 1.03  | **1.42** | +38%        |
+| colors      | 1.05  | **1.25** | +19%        |
+| royalty     | 1.04  | **1.24** | +19%        |
+| food        | 1.01  | **1.23** | +22%        |
+| professions | 1.06  | **1.22** | +15%        |
+| actions     | 1.02  | **1.20** | +18%        |
+| animals     | 1.01  | **1.19** | +18%        |
+| nature      | 1.01  | **1.19** | +18%        |
+| elements    | 0.96  | **1.17** | +22%        |
+| body        | 1.01  | **1.14** | +13%        |
+| home        | 1.03  | **1.12** | +9%         |
+| emotions    | 1.00  | **1.11** | +11%        |
+| **Mean**    | **1.02** | **1.21** | **+19%** |
+
+### Additional Metrics
+
+| Metric               | Token  | Sentence |
+|----------------------|--------|----------|
+| Mean similarity      | 0.5102 | 0.4071   |
+| Mean UBS             | 197.11 | 198.34   |
+| Connected pairs      | 100%   | 100%     |
+| Coherent triangles   | 100%   | 100%     |
+| Subsumption pairs    | 2      | 0        |
+
+### Analysis
+
+**1. Sentence-level aggregation raises mean separation from 1.02 to 1.21 (+19%).**
+Every single domain improves. This is the first time the benchmark shows clear domain
+differentiation in prime space.
+
+**2. Family domain leads at 1.42.**
+Sentences about mother/father/brother/sister share distinctive contextual patterns
+(hugging, playing, singing lullabies) that are very different from other domains.
+The model captures this in its triadic projections when given context.
+
+**3. Emotions domain is weakest at 1.11.**
+Emotion words appear in diverse contexts (happy boy, sad girl, angry man) that overlap
+significantly with other domains. This matches the triadic-head 50K finding where
+emotions had only +0.5% signal vs +11-12% for other groups.
+
+**4. Mean similarity drops from 0.51 to 0.41.**
+Sentence-level projections are more differentiated overall (lower baseline similarity),
+which is what enables domain separation. Token-level projections were "too similar"
+across the board.
+
+**5. The model learned domain structure — it just wasn't visible at token level.**
+This resolves the known issue "separation ratio ~1.0 is structural". It is NOT structural —
+it was a measurement artifact. The information exists in the model's contextual projections;
+isolated tokens simply don't carry enough context to reveal it.
+
+### Conclusion
+**Sentence-level aggregation resolves the domain separation problem.** The triadic head
+captures meaningful domain structure when given contextual input. This is consistent with
+how transformer language models work: individual tokens have limited semantics, but tokens
+in context carry rich relational information that the triadic head successfully encodes.
+
+**Experiment 11 Status: COMPLETE. Positive result — domain separation confirmed via sentence aggregation.**

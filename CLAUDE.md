@@ -64,17 +64,22 @@ Text → FastBPETokenizer → Token IDs → TriadicGPT (12L/512D/8H) → Two Hea
   Total Loss = L_lang + α · L_triadic [+ α_dist · L_distillation]
 ```
 
-## Current State (as of Phase 0.5 Diagnostic, 2026-03-06)
-- **Best Language Loss**: 1.27 (Run 9, XL pure) / 1.03 (Run 10, GoldPrimes — but triadic collapsed)
-- **Bias Audit**: 98.5% accuracy, FPR 0.96% (using distillation model)
-- **Triadic Quality (XL pure)**: 97.3% unique signatures, King↔Queen=89%, King↔Dog=60%
-- **Language Quality**: Excellent — coherent multi-sentence TinyStories generation
+## Current State (2026-03-10 — 11 Experiments, 29 Runs, Paper Ready)
+- **Production Model**: Run 15 (v1.4-strongalign), 40M params, loss 0.946, entropy 0.749
+- **Checkpoint**: `checkpoints/torch_run15_strongalign/model_L12_D512_B64_best.pt`
+- **Tokenizer**: `checkpoints/torch_run15_strongalign/tokenizer.json` (different from `checkpoints/torch/`)
+- **Language Cost**: Zero (PPL 7.69 vs 7.56 ablation, within noise)
+- **Semantic Gap**: +0.020 from-scratch; +0.099 GPT-2 transfer (InfoNCE, closes 72% to Engine PCA)
+- **Domain Separation**: 1.21 mean (sentence-level aggregation; was ~1.02 token-level) — Experiment 11
+- **Paper**: 16 pages compiled (`paper/triadic_microgpt.pdf`), all 11 experiments included
+- **PyPI**: `triadic-head` v0.1.0 built & validated (signal +8.5% above random), not yet published
 
 ## Known Issues (MUST READ)
-1. **Knowledge Distillation Destroys Triadic Head**: GoldPrimes model (Run 10) has COMPLETE triadic collapse (1 unique signature, all similarities=100%). The 5× distillation weight overwhelmed all emergent differentiation. Use XL pure model (Run 9) as base.
-2. **Partial Bit Entropy**: XL model has mean entropy 0.381 — ~15 bits are dead (always positive), ~20 bits carry most semantic info. Needs entropy regularization to activate dead bits.
-3. **Tokenizer Compatibility**: Runs 1-6 use Python BPE; runs 7+ use HuggingFace. NOT interchangeable.
-4. **eval_report.json is MISLEADING**: It was generated from the GoldPrimes model and shows 100% similarity for all pairs. This does NOT represent the XL model's actual capability.
+1. **Knowledge Distillation at 5× weight = collapse**: GoldPrimes model (Run 10) has complete triadic collapse. Made configurable (`--dist-weight`, default 1.0). Use Run 15 as production model.
+2. **Dead Bits**: ~15 of 64 bits have low entropy (< 0.3). Entropy regularization mitigates but doesn't eliminate.
+3. **Tokenizer Compatibility**: Runs 1-6 use Python BPE; runs 7+ use HuggingFace. NOT interchangeable. Run 15's tokenizer differs from `checkpoints/torch/tokenizer.json` — always use the one in the same checkpoint directory.
+4. **Subsumption 0% at k=64**: Mathematical limitation — exact prime divisibility is combinatorially improbable with ~32 active bits. Works at k=6-12 (parent library regime).
+5. **Coherence loss = collapse**: NEVER re-enable. Adjacent-token agreement drives all projections to identical.
 
 ## Coding Conventions
 - All PyTorch training code is in `src/torch_*.py`

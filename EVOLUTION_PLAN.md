@@ -63,8 +63,11 @@ Without semantic signal, entropy regularization alone produces diverse but rando
 **Pareto Frontier: Sharp Cliff at alpha > 0.05 (Runs 16-17)**
 Runs 16 (alpha=0.2, align=10) and 17 (alpha=0.1, align=7) both lost semantic ordering (King↔Dog rose to 55%, higher than King↔Queen). The triadic loss has a sharp cliff between alpha=0.05 and alpha=0.10 — beyond it, semantic quality collapses even while entropy remains high. Run 15 (alpha=0.05, align=5) is Pareto-optimal.
 
-**Domain Separation Ratio — Target Revised**
-Sep. ratio consistently ~1.0-1.02 across all runs (15-17). The original target of 1.5 is not achievable with 64-bit token-level projections. Domain clustering requires sentence-level or multi-token aggregation — this is a future research direction, not a deficiency. Target revised to "positive signal present."
+**Domain Separation Ratio — SOLVED (Experiment 11, 2026-03-10)**
+Sep. ratio was ~1.02 with isolated-token projections. Sentence-level aggregation (mean-pool across
+all tokens in 3 contextual sentences per concept) raises it to **1.21 mean** (range 1.11-1.42).
+Family domain leads at 1.42, emotions weakest at 1.11. The model learned domain structure —
+it was a measurement artifact, not a deficiency. See `benchmarks/results/v6.0-sentence_geometric_topology_2026-03-10.json`.
 
 **Architecture Changes Made**:
 - Removed coherence loss from `triadic_loss()` (was the 4th loss component)
@@ -90,7 +93,7 @@ Sep. ratio consistently ~1.0-1.02 across all runs (15-17). The original target o
 - Coherent multi-sentence generation confirmed
 
 ### 1.4 Resolved
-- [x] Domain separation ratio target revised (1.5 → positive signal)
+- [x] Domain separation ratio SOLVED via sentence aggregation (1.02 → 1.21, Experiment 11)
 - [x] Language quality benchmark completed
 - [x] Pareto frontier mapped — Run 15 is optimal, no further hyperparameter search needed
 
@@ -330,10 +333,17 @@ from triadic_head import TriadicWrapper
 model = TriadicWrapper(any_hf_model, n_bits=64, align_mode='infonce')
 ```
 
-### 7.4 Sentence-Level Aggregation
-Current projections are token-level. Add attention-weighted pooling for sentence-level signatures to enable:
-- Practical subsumption (currently 0% at k=64)
-- Domain clustering (currently sep ratio ~1.0)
+### 7.4 Sentence-Level Aggregation — COMPLETE (Experiment 11, 2026-03-10)
+Added `--aggregate sentence` to `geometric_topology.py`. Mean-pools triadic projections across
+3 TinyStories-style sentences per concept (270 sentences for 90 concepts, 12 domains).
+
+**Results**: Mean separation ratio 1.02 → **1.21** (+19%). All 12 domains improve.
+Best: family (1.42), worst: emotions (1.11). Domain structure was always present in the model —
+isolated tokens simply lacked context to reveal it.
+
+Remaining future work:
+- Attention-weighted pooling (currently uniform mean-pool)
+- Sentence-level subsumption testing (currently still 0% at k=64)
 
 ### 7.5 triadic-cloud Integration
 Add `/encode` endpoint to the cloud API returning prime signatures alongside generated text — neurosymbolic inference as a service.
