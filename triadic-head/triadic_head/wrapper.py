@@ -538,6 +538,7 @@ class TriadicWrapper(nn.Module):
         tokenizer=None,
         word_groups: Optional[Dict[str, List[str]]] = None,
         verbose: bool = True,
+        training_steps: int = 0,
     ) -> Dict:
         """
         Run diagnostic checks to verify triadic head training quality.
@@ -546,6 +547,7 @@ class TriadicWrapper(nn.Module):
           1. Diversity — are signatures unique? (>75% = PASS)
           2. Active bits — are enough bits firing? (15-85% = PASS)
           3. Semantic ordering — related words more similar than unrelated? (gap > 0 = PASS)
+          4. Random baseline — is the gap significantly above what random bits would produce?
 
         Also provides per-group breakdown so you can see which semantic
         categories the model handles well and which need more training.
@@ -556,12 +558,14 @@ class TriadicWrapper(nn.Module):
                          {"animals": ["dog", "cat"], "colors": ["red", "blue"]}.
                          Uses built-in groups if None.
             verbose: Print results to console.
+            training_steps: Total training steps completed (for guidance messages).
 
         Returns:
-            Dict with check results, per-group breakdown, overall PASS/FAIL,
-            config snapshot, and all signatures.
+            Dict with check results, per-group breakdown, random baseline,
+            overall PASS/FAIL, config snapshot, and all signatures.
         """
-        from .algebra import TriadicValidator as TV
+        import random as _random
+        from .algebra import PrimeMapper, TriadicValidator as TV
 
         if word_groups is None:
             word_groups = {
@@ -632,6 +636,67 @@ class TriadicWrapper(nn.Module):
         avg_inter = sum(inter_sims_clean) / len(inter_sims_clean) if inter_sims_clean else 0
         semantic_gap = avg_intra - avg_inter
 
+        # --- Check 4: Random baseline ---
+        # Generate random bit patterns and measure what gap you'd get by pure chance.
+        # This tells the user how much of the measured gap is real signal vs noise.
+        n_words = len(all_words)
+        n_trials = 100  # average over 100 random assignments
+        mapper = PrimeMapper(self.n_bits)
+        random_gaps = []
+        _random.seed(42)
+
+        for _ in range(n_trials):
+            # Generate random composites with similar active-bit ratio as model
+            random_composites = []
+            for _ in range(n_words):
+                bits = [1 if _random.random() < active_frac else 0 for _ in range(self.n_bits)]
+                proj = [(b * 2.0 - 1.0) for b in bits]  # convert to [-1, 1]
+                random_composites.append(mapper.encode(proj))
+
+            # Compute intra/inter using same group structure
+            r_intra, r_inter = [], []
+            word_idx = 0
+            for group in groups:
+                g_composites = random_composites[word_idx:word_idx + len(group)]
+                word_idx += len(group)
+                for ii in range(len(g_composites)):
+                    for jj in range(ii + 1, len(g_composites)):
+                        r_intra.append(TV.similarity(g_composites[ii], g_composites[jj]))
+
+            # Inter: all cross-group pairs
+            word_idx = 0
+            group_composites = []
+            for group in groups:
+                group_composites.append(random_composites[word_idx:word_idx + len(group)])
+                word_idx += len(group)
+
+            for gi in range(len(group_composites)):
+                for gj in range(gi + 1, len(group_composites)):
+                    for c1 in group_composites[gi]:
+                        for c2 in group_composites[gj]:
+                            r_inter.append(TV.similarity(c1, c2))
+
+            r_avg_intra = sum(r_intra) / len(r_intra) if r_intra else 0
+            r_avg_inter = sum(r_inter) / len(r_inter) if r_inter else 0
+            random_gaps.append(r_avg_intra - r_avg_inter)
+
+        random_gap_mean = sum(random_gaps) / len(random_gaps)
+        random_gap_std = (sum((g - random_gap_mean) ** 2 for g in random_gaps) / len(random_gaps)) ** 0.5
+        signal_above_random = semantic_gap - random_gap_mean
+
+        # The gap is meaningful if it's at least 2 standard deviations above random
+        baseline_pass = signal_above_random > max(2 * random_gap_std, 0.01)
+
+        baseline_info = {
+            'random_gap_mean': random_gap_mean,
+            'random_gap_std': random_gap_std,
+            'model_gap': semantic_gap,
+            'signal_above_random': signal_above_random,
+            'pass': baseline_pass,
+            'detail': (f"model gap {semantic_gap:+.1%} vs random baseline {random_gap_mean:+.1%} "
+                       f"(signal {signal_above_random:+.1%}, random std {random_gap_std:.1%})"),
+        }
+
         # --- Build results ---
         checks = {
             'diversity': {
@@ -651,9 +716,13 @@ class TriadicWrapper(nn.Module):
                 'pass': semantic_gap > 0,
                 'detail': f"within-group {avg_intra:.1%} vs between-group {avg_inter:.1%} (gap {semantic_gap:+.1%})",
             },
+            'random_baseline': baseline_info,
         }
 
         overall = all(c['pass'] for c in checks.values())
+
+        # --- Training guidance ---
+        guidance = self._training_guidance(training_steps, semantic_gap, signal_above_random, baseline_pass)
 
         if verbose:
             print(f"\n{'=' * 60}")
@@ -661,6 +730,8 @@ class TriadicWrapper(nn.Module):
             print(f"{'=' * 60}")
             print(f"  Config: {self.n_bits} bits | align_mode={self.align_mode} | "
                   f"{self.triadic_params():,} triadic params")
+            if training_steps > 0:
+                print(f"  Training: {training_steps:,} steps completed")
             print(f"{'-' * 60}")
 
             for name, check in checks.items():
@@ -682,6 +753,7 @@ class TriadicWrapper(nn.Module):
             print(f"{'-' * 60}")
             if overall:
                 print("  RESULT: PASS — Triadic head is producing meaningful signatures.")
+                print(f"  Signal above random: {signal_above_random:+.1%}")
             else:
                 failed = [n for n, c in checks.items() if not c['pass']]
                 print(f"  RESULT: FAIL — Issues detected: {', '.join(failed)}")
@@ -695,18 +767,76 @@ class TriadicWrapper(nn.Module):
                 if 'semantic_ordering' in failed:
                     print("    -> Related words aren't more similar than unrelated.")
                     print("       Try: increase align_weight, or use align_mode='infonce' for pre-trained models.")
+                if 'random_baseline' in failed:
+                    print("    -> Gap is not significantly above random chance.")
+                    print("       The model may be producing hash-like signatures without real semantics.")
+                    print("       This usually means MORE TRAINING is needed (see guidance below).")
                 failing_groups = [g for g, d in group_details.items() if not d['pass']]
                 if failing_groups:
                     print(f"    -> Weak groups: {', '.join(failing_groups)} — consider adding more training data for these domains.")
+
+            # Always show training guidance
+            if guidance:
+                print(f"\n  TRAINING GUIDANCE:")
+                for line in guidance:
+                    print(f"    {line}")
+
             print(f"{'=' * 60}")
 
         return {
             'checks': checks,
             'overall_pass': overall,
             'group_details': group_details,
+            'random_baseline': baseline_info,
+            'guidance': guidance,
             'config': self.config(),
             'signatures': sigs,
         }
+
+    @staticmethod
+    def _training_guidance(training_steps: int, semantic_gap: float,
+                           signal_above_random: float, baseline_pass: bool) -> List[str]:
+        """Generate actionable training guidance based on current results."""
+        lines = []
+
+        # Recommended minimums (from 26 training runs in Triadic MicroGPT research)
+        RECOMMENDED = {
+            'smoke_test': 5_000,
+            'minimum_viable': 20_000,
+            'good_quality': 50_000,
+            'production': 100_000,
+        }
+
+        if training_steps > 0 and training_steps < RECOMMENDED['minimum_viable']:
+            lines.append(f"WARNING: {training_steps:,} steps is a quick smoke test, not a full training run.")
+            lines.append(f"Minimum recommended: {RECOMMENDED['minimum_viable']:,} steps for meaningful results.")
+            lines.append(f"")
+
+        lines.append("Recommended training steps:")
+        lines.append(f"  Smoke test:      {RECOMMENDED['smoke_test']:>8,} steps  (verify pipeline works)")
+        lines.append(f"  Minimum viable:  {RECOMMENDED['minimum_viable']:>8,} steps  (basic semantic ordering)")
+        lines.append(f"  Good quality:    {RECOMMENDED['good_quality']:>8,} steps  (reliable word relationships)")
+        lines.append(f"  Production:      {RECOMMENDED['production']:>8,} steps+ (publish-ready signatures)")
+
+        if not baseline_pass:
+            lines.append(f"")
+            lines.append(f"Your model's semantic gap ({semantic_gap:+.1%}) is close to random noise ({signal_above_random:+.1%} above random).")
+            lines.append(f"This is expected with short training. The model needs more steps to")
+            lines.append(f"learn real word relationships vs statistical coincidence.")
+        elif signal_above_random > 0 and signal_above_random < 0.05:
+            lines.append(f"")
+            lines.append(f"Your model shows weak signal above random ({signal_above_random:+.1%}).")
+            lines.append(f"More training will strengthen real semantic relationships.")
+        elif signal_above_random >= 0.05:
+            lines.append(f"")
+            lines.append(f"Good signal above random: {signal_above_random:+.1%}")
+
+        lines.append(f"")
+        lines.append(f"For large models (LLaMA, Mistral, etc.), expect to need more steps.")
+        lines.append(f"Monitor the semantic gap: it should grow steadily during training.")
+        lines.append(f"If gap plateaus, try: increase align_weight or switch align_mode.")
+
+        return lines
 
     # ----------------------------------------------------------
     # Explore — Discover relationships between words

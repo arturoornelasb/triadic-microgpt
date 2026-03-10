@@ -534,7 +534,27 @@ Our results have several limitations:
     \item \textbf{Token-level projections.} Each token receives an independent projection. Sentence-level or concept-level aggregation (e.g., averaging projections across a phrase) might enable stronger domain clustering.
     \item \textbf{Subsumption at high $k$.} Exact algebraic subsumption is impractical at $k > 16$. Relaxed subsumption (threshold on shared-factor ratio) could extend the useful range.
     \item \textbf{Single GPU, single run.} All results are from single training runs. Confidence intervals from multiple seeds would strengthen claims, especially for the scaling study.
+    \item \textbf{Dead bits.} Per-bit entropy analysis reveals that $\sim$15 of the 64 bits have low activation probability ($q_i < 0.1$), contributing little semantic information. Figure~\ref{fig:bit_entropy} visualizes the entropy distribution. Stronger entropy regularization or targeted bit activation schedules could address this.
 \end{enumerate}
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/bit_entropy_heatmap.png}
+        \caption{Per-bit entropy heatmap. Darker cells indicate lower entropy (dead bits that fire infrequently).}
+        \label{fig:entropy_heatmap}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/per_bit_entropy.png}
+        \caption{Entropy distribution across 64 bits. Most bits reach $H \approx 0.7$--$0.9$; $\sim$15 bits remain below $0.3$.}
+        \label{fig:entropy_dist}
+    \end{subfigure}
+    \caption{Bit entropy analysis for the XL model (Run~15). Mean entropy $\bar{H} = 0.679$; $\sim$15 bits are effectively dead (entropy $< 0.3$). Entropy regularization ($\lambda_{\text{ent}} = 1.0$) mitigates but does not eliminate this.}
+    \label{fig:bit_entropy}
+\end{figure}
 
 \paragraph{The loss--embedding interaction.}
 Perhaps the most practically important finding is that the optimal alignment loss depends on the quality of the embedding teacher (Section~\ref{sec:transfer}). InfoNCE mines positive/negative pairs from the embedding space, which requires clear cluster structure; MSE matches absolute similarity values, which requires only local pairwise relationships. This interaction is reminiscent of curriculum effects in contrastive learning~\citep{oord2018cpc}: contrastive objectives succeed when the feature space provides meaningful contrast, but degrade when all examples are approximately equidistant.

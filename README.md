@@ -23,6 +23,29 @@ Analogy:    factor transfer   king:queen :: man:woman
 | Analogy verification | **69.2%** (random baseline 50%) |
 | Semantic compression | **8x** (64 bits = 512D embedding probe accuracy) |
 | Signature uniqueness | **100%** across all evaluated concepts |
+| GPT-2 transfer (InfoNCE) | Gap **+0.099**, closing **72%** of gap to Engine PCA (+0.136) |
+
+## Phase 5: Transfer Learning & Alignment Loss Ablation (Experiment 10)
+
+Attaching the triadic head to pre-trained GPT-2 Small (124M) and testing three alignment loss
+formulations reveals a **loss-embedding interaction**: the optimal loss depends on embedding quality.
+
+| Alignment Loss | Semantic Gap | Analogy Verif | Notes |
+|----------------|-------------|---------------|-------|
+| MSE | +0.011 | 75.0% | Weak — absolute value matching wastes capacity |
+| Rank | +0.047 | **83.3%** | Best analogies; ordering-based |
+| **InfoNCE** | **+0.099** | 66.7% | **Closes 72% of gap to Engine PCA** |
+| From-scratch (MSE) | +0.020 | 66.7% | Baseline |
+| Engine PCA | +0.136 | 91.7% | Upper bound (post-hoc, MiniLM) |
+
+**Key finding — Loss-Embedding Interaction:**
+- **Rich embeddings** (GPT-2, 768D, WebText): Use **InfoNCE** — structured pos/neg mining leverages
+  tight semantic clusters. MSE's absolute matching wastes capacity on scale mismatch.
+- **Weak embeddings** (from-scratch, 512D, TinyStories): Use **MSE** — dense local gradients
+  work even without global cluster structure. InfoNCE and Rank fail (no meaningful negatives).
+
+The bottleneck is the **loss formulation**, not embedding quality: same model, same embeddings,
+9× gap difference from changing only the alignment loss (MSE→InfoNCE).
 
 ## Architecture
 
@@ -83,6 +106,17 @@ python benchmarks/scripts/scaling_study.py --model checkpoints/torch_run15_stron
 python src/chat.py
 ```
 
+### Desktop Explorer (GUI)
+
+A full desktop UI for exploring, auditing, and chatting with TriadicGPT interactively.
+
+```bash
+pip install PySide6
+python ui/app.py
+```
+
+See **[Desktop Explorer docs →](ui/README.md)** for the full feature reference.
+
 ## Repository Structure
 
 ```
@@ -123,6 +157,16 @@ scripts/
 
 tests/
   test_all.py              # 37 unit tests
+
+ui/
+  app.py                   # Entry point: python ui/app.py
+  model_interface.py       # Unified API for native .pt and HF TriadicWrapper
+  model_panel.py           # Top bar: load any model or HF checkpoint
+  main_window.py           # QMainWindow + 7-tab interface
+  tabs/                    # Encoder, Compare, Explore, Analogy, Validate, Chat, Benchmarks
+  widgets/                 # BitVectorWidget, PrimeDisplayWidget, MplCanvas
+  workers/                 # Async QThread workers for inference
+  resources/style.qss      # Dark theme (Catppuccin Mocha)
 
 experiment_log.md          # Complete record of all 26 training runs
 EVOLUTION_PLAN.md          # Research roadmap and phase tracking

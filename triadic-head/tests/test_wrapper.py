@@ -29,10 +29,23 @@ class TestTriadicWrapper:
 
     @pytest.fixture
     def tiny_model(self):
-        """Create a minimal GPT-2-style model for testing."""
+        """Create a minimal GPT-2-style model for testing (small vocab)."""
         from transformers import GPT2LMHeadModel, GPT2Config
         config = GPT2Config(
             vocab_size=100,
+            n_positions=64,
+            n_embd=32,
+            n_layer=2,
+            n_head=2,
+        )
+        return GPT2LMHeadModel(config)
+
+    @pytest.fixture
+    def tiny_model_full_vocab(self):
+        """Tiny model with full GPT-2 vocab (needed for tokenizer-based tests)."""
+        from transformers import GPT2LMHeadModel, GPT2Config
+        config = GPT2Config(
+            vocab_size=50257,
             n_positions=64,
             n_embd=32,
             n_layer=2,
@@ -92,10 +105,10 @@ class TestTriadicWrapper:
         assert 'GPT2LMHeadModel' in r
         assert 'n_bits=16' in r
 
-    def test_validate(self, tiny_model):
+    def test_validate(self, tiny_model_full_vocab):
         """validate() should return results even on untrained model."""
         from transformers import AutoTokenizer
-        wrapper = TriadicWrapper(tiny_model, n_bits=16)
+        wrapper = TriadicWrapper(tiny_model_full_vocab, n_bits=16)
         tokenizer = AutoTokenizer.from_pretrained('gpt2')
         tokenizer.pad_token = tokenizer.eos_token
 
@@ -103,18 +116,43 @@ class TestTriadicWrapper:
         assert 'checks' in report
         assert 'overall_pass' in report
         assert 'signatures' in report
+        assert 'random_baseline' in report
+        assert 'guidance' in report
         assert 'diversity' in report['checks']
         assert 'active_bits' in report['checks']
         assert 'semantic_ordering' in report['checks']
+        assert 'random_baseline' in report['checks']
         # Each check has 'pass' and 'detail'
         for name, check in report['checks'].items():
             assert 'pass' in check
             assert 'detail' in check
+        # Random baseline has expected fields
+        baseline = report['random_baseline']
+        assert 'random_gap_mean' in baseline
+        assert 'signal_above_random' in baseline
+        assert isinstance(baseline['pass'], bool)
 
-    def test_validate_custom_groups(self, tiny_model):
+    def test_validate_training_guidance(self, tiny_model_full_vocab):
+        """validate() with training_steps shows appropriate guidance."""
+        from transformers import AutoTokenizer
+        wrapper = TriadicWrapper(tiny_model_full_vocab, n_bits=16)
+        tokenizer = AutoTokenizer.from_pretrained('gpt2')
+        tokenizer.pad_token = tokenizer.eos_token
+
+        # Short training should warn about being a smoke test
+        report = wrapper.validate(tokenizer=tokenizer, verbose=False, training_steps=5000)
+        guidance = report['guidance']
+        assert any('WARNING' in line or 'quick smoke test' in line for line in guidance)
+
+        # Long training should not have the "quick smoke test" warning
+        report2 = wrapper.validate(tokenizer=tokenizer, verbose=False, training_steps=50000)
+        guidance2 = report2['guidance']
+        assert not any('quick smoke test' in line for line in guidance2)
+
+    def test_validate_custom_groups(self, tiny_model_full_vocab):
         """validate() accepts custom word groups."""
         from transformers import AutoTokenizer
-        wrapper = TriadicWrapper(tiny_model, n_bits=16)
+        wrapper = TriadicWrapper(tiny_model_full_vocab, n_bits=16)
         tokenizer = AutoTokenizer.from_pretrained('gpt2')
         tokenizer.pad_token = tokenizer.eos_token
 
@@ -125,10 +163,10 @@ class TestTriadicWrapper:
         )
         assert len(report['signatures']) == 4
 
-    def test_explore(self, tiny_model):
+    def test_explore(self, tiny_model_full_vocab):
         """explore() should return matrix, ranked pairs, and per-pair details."""
         from transformers import AutoTokenizer
-        wrapper = TriadicWrapper(tiny_model, n_bits=16)
+        wrapper = TriadicWrapper(tiny_model_full_vocab, n_bits=16)
         tokenizer = AutoTokenizer.from_pretrained('gpt2')
         tokenizer.pad_token = tokenizer.eos_token
 
@@ -151,10 +189,10 @@ class TestTriadicWrapper:
         sims = [p['similarity'] for p in result['pairs_ranked']]
         assert sims == sorted(sims, reverse=True)
 
-    def test_explore_threshold(self, tiny_model):
+    def test_explore_threshold(self, tiny_model_full_vocab):
         """explore() with threshold flags high-similarity pairs."""
         from transformers import AutoTokenizer
-        wrapper = TriadicWrapper(tiny_model, n_bits=16)
+        wrapper = TriadicWrapper(tiny_model_full_vocab, n_bits=16)
         tokenizer = AutoTokenizer.from_pretrained('gpt2')
         tokenizer.pad_token = tokenizer.eos_token
 

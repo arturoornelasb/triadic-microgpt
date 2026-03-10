@@ -9,9 +9,23 @@ Usage:
     python examples/train_gpt2.py --data corpus.txt  # real training
 
 After training:
-  - validate() tells you if training worked (PASS/FAIL)
+  - validate() tells you if training worked (PASS/FAIL + random baseline)
   - explore() shows you how words relate to each other
   - Full report saved to --output-dir
+
+TRAINING DURATION GUIDE:
+  The number of training steps directly determines result quality.
+  Short runs (< 10K steps) are useful for smoke-testing the pipeline
+  but will NOT produce reliable semantic signatures.
+
+  Recommended minimums:
+    Smoke test:      5,000 steps   (verify pipeline works, ~5 min)
+    Minimum viable:  20,000 steps  (basic semantic ordering, ~20 min)
+    Good quality:    50,000 steps  (reliable word relationships, ~50 min)
+    Production:      100,000+ steps (publish-ready signatures, ~2 hours)
+
+  Times are approximate for GPT-2 (124M) on a single GPU.
+  Larger models (LLaMA, Mistral) will need proportionally more steps.
 """
 
 import argparse
@@ -71,6 +85,8 @@ sys.stdout = tee
 # ============================================================
 # Setup
 # ============================================================
+total_steps = args.phase1_steps + args.phase2_steps
+
 print(f"\n{'=' * 60}")
 print(f"  TRIADIC HEAD TRAINING")
 print(f"{'=' * 60}")
@@ -78,7 +94,17 @@ print(f"  Model:      {args.model}")
 print(f"  Device:     {DEVICE}")
 print(f"  Bits:       {args.bits}")
 print(f"  Align mode: {args.align_mode}")
+print(f"  Steps:      {total_steps:,} total ({args.phase1_steps:,} frozen + {args.phase2_steps:,} joint)")
 print(f"  Output:     {os.path.abspath(args.output_dir)}")
+
+if total_steps < 20_000:
+    print(f"{'-' * 60}")
+    print(f"  NOTE: {total_steps:,} steps is a quick smoke test.")
+    print(f"  For reliable semantic signatures, use at least 20,000 steps.")
+    print(f"  Example: --phase1-steps 5000 --phase2-steps 20000")
+    if total_steps < 5_000:
+        print(f"  WARNING: Very short run — results will be mostly noise.")
+
 print(f"{'=' * 60}")
 
 print(f"\nLoading {args.model}...")
@@ -217,7 +243,7 @@ print(f"\nSaved triadic head to {ckpt_path}")
 # Validate — Did training work?
 # ============================================================
 model.eval()
-report = model.validate(tokenizer=tokenizer)
+report = model.validate(tokenizer=tokenizer, training_steps=total_steps)
 
 
 # ============================================================

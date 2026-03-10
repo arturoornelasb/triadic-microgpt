@@ -71,6 +71,30 @@ total_loss.backward()
 | `mse` | From-scratch training | Dense local gradients work with weak embeddings |
 | `rank` | Best analogy accuracy | Preserves similarity ordering, not absolute values |
 
+## Training guide — How long to train
+
+The number of training steps directly determines result quality. Short runs are useful for smoke-testing the pipeline, but **will NOT produce reliable semantic signatures**. The triadic head needs enough steps to learn real word relationships beyond statistical noise.
+
+| Level | Steps | Time (GPT-2, 1 GPU) | What to expect |
+|-------|------:|-----:|----------------|
+| Smoke test | 5,000 | ~5 min | Pipeline works, results are mostly noise |
+| Minimum viable | 20,000 | ~20 min | Basic semantic ordering emerges |
+| Good quality | 50,000 | ~50 min | Reliable word relationships, gap well above random |
+| Production | 100,000+ | ~2 hours | Publish-ready signatures |
+
+**Important**: Larger models (LLaMA, Mistral, etc.) need proportionally more steps. The `validate()` method includes a **random baseline** — it generates random bit patterns and measures what gap you'd get by pure chance. If your model's gap is close to the random baseline, you need more training.
+
+```bash
+# Quick smoke test (verify the pipeline works)
+python examples/train_gpt2.py --data corpus.txt --phase1-steps 1000 --phase2-steps 4000
+
+# Good quality training
+python examples/train_gpt2.py --data corpus.txt --phase1-steps 10000 --phase2-steps 40000
+
+# Production quality
+python examples/train_gpt2.py --data corpus.txt --phase1-steps 20000 --phase2-steps 80000
+```
+
 ## Validation — Did training work?
 
 ```python
@@ -85,8 +109,10 @@ report = model.validate()
 #   [PASS] diversity: 16/16 unique signatures (100%)
 #   [PASS] active_bits: 35.2/64 bits active on avg (55%)
 #   [PASS] semantic_ordering: within-group 72% vs between-group 58% (gap +14%)
+#   [PASS] random_baseline: model gap +14% vs random baseline +0.3% (signal +13.7%)
 # ------------------------------------------------------------
 #   RESULT: PASS — Triadic head is producing meaningful signatures.
+#   Signal above random: +13.7%
 # ============================================================
 
 # Use your own domain-specific word groups:
