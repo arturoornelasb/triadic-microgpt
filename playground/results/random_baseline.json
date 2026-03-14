@@ -1,0 +1,44 @@
+{
+  "experiment": "random_baseline",
+  "config": "6L/256D/64bits",
+  "steps": 10000,
+  "normal": {
+    "final_loss": 1.734944224357605,
+    "semantic_gap": -0.012588114506668524,
+    "related_vs_unrelated_gap": -0.029077427254782795,
+    "mean_related_sim": 0.5608229570918613,
+    "mean_unrelated_sim": 0.589900384346644,
+    "mean_random_sim": 0.5734110715985298,
+    "vector_analogy_acc": 0.0,
+    "algebraic_analogy_acc": 0.25,
+    "mean_bit_entropy": 0.6174591261596549,
+    "dead_bits": 15,
+    "unique_signatures": 28
+  },
+  "frozen_random": {
+    "final_loss": 1.7331465482711792,
+    "semantic_gap": 0.008035479320420147,
+    "related_vs_unrelated_gap": 0.019067857000562904,
+    "mean_related_sim": 0.7061642540825738,
+    "mean_unrelated_sim": 0.6870963970820109,
+    "mean_random_sim": 0.6981287747621536,
+    "vector_analogy_acc": 0.0,
+    "algebraic_analogy_acc": 0.5,
+    "mean_bit_entropy": 0.5384678459450928,
+    "dead_bits": 19,
+    "unique_signatures": 28
+  },
+  "language_only": {
+    "final_loss": 1.7519237995147705,
+    "semantic_gap": -0.006794759266906314,
+    "related_vs_unrelated_gap": 0.009667780664232128,
+    "mean_related_sim": 0.6643611556953855,
+    "mean_unrelated_sim": 0.6546933750311533,
+    "mean_random_sim": 0.6711559149622918,
+    "vector_analogy_acc": 0.0,
+    "algebraic_analogy_acc": 0.75,
+    "mean_bit_entropy": 0.5416053602898443,
+    "dead_bits": 18,
+    "unique_signatures": 28
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "experiment": "rule_of_three_loss",
+  "source": "La Danza Cosmica Cap. 25",
+  "config": "6L/256D/64bits",
+  "steps": 10000,
+  "n_analogy_triples": 16,
+  "baseline": {
+    "final_loss": 1.72258722782135,
+    "analogies": [
+      {
+        "analogy": "king:queen::man:woman",
+        "offset_cos": 0.3906037211418152,
+        "algebraic_sim": 0.4782608695652174,
+        "K": 0.8577057950630783
+      },
+      {
+        "analogy": "father:mother::brother:sister",
+        "offset_cos": 0.2862556576728821,
+        "algebraic_sim": 0.5813953488372093,
+        "K": 1.142990565041606
+      },
+      {
+        "analogy": "dog:puppy::cat:kitten",
+        "offset_cos": 0.25454241037368774,
+        "algebraic_sim": 0.48936170212765956,
+        "K": 0.9241286877876232
+      },
+      {
+        "analogy": "big:small::tall:short",
+        "offset_cos": 0.36659130454063416,
+        "algebraic_sim": 0.5227272727272727,
+        "K": 0.8632284755984684
+      },
+      {
+        "analogy": "hot:cold::day:night",
+        "offset_cos": 0.4262476861476898,
+        "algebraic_sim": 0.40476190476190477,
+        "K": 1.0486879030035454
+      },
+      {
+        "analogy": "happy:sad::love:hate",
+        "offset_cos": 0.4244768023490906,
+        "algebraic_sim": 0.47619047619047616,
+        "K": 1.3664724391381278
+      }
+    ]
+  },
+  "r3_1.0": {
+    "final_loss": 1.7180697917938232,
+    "analogies": [
+      {
+        "analogy": "king:queen::man:woman",
+        "offset_cos": 0.9998095631599426,
+        "algebraic_sim": 1.0,
+        "K": 1.000298536986818
+      },
+      {
+        "analogy": "father:mother::brother:sister",
+        "offset_cos": 0.9997109174728394,
+        "algebraic_sim": 1.0,
+        "K": 0.9999498622601329
+      },
+      {
+        "analogy": "dog:puppy::cat:kitten",
+        "offset_cos": 0.9990916848182678,
+        "algebraic_sim": 1.0,
+        "K": 0.9999987746883574
+      },
+      {
+        "analogy": "big:small::tall:short",
+        "offset_cos": 0.9996504187583923,
+        "algebraic_sim": 1.0,
+        "K": 1.0003451885602934
+      },
+      {
+        "analogy": "hot:cold::day:night",
+        "offset_cos": 0.9995577931404114,
+        "algebraic_sim": 1.0,
+        "K": 1.0003505257585328
+      },
+      {
+        "analogy": "happy:sad::love:hate",
+        "offset_cos": 0.9991469979286194,
+        "algebraic_sim": 1.0,
+        "K": 0.9997718706273079
+      }
+    ]
+  },
+  "r3_5.0": {
+    "final_loss": 1.665408730506897,
+    "analogies": [
+      {
+        "analogy": "king:queen::man:woman",
+        "offset_cos": 0.9999607801437378,
+        "algebraic_sim": 1.0,
+        "K": 1.0000023245200567
+      },
+      {
+        "analogy": "father:mother::brother:sister",
+        "offset_cos": 0.9999600052833557,
+        "algebraic_sim": 1.0,
+        "K": 0.9999875422343847
+      },
+      {
+        "analogy": "dog:puppy::cat:kitten",
+        "offset_cos": 0.9999395608901978,
+        "algebraic_sim": 1.0,
+        "K": 0.9999827734053551
+      },
+      {
+        "analogy": "big:small::tall:short",
+        "offset_cos": 0.999964714050293,
+        "algebraic_sim": 1.0,
+        "K": 1.000019014540674
+      },
+      {
+        "analogy": "hot:cold::day:night",
+        "offset_cos": 0.9999493360519409,
+        "algebraic_sim": 1.0,
+        "K": 1.000049535332003
+      },
+      {
+        "analogy": "happy:sad::love:hate",
+        "offset_cos": 0.9999389052391052,
+        "algebraic_sim": 1.0,
+        "K": 1.0000098949851115
+      }
+    ]
+  }
+}

@@ -1,0 +1,1256 @@
+{
+  "experiment": "subsumption_loss",
+  "source": "Linea 4 \u2014 Recuperacion de Subsumption",
+  "config": "6L/256D/64bits",
+  "steps": 10000,
+  "n_train_pairs": 45,
+  "n_test_pairs": 12,
+  "baseline": {
+    "final_loss": 1.8103969097137451,
+    "train_eval": {
+      "subsumption_rate": 0.0,
+      "mean_bit_inheritance": 0.7346408157050155,
+      "total_pairs": 45,
+      "details": [
+        {
+          "pair": "animal->dog",
+          "subsumes": false,
+          "bit_inheritance": 0.8055555555555556,
+          "hyper_active_bits": 36,
+          "shared_bits": 29
+        },
+        {
+          "pair": "animal->cat",
+          "subsumes": false,
+          "bit_inheritance": 0.6666666666666666,
+          "hyper_active_bits": 36,
+          "shared_bits": 24
+        },
+        {
+          "pair": "animal->bird",
+          "subsumes": false,
+          "bit_inheritance": 0.8055555555555556,
+          "hyper_active_bits": 36,
+          "shared_bits": 29
+        },
+        {
+          "pair": "animal->fish",
+          "subsumes": false,
+          "bit_inheritance": 0.75,
+          "hyper_active_bits": 36,
+          "shared_bits": 27
+        },
+        {
+          "pair": "animal->horse",
+          "subsumes": false,
+          "bit_inheritance": 0.6388888888888888,
+          "hyper_active_bits": 36,
+          "shared_bits": 23
+        },
+        {
+          "pair": "animal->rabbit",
+          "subsumes": false,
+          "bit_inheritance": 0.75,
+          "hyper_active_bits": 36,
+          "shared_bits": 27
+        },
+        {
+          "pair": "animal->bear",
+          "subsumes": false,
+          "bit_inheritance": 0.75,
+          "hyper_active_bits": 36,
+          "shared_bits": 27
+        },
+        {
+          "pair": "animal->mouse",
+          "subsumes": false,
+          "bit_inheritance": 0.6944444444444444,
+          "hyper_active_bits": 36,
+          "shared_bits": 25
+        },
+        {
+          "pair": "animal->lion",
+          "subsumes": false,
+          "bit_inheritance": 0.6944444444444444,
+          "hyper_active_bits": 36,
+          "shared_bits": 25
+        },
+        {
+          "pair": "person->king",
+          "subsumes": false,
+          "bit_inheritance": 0.7027027027027027,
+          "hyper_active_bits": 37,
+          "shared_bits": 26
+        },
+        {
+          "pair": "person->queen",
+          "subsumes": false,
+          "bit_inheritance": 0.7297297297297297,
+          "hyper_active_bits": 37,
+          "shared_bits": 27
+        },
+        {
+          "pair": "person->doctor",
+          "subsumes": false,
+          "bit_inheritance": 0.7297297297297297,
+          "hyper_active_bits": 37,
+          "shared_bits": 27
+        },
+        {
+          "pair": "person->teacher",
+          "subsumes": false,
+          "bit_inheritance": 0.8378378378378378,
+          "hyper_active_bits": 37,
+          "shared_bits": 31
+        },
+        {
+          "pair": "person->princess",
+          "subsumes": false,
+          "bit_inheritance": 0.8108108108108109,
+          "hyper_active_bits": 37,
+          "shared_bits": 30
+        },
+        {
+          "pair": "person->prince",
+          "subsumes": false,
+          "bit_inheritance": 0.7567567567567568,
+          "hyper_active_bits": 37,
+          "shared_bits": 28
+        },
+        {
+          "pair": "person->boy",
+          "subsumes": false,
+          "bit_inheritance": 0.6756756756756757,
+          "hyper_active_bits": 37,
+          "shared_bits": 25
+        },
+        {
+          "pair": "person->girl",
+          "subsumes": false,
+          "bit_inheritance": 0.7567567567567568,
+          "hyper_active_bits": 37,
+          "shared_bits": 28
+        },
+        {
+          "pair": "feeling->happy",
+          "subsumes": false,
+          "bit_inheritance": 0.7428571428571429,
+          "hyper_active_bits": 35,
+          "shared_bits": 26
+        },
+        {
+          "pair": "feeling->sad",
+          "subsumes": false,
+          "bit_inheritance": 0.7714285714285715,
+          "hyper_active_bits": 35,
+          "shared_bits": 27
+        },
+        {
+          "pair": "feeling->love",
+          "subsumes": false,
+          "bit_inheritance": 0.7428571428571429,
+          "hyper_active_bits": 35,
+          "shared_bits": 26
+        },
+        {
+          "pair": "feeling->hate",
+          "subsumes": false,
+          "bit_inheritance": 0.7714285714285715,
+          "hyper_active_bits": 35,
+          "shared_bits": 27
+        },
+        {
+          "pair": "feeling->angry",
+          "subsumes": false,
+          "bit_inheritance": 0.7428571428571429,
+          "hyper_active_bits": 35,
+          "shared_bits": 26
+        },
+        {
+          "pair": "feeling->scared",
+          "subsumes": false,
+          "bit_inheritance": 0.6571428571428571,
+          "hyper_active_bits": 35,
+          "shared_bits": 23
+        },
+        {
+          "pair": "food->apple",
+          "subsumes": false,
+          "bit_inheritance": 0.7419354838709677,
+          "hyper_active_bits": 31,
+          "shared_bits": 23
+        },
+        {
+          "pair": "food->cake",
+          "subsumes": false,
+          "bit_inheritance": 0.7741935483870968,
+          "hyper_active_bits": 31,
+          "shared_bits": 24
+        },
+        {
+          "pair": "food->bread",
+          "subsumes": false,
+          "bit_inheritance": 0.8709677419354839,
+          "hyper_active_bits": 31,
+          "shared_bits": 27
+        },
+        {
+          "pair": "food->candy",
+          "subsumes": false,
+          "bit_inheritance": 0.7419354838709677,
+          "hyper_active_bits": 31,
+          "shared_bits": 23
+        },
+        {
+          "pair": "food->cookie",
+          "subsumes": false,
+          "bit_inheritance": 0.8387096774193549,
+          "hyper_active_bits": 31,
+          "shared_bits": 26
+        },
+        {
+          "pair": "color->red",
+          "subsumes": false,
+          "bit_inheritance": 0.7142857142857143,
+          "hyper_active_bits": 42,
+          "shared_bits": 30
+        },
+        {
+          "pair": "color->blue",
+          "subsumes": false,
+          "bit_inheritance": 0.7380952380952381,
+          "hyper_active_bits": 42,
+          "shared_bits": 31
+        },
+        {
+          "pair": "color->green",
+          "subsumes": false,
+          "bit_inheritance": 0.7619047619047619,
+          "hyper_active_bits": 42,
+          "shared_bits": 32
+        },
+        {
+          "pair": "color->yellow",
+          "subsumes": false,
+          "bit_inheritance": 0.7619047619047619,
+          "hyper_active_bits": 42,
+          "shared_bits": 32
+        },
+        {
+          "pair": "color->pink",
+          "subsumes": false,
+          "bit_inheritance": 0.6904761904761905,
+          "hyper_active_bits": 42,
+          "shared_bits": 29
+        },
+        {
+          "pair": "color->purple",
+          "subsumes": false,
+          "bit_inheritance": 0.7380952380952381,
+          "hyper_active_bits": 42,
+          "shared_bits": 31
+        },
+        {
+          "pair": "place->school",
+          "subsumes": false,
+          "bit_inheritance": 0.7941176470588235,
+          "hyper_active_bits": 34,
+          "shared_bits": 27
+        },
+        {
+          "pair": "place->hospital",
+          "subsumes": false,
+          "bit_inheritance": 0.6764705882352942,
+          "hyper_active_bits": 34,
+          "shared_bits": 23
+        },
+        {
+          "pair": "place->house",
+          "subsumes": false,
+          "bit_inheritance": 0.7058823529411765,
+          "hyper_active_bits": 34,
+          "shared_bits": 24
+        },
+        {
+          "pair": "place->garden",
+          "subsumes": false,
+          "bit_inheritance": 0.7058823529411765,
+          "hyper_active_bits": 34,
+          "shared_bits": 24
+        },
+        {
+          "pair": "place->forest",
+          "subsumes": false,
+          "bit_inheritance": 0.5882352941176471,
+          "hyper_active_bits": 34,
+          "shared_bits": 20
+        },
+        {
+          "pair": "place->beach",
+          "subsumes": false,
+          "bit_inheritance": 0.6176470588235294,
+          "hyper_active_bits": 34,
+          "shared_bits": 21
+        },
+        {
+          "pair": "place->park",
+          "subsumes": false,
+          "bit_inheritance": 0.6764705882352942,
+          "hyper_active_bits": 34,
+          "shared_bits": 23
+        },
+        {
+          "pair": "time->day",
+          "subsumes": false,
+          "bit_inheritance": 0.65625,
+          "hyper_active_bits": 32,
+          "shared_bits": 21
+        },
+        {
+          "pair": "time->night",
+          "subsumes": false,
+          "bit_inheritance": 0.84375,
+          "hyper_active_bits": 32,
+          "shared_bits": 27
+        },
+        {
+          "pair": "time->morning",
+          "subsumes": false,
+          "bit_inheritance": 0.6875,
+          "hyper_active_bits": 32,
+          "shared_bits": 22
+        },
+        {
+          "pair": "time->evening",
+          "subsumes": false,
+          "bit_inheritance": 0.75,
+          "hyper_active_bits": 32,
+          "shared_bits": 24
+        }
+      ]
+    },
+    "test_eval": {
+      "subsumption_rate": 0.0,
+      "mean_bit_inheritance": 0.7154955002440772,
+      "total_pairs": 12,
+      "details": [
+        {
+          "pair": "animal->tiger",
+          "subsumes": false,
+          "bit_inheritance": 0.6111111111111112,
+          "hyper_active_bits": 36,
+          "shared_bits": 22
+        },
+        {
+          "pair": "animal->frog",
+          "subsumes": false,
+          "bit_inheritance": 0.6944444444444444,
+          "hyper_active_bits": 36,
+          "shared_bits": 25
+        },
+        {
+          "pair": "animal->deer",
+          "subsumes": false,
+          "bit_inheritance": 0.6666666666666666,
+          "hyper_active_bits": 36,
+          "shared_bits": 24
+        },
+        {
+          "pair": "person->man",
+          "subsumes": false,
+          "bit_inheritance": 0.7567567567567568,
+          "hyper_active_bits": 37,
+          "shared_bits": 28
+        },
+        {
+          "pair": "person->woman",
+          "subsumes": false,
+          "bit_inheritance": 0.7837837837837838,
+          "hyper_active_bits": 37,
+          "shared_bits": 29
+        },
+        {
+          "pair": "person->baby",
+          "subsumes": false,
+          "bit_inheritance": 0.7297297297297297,
+          "hyper_active_bits": 37,
+          "shared_bits": 27
+        },
+        {
+          "pair": "food->pizza",
+          "subsumes": false,
+          "bit_inheritance": 0.7096774193548387,
+          "hyper_active_bits": 31,
+          "shared_bits": 22
+        },
+        {
+          "pair": "food->milk",
+          "subsumes": false,
+          "bit_inheritance": 0.8387096774193549,
+          "hyper_active_bits": 31,
+          "shared_bits": 26
+        },
+        {
+          "pair": "food->egg",
+          "subsumes": false,
+          "bit_inheritance": 0.6774193548387096,
+          "hyper_active_bits": 31,
+          "shared_bits": 21
+        },
+        {
+          "pair": "place->castle",
+          "subsumes": false,
+          "bit_inheritance": 0.6764705882352942,
+          "hyper_active_bits": 34,
+          "shared_bits": 23
+        },
+        {
+          "pair": "place->farm",
+          "subsumes": false,
+          "bit_inheritance": 0.7941176470588235,
+          "hyper_active_bits": 34,
+          "shared_bits": 27
+        },
+        {
+          "pair": "place->river",
+          "subsumes": false,
+          "bit_inheritance": 0.6470588235294118,
+          "hyper_active_bits": 34,
+          "shared_bits": 22
+        }
+      ]
+    }
+  },
+  "sub_1.0": {
+    "final_loss": 1.7206151485443115,
+    "train_eval": {
+      "subsumption_rate": 1.0,
+      "mean_bit_inheritance": 1.0,
+      "total_pairs": 45,
+      "details": [
+        {
+          "pair": "animal->dog",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "animal->cat",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "animal->bird",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "animal->fish",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "animal->horse",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "animal->rabbit",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "animal->bear",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "animal->mouse",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "animal->lion",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "person->king",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 7,
+          "shared_bits": 7
+        },
+        {
+          "pair": "person->queen",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 7,
+          "shared_bits": 7
+        },
+        {
+          "pair": "person->doctor",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 7,
+          "shared_bits": 7
+        },
+        {
+          "pair": "person->teacher",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 7,
+          "shared_bits": 7
+        },
+        {
+          "pair": "person->princess",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 7,
+          "shared_bits": 7
+        },
+        {
+          "pair": "person->prince",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 7,
+          "shared_bits": 7
+        },
+        {
+          "pair": "person->boy",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 7,
+          "shared_bits": 7
+        },
+        {
+          "pair": "person->girl",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 7,
+          "shared_bits": 7
+        },
+        {
+          "pair": "feeling->happy",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "feeling->sad",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "feeling->love",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "feeling->hate",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "feeling->angry",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "feeling->scared",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "food->apple",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 11,
+          "shared_bits": 11
+        },
+        {
+          "pair": "food->cake",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 11,
+          "shared_bits": 11
+        },
+        {
+          "pair": "food->bread",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 11,
+          "shared_bits": 11
+        },
+        {
+          "pair": "food->candy",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 11,
+          "shared_bits": 11
+        },
+        {
+          "pair": "food->cookie",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 11,
+          "shared_bits": 11
+        },
+        {
+          "pair": "color->red",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "color->blue",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "color->green",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "color->yellow",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "color->pink",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "color->purple",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "place->school",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "place->hospital",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "place->house",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "place->garden",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "place->forest",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "place->beach",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "place->park",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "time->day",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "time->night",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "time->morning",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "time->evening",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        }
+      ]
+    },
+    "test_eval": {
+      "subsumption_rate": 0.8333333333333334,
+      "mean_bit_inheritance": 0.9672619047619048,
+      "total_pairs": 12,
+      "details": [
+        {
+          "pair": "animal->tiger",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "animal->frog",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "animal->deer",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "person->man",
+          "subsumes": false,
+          "bit_inheritance": 0.8571428571428571,
+          "hyper_active_bits": 7,
+          "shared_bits": 6
+        },
+        {
+          "pair": "person->woman",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 7,
+          "shared_bits": 7
+        },
+        {
+          "pair": "person->baby",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 7,
+          "shared_bits": 7
+        },
+        {
+          "pair": "food->pizza",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 11,
+          "shared_bits": 11
+        },
+        {
+          "pair": "food->milk",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 11,
+          "shared_bits": 11
+        },
+        {
+          "pair": "food->egg",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 11,
+          "shared_bits": 11
+        },
+        {
+          "pair": "place->castle",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "place->farm",
+          "subsumes": false,
+          "bit_inheritance": 0.75,
+          "hyper_active_bits": 4,
+          "shared_bits": 3
+        },
+        {
+          "pair": "place->river",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        }
+      ]
+    }
+  },
+  "sub_5.0": {
+    "final_loss": 1.7065322399139404,
+    "train_eval": {
+      "subsumption_rate": 1.0,
+      "mean_bit_inheritance": 1.0,
+      "total_pairs": 45,
+      "details": [
+        {
+          "pair": "animal->dog",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "animal->cat",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "animal->bird",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "animal->fish",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "animal->horse",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "animal->rabbit",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "animal->bear",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "animal->mouse",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "animal->lion",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "person->king",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "person->queen",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "person->doctor",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "person->teacher",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "person->princess",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "person->prince",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "person->boy",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "person->girl",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "feeling->happy",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "feeling->sad",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "feeling->love",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "feeling->hate",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "feeling->angry",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "feeling->scared",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "food->apple",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 6,
+          "shared_bits": 6
+        },
+        {
+          "pair": "food->cake",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 6,
+          "shared_bits": 6
+        },
+        {
+          "pair": "food->bread",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 6,
+          "shared_bits": 6
+        },
+        {
+          "pair": "food->candy",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 6,
+          "shared_bits": 6
+        },
+        {
+          "pair": "food->cookie",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 6,
+          "shared_bits": 6
+        },
+        {
+          "pair": "color->red",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "color->blue",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "color->green",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "color->yellow",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "color->pink",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "color->purple",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "place->school",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "place->hospital",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "place->house",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "place->garden",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "place->forest",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "place->beach",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "place->park",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "time->day",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "time->night",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "time->morning",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "time->evening",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        }
+      ]
+    },
+    "test_eval": {
+      "subsumption_rate": 0.9166666666666666,
+      "mean_bit_inheritance": 0.9791666666666666,
+      "total_pairs": 12,
+      "details": [
+        {
+          "pair": "animal->tiger",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "animal->frog",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "animal->deer",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 2,
+          "shared_bits": 2
+        },
+        {
+          "pair": "person->man",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "person->woman",
+          "subsumes": false,
+          "bit_inheritance": 0.75,
+          "hyper_active_bits": 4,
+          "shared_bits": 3
+        },
+        {
+          "pair": "person->baby",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 4,
+          "shared_bits": 4
+        },
+        {
+          "pair": "food->pizza",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 6,
+          "shared_bits": 6
+        },
+        {
+          "pair": "food->milk",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 6,
+          "shared_bits": 6
+        },
+        {
+          "pair": "food->egg",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 6,
+          "shared_bits": 6
+        },
+        {
+          "pair": "place->castle",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "place->farm",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        },
+        {
+          "pair": "place->river",
+          "subsumes": true,
+          "bit_inheritance": 1.0,
+          "hyper_active_bits": 1,
+          "shared_bits": 1
+        }
+      ]
+    }
+  }
+}

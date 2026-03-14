@@ -1,0 +1,26 @@
+{
+  "experiment": "xl_sigmoid_anneal",
+  "source": "playground soft_signatures \u2192 XL validation",
+  "config": "12L/512D/8H/64bits (40M params)",
+  "steps": 50000,
+  "final_temp": 10.0,
+  "training_time_min": 186.41908658742904,
+  "best_loss": 0.5481677651405334,
+  "perplexity": 16.59587421289122,
+  "semantic_gap": 0.010398235980134674,
+  "related_vs_unrelated": 0.07203912556680858,
+  "mean_related_sim": 0.521795194882613,
+  "mean_random_sim": 0.5113969589024783,
+  "analogy_verification": 1.0,
+  "mean_bit_entropy": 0.6352912695110706,
+  "dead_bits": 12,
+  "active_bits": 52,
+  "unique_signatures": 46,
+  "run15_baseline": {
+    "loss": 0.946,
+    "entropy": 0.749,
+    "semantic_gap": 0.02,
+    "dead_bits": 15,
+    "ppl": 7.69
+  }
+}

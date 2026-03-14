@@ -32,3 +32,6 @@ paper/*.synctex.gz
 
 # Training results (generated, large)
 triadic-head/results/
+
+# Playground checkpoints (large model files)
+playground/checkpoints_*/

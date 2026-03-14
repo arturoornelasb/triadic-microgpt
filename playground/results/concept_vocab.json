@@ -1,0 +1,2570 @@
+{
+  "0": {
+    "prime": 2,
+    "representative": "are",
+    "size": 4,
+    "members_sample": [
+      "are",
+      "were",
+      "Are",
+      "Are"
+    ]
+  },
+  "1": {
+    "prime": 3,
+    "representative": "jew",
+    "size": 1,
+    "members_sample": [
+      "jew"
+    ]
+  },
+  "2": {
+    "prime": 5,
+    "representative": "ube",
+    "size": 322,
+    "members_sample": [
+      "ube",
+      "$",
+      "lew",
+      "ambul",
+      "getable",
+      "laund",
+      "adventur",
+      "advent",
+      "6",
+      "amond"
+    ]
+  },
+  "3": {
+    "prime": 7,
+    "representative": "in",
+    "size": 3,
+    "members_sample": [
+      "in",
+      "on",
+      "with"
+    ]
+  },
+  "4": {
+    "prime": 11,
+    "representative": ".”",
+    "size": 3,
+    "members_sample": [
+      ".”",
+      "!”",
+      ",”"
+    ]
+  },
+  "5": {
+    "prime": 13,
+    "representative": "swing",
+    "size": 2,
+    "members_sample": [
+      "swing",
+      "swings"
+    ]
+  },
+  "6": {
+    "prime": 17,
+    "representative": "Let",
+    "size": 4,
+    "members_sample": [
+      "Let",
+      "Let",
+      "let",
+      "decided"
+    ]
+  },
+  "7": {
+    "prime": 19,
+    "representative": "happy",
+    "size": 2,
+    "members_sample": [
+      "happy",
+      "proud"
+    ]
+  },
+  "8": {
+    "prime": 23,
+    "representative": "who",
+    "size": 1,
+    "members_sample": [
+      "who"
+    ]
+  },
+  "9": {
+    "prime": 29,
+    "representative": "has",
+    "size": 4,
+    "members_sample": [
+      "has",
+      "have",
+      "had",
+      "is"
+    ]
+  },
+  "10": {
+    "prime": 31,
+    "representative": "ever",
+    "size": 1,
+    "members_sample": [
+      "ever"
+    ]
+  },
+  "11": {
+    "prime": 37,
+    "representative": "le",
+    "size": 2,
+    "members_sample": [
+      "le",
+      "les"
+    ]
+  },
+  "12": {
+    "prime": 41,
+    "representative": "modest",
+    "size": 1,
+    "members_sample": [
+      "modest"
+    ]
+  },
+  "13": {
+    "prime": 43,
+    "representative": "S",
+    "size": 4,
+    "members_sample": [
+      "S",
+      "S",
+      "p",
+      "c"
+    ]
+  },
+  "14": {
+    "prime": 47,
+    "representative": "started",
+    "size": 4,
+    "members_sample": [
+      "started",
+      "began",
+      "starts",
+      "start"
+    ]
+  },
+  "15": {
+    "prime": 53,
+    "representative": "knows",
+    "size": 3,
+    "members_sample": [
+      "knows",
+      "knew",
+      "know"
+    ]
+  },
+  "16": {
+    "prime": 59,
+    "representative": "cool",
+    "size": 3,
+    "members_sample": [
+      "cool",
+      "interesting",
+      "nice"
+    ]
+  },
+  "17": {
+    "prime": 61,
+    "representative": "\"",
+    "size": 1,
+    "members_sample": [
+      "\""
+    ]
+  },
+  "18": {
+    "prime": 67,
+    "representative": "grandma",
+    "size": 2,
+    "members_sample": [
+      "grandma",
+      "Grandma"
+    ]
+  },
+  "19": {
+    "prime": 71,
+    "representative": "all",
+    "size": 2,
+    "members_sample": [
+      "all",
+      "both"
+    ]
+  },
+  "20": {
+    "prime": 73,
+    "representative": "It",
+    "size": 3,
+    "members_sample": [
+      "It",
+      "It",
+      "it"
+    ]
+  },
+  "21": {
+    "prime": 79,
+    "representative": "Amy",
+    "size": 10,
+    "members_sample": [
+      "Amy",
+      "Jill",
+      "Sue",
+      "Sally",
+      "Mia",
+      "Amy",
+      "Sue",
+      "Jill",
+      "Mia",
+      "Sally"
+    ]
+  },
+  "22": {
+    "prime": 83,
+    "representative": "me",
+    "size": 1,
+    "members_sample": [
+      "me"
+    ]
+  },
+  "23": {
+    "prime": 89,
+    "representative": "watched",
+    "size": 3,
+    "members_sample": [
+      "watched",
+      "watch",
+      "watching"
+    ]
+  },
+  "24": {
+    "prime": 97,
+    "representative": "Can",
+    "size": 3,
+    "members_sample": [
+      "Can",
+      "Can",
+      "can"
+    ]
+  },
+  "25": {
+    "prime": 101,
+    "representative": "white",
+    "size": 2,
+    "members_sample": [
+      "white",
+      "black"
+    ]
+  },
+  "26": {
+    "prime": 103,
+    "representative": "rad",
+    "size": 94,
+    "members_sample": [
+      "rad",
+      "Q",
+      "Cl",
+      "resp",
+      "K",
+      "Y",
+      "Tr",
+      "cle",
+      "rece",
+      "if"
+    ]
+  },
+  "27": {
+    "prime": 107,
+    "representative": "Then",
+    "size": 3,
+    "members_sample": [
+      "Then",
+      "Then",
+      "then"
+    ]
+  },
+  "28": {
+    "prime": 109,
+    "representative": "Lily",
+    "size": 4,
+    "members_sample": [
+      "Lily",
+      "Anna",
+      "Lily",
+      "Tom"
+    ]
+  },
+  "29": {
+    "prime": 113,
+    "representative": "gets",
+    "size": 4,
+    "members_sample": [
+      "gets",
+      "get",
+      "got",
+      "getting"
+    ]
+  },
+  "30": {
+    "prime": 127,
+    "representative": "ocked",
+    "size": 302,
+    "members_sample": [
+      "ocked",
+      "ining",
+      "asing",
+      "itting",
+      "cing",
+      "apping",
+      "gging",
+      "swinging",
+      "ided",
+      "riding"
+    ]
+  },
+  "31": {
+    "prime": 131,
+    "representative": "didn",
+    "size": 2,
+    "members_sample": [
+      "didn",
+      "don"
+    ]
+  },
+  "32": {
+    "prime": 137,
+    "representative": "tries",
+    "size": 4,
+    "members_sample": [
+      "tries",
+      "tried",
+      "trying",
+      "try"
+    ]
+  },
+  "33": {
+    "prime": 139,
+    "representative": "other",
+    "size": 1,
+    "members_sample": [
+      "other"
+    ]
+  },
+  "34": {
+    "prime": 149,
+    "representative": "Sara",
+    "size": 5,
+    "members_sample": [
+      "Sara",
+      "Lila",
+      "Sara",
+      "Lila",
+      "Anna"
+    ]
+  },
+  "35": {
+    "prime": 151,
+    "representative": "helped",
+    "size": 4,
+    "members_sample": [
+      "helped",
+      "helping",
+      "helps",
+      "help"
+    ]
+  },
+  "36": {
+    "prime": 157,
+    "representative": "our",
+    "size": 5,
+    "members_sample": [
+      "our",
+      "your",
+      "my",
+      "their",
+      "us"
+    ]
+  },
+  "37": {
+    "prime": 163,
+    "representative": "gives",
+    "size": 4,
+    "members_sample": [
+      "gives",
+      "gave",
+      "give",
+      "giving"
+    ]
+  },
+  "38": {
+    "prime": 167,
+    "representative": "bad",
+    "size": 1,
+    "members_sample": [
+      "bad"
+    ]
+  },
+  "39": {
+    "prime": 173,
+    "representative": "before",
+    "size": 2,
+    "members_sample": [
+      "before",
+      "after"
+    ]
+  },
+  "40": {
+    "prime": 179,
+    "representative": "wet",
+    "size": 2,
+    "members_sample": [
+      "wet",
+      "dry"
+    ]
+  },
+  "41": {
+    "prime": 181,
+    "representative": "One",
+    "size": 3,
+    "members_sample": [
+      "One",
+      "One",
+      "one"
+    ]
+  },
+  "42": {
+    "prime": 191,
+    "representative": ".",
+    "size": 3,
+    "members_sample": [
+      ".",
+      ",",
+      "and"
+    ]
+  },
+  "43": {
+    "prime": 193,
+    "representative": "-",
+    "size": 3,
+    "members_sample": [
+      "-",
+      ";",
+      ":"
+    ]
+  },
+  "44": {
+    "prime": 197,
+    "representative": "loves",
+    "size": 3,
+    "members_sample": [
+      "loves",
+      "loved",
+      "likes"
+    ]
+  },
+  "45": {
+    "prime": 199,
+    "representative": "great",
+    "size": 3,
+    "members_sample": [
+      "great",
+      "wonderful",
+      "good"
+    ]
+  },
+  "46": {
+    "prime": 211,
+    "representative": "poin",
+    "size": 2,
+    "members_sample": [
+      "poin",
+      "pointed"
+    ]
+  },
+  "47": {
+    "prime": 223,
+    "representative": "her",
+    "size": 1,
+    "members_sample": [
+      "her"
+    ]
+  },
+  "48": {
+    "prime": 227,
+    "representative": "Look",
+    "size": 2,
+    "members_sample": [
+      "Look",
+      "Look"
+    ]
+  },
+  "49": {
+    "prime": 229,
+    "representative": "thinks",
+    "size": 3,
+    "members_sample": [
+      "thinks",
+      "thought",
+      "think"
+    ]
+  },
+  "50": {
+    "prime": 233,
+    "representative": "tree",
+    "size": 2,
+    "members_sample": [
+      "tree",
+      "trees"
+    ]
+  },
+  "51": {
+    "prime": 239,
+    "representative": "him",
+    "size": 2,
+    "members_sample": [
+      "him",
+      "them"
+    ]
+  },
+  "52": {
+    "prime": 241,
+    "representative": "hear",
+    "size": 5,
+    "members_sample": [
+      "hear",
+      "hears",
+      "heard",
+      "seen",
+      "see"
+    ]
+  },
+  "53": {
+    "prime": 251,
+    "representative": "You",
+    "size": 3,
+    "members_sample": [
+      "You",
+      "You",
+      "you"
+    ]
+  },
+  "54": {
+    "prime": 257,
+    "representative": "feels",
+    "size": 4,
+    "members_sample": [
+      "feels",
+      "felt",
+      "feel",
+      "feeling"
+    ]
+  },
+  "55": {
+    "prime": 263,
+    "representative": "herself",
+    "size": 5,
+    "members_sample": [
+      "herself",
+      "himself",
+      "themselves",
+      "yourself",
+      "itself"
+    ]
+  },
+  "56": {
+    "prime": 269,
+    "representative": "of",
+    "size": 2,
+    "members_sample": [
+      "of",
+      "from"
+    ]
+  },
+  "57": {
+    "prime": 271,
+    "representative": "anything",
+    "size": 4,
+    "members_sample": [
+      "anything",
+      "anyone",
+      "any",
+      "things"
+    ]
+  },
+  "58": {
+    "prime": 277,
+    "representative": "I",
+    "size": 2,
+    "members_sample": [
+      "I",
+      "I"
+    ]
+  },
+  "59": {
+    "prime": 281,
+    "representative": "Jack",
+    "size": 6,
+    "members_sample": [
+      "Jack",
+      "Jack",
+      "Tom",
+      "Bob",
+      "Max",
+      "John"
+    ]
+  },
+  "60": {
+    "prime": 283,
+    "representative": "kick",
+    "size": 3,
+    "members_sample": [
+      "kick",
+      "kicked",
+      "wild"
+    ]
+  },
+  "61": {
+    "prime": 293,
+    "representative": "thing",
+    "size": 2,
+    "members_sample": [
+      "thing",
+      "object"
+    ]
+  },
+  "62": {
+    "prime": 307,
+    "representative": "if",
+    "size": 1,
+    "members_sample": [
+      "if"
+    ]
+  },
+  "63": {
+    "prime": 311,
+    "representative": "-",
+    "size": 1,
+    "members_sample": [
+      "-"
+    ]
+  },
+  "64": {
+    "prime": 313,
+    "representative": "!\"",
+    "size": 4,
+    "members_sample": [
+      "!\"",
+      ".\"",
+      ",\"",
+      "!"
+    ]
+  },
+  "65": {
+    "prime": 317,
+    "representative": "put",
+    "size": 2,
+    "members_sample": [
+      "put",
+      "puts"
+    ]
+  },
+  "66": {
+    "prime": 331,
+    "representative": "worked",
+    "size": 3,
+    "members_sample": [
+      "worked",
+      "work",
+      "working"
+    ]
+  },
+  "67": {
+    "prime": 337,
+    "representative": "'m",
+    "size": 3,
+    "members_sample": [
+      "'m",
+      "'re",
+      "am"
+    ]
+  },
+  "68": {
+    "prime": 347,
+    "representative": "wr",
+    "size": 1,
+    "members_sample": [
+      "wr"
+    ]
+  },
+  "69": {
+    "prime": 349,
+    "representative": "how",
+    "size": 3,
+    "members_sample": [
+      "how",
+      "what",
+      "where"
+    ]
+  },
+  "70": {
+    "prime": 353,
+    "representative": "huge",
+    "size": 4,
+    "members_sample": [
+      "huge",
+      "large",
+      "big",
+      "old"
+    ]
+  },
+  "71": {
+    "prime": 359,
+    "representative": "B",
+    "size": 2,
+    "members_sample": [
+      "B",
+      "B"
+    ]
+  },
+  "72": {
+    "prime": 367,
+    "representative": "te",
+    "size": 3,
+    "members_sample": [
+      "te",
+      "r",
+      "ch"
+    ]
+  },
+  "73": {
+    "prime": 373,
+    "representative": "'t",
+    "size": 3,
+    "members_sample": [
+      "'t",
+      "t",
+      "not"
+    ]
+  },
+  "74": {
+    "prime": 379,
+    "representative": "Mama",
+    "size": 10,
+    "members_sample": [
+      "Mama",
+      "Mummy",
+      "Mum",
+      "Mummy",
+      "Mum",
+      "mummy",
+      "mama",
+      "Mama",
+      "mum",
+      "mother"
+    ]
+  },
+  "75": {
+    "prime": 383,
+    "representative": "small",
+    "size": 3,
+    "members_sample": [
+      "small",
+      "tiny",
+      "little"
+    ]
+  },
+  "76": {
+    "prime": 389,
+    "representative": "spotted",
+    "size": 3,
+    "members_sample": [
+      "spotted",
+      "noticed",
+      "sees"
+    ]
+  },
+  "77": {
+    "prime": 397,
+    "representative": "played",
+    "size": 3,
+    "members_sample": [
+      "played",
+      "play",
+      "playing"
+    ]
+  },
+  "78": {
+    "prime": 401,
+    "representative": "kids",
+    "size": 2,
+    "members_sample": [
+      "kids",
+      "children"
+    ]
+  },
+  "79": {
+    "prime": 409,
+    "representative": "walks",
+    "size": 1,
+    "members_sample": [
+      "walks"
+    ]
+  },
+  "80": {
+    "prime": 419,
+    "representative": "wants",
+    "size": 6,
+    "members_sample": [
+      "wants",
+      "needed",
+      "needs",
+      "want",
+      "need",
+      "wanted"
+    ]
+  },
+  "81": {
+    "prime": 421,
+    "representative": "n",
+    "size": 1,
+    "members_sample": [
+      "n"
+    ]
+  },
+  "82": {
+    "prime": 431,
+    "representative": "now",
+    "size": 1,
+    "members_sample": [
+      "now"
+    ]
+  },
+  "83": {
+    "prime": 433,
+    "representative": "H",
+    "size": 2,
+    "members_sample": [
+      "H",
+      "H"
+    ]
+  },
+  "84": {
+    "prime": 439,
+    "representative": "po",
+    "size": 1,
+    "members_sample": [
+      "po"
+    ]
+  },
+  "85": {
+    "prime": 443,
+    "representative": "girl",
+    "size": 2,
+    "members_sample": [
+      "girl",
+      "boy"
+    ]
+  },
+  "86": {
+    "prime": 449,
+    "representative": "game",
+    "size": 2,
+    "members_sample": [
+      "game",
+      "toy"
+    ]
+  },
+  "87": {
+    "prime": 457,
+    "representative": "?\".",
+    "size": 6,
+    "members_sample": [
+      "?\".",
+      "?”",
+      "?\"",
+      "?",
+      "!\".",
+      "\"."
+    ]
+  },
+  "88": {
+    "prime": 461,
+    "representative": "favorite",
+    "size": 2,
+    "members_sample": [
+      "favorite",
+      "favourite"
+    ]
+  },
+  "89": {
+    "prime": 463,
+    "representative": "friend",
+    "size": 2,
+    "members_sample": [
+      "friend",
+      "friends"
+    ]
+  },
+  "90": {
+    "prime": 467,
+    "representative": "took",
+    "size": 4,
+    "members_sample": [
+      "took",
+      "take",
+      "takes",
+      "taking"
+    ]
+  },
+  "91": {
+    "prime": 479,
+    "representative": "l",
+    "size": 1,
+    "members_sample": [
+      "l"
+    ]
+  },
+  "92": {
+    "prime": 487,
+    "representative": "laughed",
+    "size": 4,
+    "members_sample": [
+      "laughed",
+      "laugh",
+      "laughs",
+      "laughing"
+    ]
+  },
+  "93": {
+    "prime": 491,
+    "representative": "exploring",
+    "size": 35,
+    "members_sample": [
+      "exploring",
+      "searching",
+      "explored",
+      "adventurous",
+      "journey",
+      "wondered",
+      "search",
+      "map",
+      "adventures",
+      "searched"
+    ]
+  },
+  "94": {
+    "prime": 499,
+    "representative": "She",
+    "size": 4,
+    "members_sample": [
+      "She",
+      "She",
+      "she",
+      "The"
+    ]
+  },
+  "95": {
+    "prime": 503,
+    "representative": "w",
+    "size": 1,
+    "members_sample": [
+      "w"
+    ]
+  },
+  "96": {
+    "prime": 509,
+    "representative": "replied",
+    "size": 1,
+    "members_sample": [
+      "replied"
+    ]
+  },
+  "97": {
+    "prime": 521,
+    "representative": "Maybe",
+    "size": 3,
+    "members_sample": [
+      "Maybe",
+      "Maybe",
+      "maybe"
+    ]
+  },
+  "98": {
+    "prime": 523,
+    "representative": "asks",
+    "size": 3,
+    "members_sample": [
+      "asks",
+      "asked",
+      "ask"
+    ]
+  },
+  "99": {
+    "prime": 541,
+    "representative": "sun",
+    "size": 1,
+    "members_sample": [
+      "sun"
+    ]
+  },
+  "100": {
+    "prime": 547,
+    "representative": "but",
+    "size": 1,
+    "members_sample": [
+      "but"
+    ]
+  },
+  "101": {
+    "prime": 557,
+    "representative": "found",
+    "size": 3,
+    "members_sample": [
+      "found",
+      "find",
+      "saw"
+    ]
+  },
+  "102": {
+    "prime": 563,
+    "representative": "picked",
+    "size": 4,
+    "members_sample": [
+      "picked",
+      "picks",
+      "pick",
+      "picking"
+    ]
+  },
+  "103": {
+    "prime": 569,
+    "representative": "lots",
+    "size": 4,
+    "members_sample": [
+      "lots",
+      "many",
+      "lot",
+      "some"
+    ]
+  },
+  "104": {
+    "prime": 571,
+    "representative": "U",
+    "size": 4,
+    "members_sample": [
+      "U",
+      "U",
+      "o",
+      "d"
+    ]
+  },
+  "105": {
+    "prime": 577,
+    "representative": "jumped",
+    "size": 5,
+    "members_sample": [
+      "jumped",
+      "jumps",
+      "jumping",
+      "jump",
+      "hopped"
+    ]
+  },
+  "106": {
+    "prime": 587,
+    "representative": "Finally",
+    "size": 5,
+    "members_sample": [
+      "Finally",
+      "Finally",
+      "finally",
+      "eventually",
+      "re"
+    ]
+  },
+  "107": {
+    "prime": 593,
+    "representative": "straw",
+    "size": 284,
+    "members_sample": [
+      "straw",
+      "cles",
+      "towers",
+      "stickers",
+      "barks",
+      "violin",
+      "sandwiches",
+      "chickens",
+      "ames",
+      "jokes"
+    ]
+  },
+  "108": {
+    "prime": 599,
+    "representative": "3",
+    "size": 3,
+    "members_sample": [
+      "3",
+      "three",
+      "only"
+    ]
+  },
+  "109": {
+    "prime": 601,
+    "representative": "st",
+    "size": 1,
+    "members_sample": [
+      "st"
+    ]
+  },
+  "110": {
+    "prime": 607,
+    "representative": "fu",
+    "size": 185,
+    "members_sample": [
+      "fu",
+      "sto",
+      "bri",
+      "obser",
+      "kinds",
+      "belie",
+      "Ha",
+      "ord",
+      "wo",
+      "ee"
+    ]
+  },
+  "111": {
+    "prime": 613,
+    "representative": "clean",
+    "size": 2,
+    "members_sample": [
+      "clean",
+      "cleaned"
+    ]
+  },
+  "112": {
+    "prime": 617,
+    "representative": "sp",
+    "size": 1,
+    "members_sample": [
+      "sp"
+    ]
+  },
+  "113": {
+    "prime": 619,
+    "representative": "just",
+    "size": 1,
+    "members_sample": [
+      "just"
+    ]
+  },
+  "114": {
+    "prime": 631,
+    "representative": "puzzle",
+    "size": 273,
+    "members_sample": [
+      "puzzle",
+      "sitting",
+      "os",
+      "tower",
+      "shirt",
+      "cabin",
+      "ss",
+      "job",
+      "circle",
+      "fruit"
+    ]
+  },
+  "115": {
+    "prime": 641,
+    "representative": "each",
+    "size": 1,
+    "members_sample": [
+      "each"
+    ]
+  },
+  "116": {
+    "prime": 643,
+    "representative": "there",
+    "size": 3,
+    "members_sample": [
+      "there",
+      "upon",
+      "here"
+    ]
+  },
+  "117": {
+    "prime": 647,
+    "representative": "use",
+    "size": 2,
+    "members_sample": [
+      "use",
+      "used"
+    ]
+  },
+  "118": {
+    "prime": 653,
+    "representative": "g",
+    "size": 1,
+    "members_sample": [
+      "g"
+    ]
+  },
+  "119": {
+    "prime": 659,
+    "representative": "couldn",
+    "size": 2,
+    "members_sample": [
+      "couldn",
+      "could"
+    ]
+  },
+  "120": {
+    "prime": 661,
+    "representative": "noise",
+    "size": 3,
+    "members_sample": [
+      "noise",
+      "sound",
+      "loud"
+    ]
+  },
+  "121": {
+    "prime": 673,
+    "representative": "war",
+    "size": 1,
+    "members_sample": [
+      "war"
+    ]
+  },
+  "122": {
+    "prime": 677,
+    "representative": "called",
+    "size": 3,
+    "members_sample": [
+      "called",
+      "named",
+      "call"
+    ]
+  },
+  "123": {
+    "prime": 683,
+    "representative": "around",
+    "size": 1,
+    "members_sample": [
+      "around"
+    ]
+  },
+  "124": {
+    "prime": 691,
+    "representative": "different",
+    "size": 1,
+    "members_sample": [
+      "different"
+    ]
+  },
+  "125": {
+    "prime": 701,
+    "representative": "brought",
+    "size": 2,
+    "members_sample": [
+      "brought",
+      "bring"
+    ]
+  },
+  "126": {
+    "prime": 709,
+    "representative": "walking",
+    "size": 3,
+    "members_sample": [
+      "walking",
+      "walk",
+      "walked"
+    ]
+  },
+  "127": {
+    "prime": 719,
+    "representative": "park",
+    "size": 2,
+    "members_sample": [
+      "park",
+      "garden"
+    ]
+  },
+  "128": {
+    "prime": 727,
+    "representative": "tell",
+    "size": 4,
+    "members_sample": [
+      "tell",
+      "tells",
+      "told",
+      "show"
+    ]
+  },
+  "129": {
+    "prime": 733,
+    "representative": "high",
+    "size": 1,
+    "members_sample": [
+      "high"
+    ]
+  },
+  "130": {
+    "prime": 739,
+    "representative": "v",
+    "size": 1,
+    "members_sample": [
+      "v"
+    ]
+  },
+  "131": {
+    "prime": 743,
+    "representative": "waited",
+    "size": 3,
+    "members_sample": [
+      "waited",
+      "wait",
+      "waiting"
+    ]
+  },
+  "132": {
+    "prime": 751,
+    "representative": "yellow",
+    "size": 8,
+    "members_sample": [
+      "yellow",
+      "pink",
+      "blue",
+      "purple",
+      "green",
+      "red",
+      "orange",
+      "brown"
+    ]
+  },
+  "133": {
+    "prime": 757,
+    "representative": "quiet",
+    "size": 2,
+    "members_sample": [
+      "quiet",
+      "calm"
+    ]
+  },
+  "134": {
+    "prime": 761,
+    "representative": "kept",
+    "size": 3,
+    "members_sample": [
+      "kept",
+      "keep",
+      "continued"
+    ]
+  },
+  "135": {
+    "prime": 769,
+    "representative": "But",
+    "size": 2,
+    "members_sample": [
+      "But",
+      "But"
+    ]
+  },
+  "136": {
+    "prime": 773,
+    "representative": "Soon",
+    "size": 4,
+    "members_sample": [
+      "Soon",
+      "Soon",
+      "soon",
+      "until"
+    ]
+  },
+  "137": {
+    "prime": 787,
+    "representative": "bright",
+    "size": 2,
+    "members_sample": [
+      "bright",
+      "brightly"
+    ]
+  },
+  "138": {
+    "prime": 797,
+    "representative": "act",
+    "size": 1,
+    "members_sample": [
+      "act"
+    ]
+  },
+  "139": {
+    "prime": 809,
+    "representative": "flowers",
+    "size": 2,
+    "members_sample": [
+      "flowers",
+      "flower"
+    ]
+  },
+  "140": {
+    "prime": 811,
+    "representative": "taught",
+    "size": 9,
+    "members_sample": [
+      "taught",
+      "learning",
+      "shows",
+      "teach",
+      "learnt",
+      "learned",
+      "learn",
+      "showing",
+      "showed"
+    ]
+  },
+  "141": {
+    "prime": 821,
+    "representative": "Mom",
+    "size": 3,
+    "members_sample": [
+      "Mom",
+      "Mom",
+      "mom"
+    ]
+  },
+  "142": {
+    "prime": 823,
+    "representative": "His",
+    "size": 3,
+    "members_sample": [
+      "His",
+      "His",
+      "his"
+    ]
+  },
+  "143": {
+    "prime": 827,
+    "representative": "to",
+    "size": 2,
+    "members_sample": [
+      "to",
+      "for"
+    ]
+  },
+  "144": {
+    "prime": 829,
+    "representative": "makes",
+    "size": 4,
+    "members_sample": [
+      "makes",
+      "make",
+      "making",
+      "made"
+    ]
+  },
+  "145": {
+    "prime": 839,
+    "representative": "pet",
+    "size": 1,
+    "members_sample": [
+      "pet"
+    ]
+  },
+  "146": {
+    "prime": 853,
+    "representative": "We",
+    "size": 3,
+    "members_sample": [
+      "We",
+      "We",
+      "we"
+    ]
+  },
+  "147": {
+    "prime": 857,
+    "representative": "Thank",
+    "size": 4,
+    "members_sample": [
+      "Thank",
+      "thank",
+      "Thank",
+      "thanked"
+    ]
+  },
+  "148": {
+    "prime": 859,
+    "representative": "looked",
+    "size": 5,
+    "members_sample": [
+      "looked",
+      "looks",
+      "look",
+      "looking",
+      "was"
+    ]
+  },
+  "149": {
+    "prime": 863,
+    "representative": "Suddenly",
+    "size": 4,
+    "members_sample": [
+      "Suddenly",
+      "Suddenly",
+      "sudden",
+      "suddenly"
+    ]
+  },
+  "150": {
+    "prime": 877,
+    "representative": "Tommy",
+    "size": 3,
+    "members_sample": [
+      "Tommy",
+      "Tommy",
+      "Ben"
+    ]
+  },
+  "151": {
+    "prime": 881,
+    "representative": "Jane",
+    "size": 6,
+    "members_sample": [
+      "Jane",
+      "Jane",
+      "Sarah",
+      "Joe",
+      "Lucy",
+      "rabbit"
+    ]
+  },
+  "152": {
+    "prime": 883,
+    "representative": "away",
+    "size": 6,
+    "members_sample": [
+      "away",
+      "off",
+      "down",
+      "up",
+      "out",
+      "back"
+    ]
+  },
+  "153": {
+    "prime": 887,
+    "representative": "s",
+    "size": 1,
+    "members_sample": [
+      "s"
+    ]
+  },
+  "154": {
+    "prime": 907,
+    "representative": "would",
+    "size": 2,
+    "members_sample": [
+      "would",
+      "will"
+    ]
+  },
+  "155": {
+    "prime": 911,
+    "representative": "Now",
+    "size": 2,
+    "members_sample": [
+      "Now",
+      "Now"
+    ]
+  },
+  "156": {
+    "prime": 919,
+    "representative": "wings",
+    "size": 1,
+    "members_sample": [
+      "wings"
+    ]
+  },
+  "157": {
+    "prime": 929,
+    "representative": "pieces",
+    "size": 2,
+    "members_sample": [
+      "pieces",
+      "piece"
+    ]
+  },
+  "158": {
+    "prime": 937,
+    "representative": "move",
+    "size": 3,
+    "members_sample": [
+      "move",
+      "moved",
+      "moving"
+    ]
+  },
+  "159": {
+    "prime": 941,
+    "representative": "water",
+    "size": 2,
+    "members_sample": [
+      "water",
+      "rain"
+    ]
+  },
+  "160": {
+    "prime": 947,
+    "representative": "ila",
+    "size": 357,
+    "members_sample": [
+      "ila",
+      "shine",
+      "allig",
+      "hen",
+      "valu",
+      "umbers",
+      "4",
+      "iddle",
+      "beet",
+      "anger"
+    ]
+  },
+  "161": {
+    "prime": 953,
+    "representative": "something",
+    "size": 1,
+    "members_sample": [
+      "something"
+    ]
+  },
+  "162": {
+    "prime": 967,
+    "representative": "whenever",
+    "size": 4,
+    "members_sample": [
+      "whenever",
+      "Whenever",
+      "every",
+      "when"
+    ]
+  },
+  "163": {
+    "prime": 971,
+    "representative": "he",
+    "size": 1,
+    "members_sample": [
+      "he"
+    ]
+  },
+  "164": {
+    "prime": 977,
+    "representative": "j",
+    "size": 1,
+    "members_sample": [
+      "j"
+    ]
+  },
+  "165": {
+    "prime": 983,
+    "representative": "these",
+    "size": 2,
+    "members_sample": [
+      "these",
+      "those"
+    ]
+  },
+  "166": {
+    "prime": 991,
+    "representative": "best",
+    "size": 3,
+    "members_sample": [
+      "best",
+      "most",
+      "two"
+    ]
+  },
+  "167": {
+    "prime": 997,
+    "representative": "rock",
+    "size": 2,
+    "members_sample": [
+      "rock",
+      "rocks"
+    ]
+  },
+  "168": {
+    "prime": 1009,
+    "representative": "did",
+    "size": 6,
+    "members_sample": [
+      "did",
+      "does",
+      "done",
+      "doing",
+      "do",
+      "finished"
+    ]
+  },
+  "169": {
+    "prime": 1013,
+    "representative": "lies",
+    "size": 277,
+    "members_sample": [
+      "lies",
+      "ittens",
+      "ours",
+      "illie",
+      "Jim",
+      "Nemo",
+      "Joey",
+      "ometimes",
+      "Tweetie",
+      "Brownie"
+    ]
+  },
+  "170": {
+    "prime": 1019,
+    "representative": "dolls",
+    "size": 3,
+    "members_sample": [
+      "dolls",
+      "doll",
+      "toys"
+    ]
+  },
+  "171": {
+    "prime": 1021,
+    "representative": "hugged",
+    "size": 3,
+    "members_sample": [
+      "hugged",
+      "hug",
+      "hugs"
+    ]
+  },
+  "172": {
+    "prime": 1031,
+    "representative": "shook",
+    "size": 2,
+    "members_sample": [
+      "shook",
+      "shakes"
+    ]
+  },
+  "173": {
+    "prime": 1033,
+    "representative": "filled",
+    "size": 3,
+    "members_sample": [
+      "filled",
+      "fill",
+      "full"
+    ]
+  },
+  "174": {
+    "prime": 1039,
+    "representative": "bird",
+    "size": 2,
+    "members_sample": [
+      "bird",
+      "truck"
+    ]
+  },
+  "175": {
+    "prime": 1049,
+    "representative": "pushed",
+    "size": 4,
+    "members_sample": [
+      "pushed",
+      "push",
+      "pushes",
+      "pushing"
+    ]
+  },
+  "176": {
+    "prime": 1051,
+    "representative": "this",
+    "size": 4,
+    "members_sample": [
+      "this",
+      "This",
+      "This",
+      "that"
+    ]
+  },
+  "177": {
+    "prime": 1061,
+    "representative": "un",
+    "size": 1,
+    "members_sample": [
+      "un"
+    ]
+  },
+  "178": {
+    "prime": 1063,
+    "representative": "smiles",
+    "size": 4,
+    "members_sample": [
+      "smiles",
+      "smile",
+      "smiled",
+      "smiling"
+    ]
+  },
+  "179": {
+    "prime": 1069,
+    "representative": "aw",
+    "size": 1,
+    "members_sample": [
+      "aw"
+    ]
+  },
+  "180": {
+    "prime": 1087,
+    "representative": "stops",
+    "size": 3,
+    "members_sample": [
+      "stops",
+      "stopped",
+      "stop"
+    ]
+  },
+  "181": {
+    "prime": 1091,
+    "representative": "ip",
+    "size": 1,
+    "members_sample": [
+      "ip"
+    ]
+  },
+  "182": {
+    "prime": 1093,
+    "representative": "pl",
+    "size": 1,
+    "members_sample": [
+      "pl"
+    ]
+  },
+  "183": {
+    "prime": 1097,
+    "representative": "wore",
+    "size": 3,
+    "members_sample": [
+      "wore",
+      "wear",
+      "wearing"
+    ]
+  },
+  "184": {
+    "prime": 1103,
+    "representative": "book",
+    "size": 2,
+    "members_sample": [
+      "book",
+      "books"
+    ]
+  },
+  "185": {
+    "prime": 1109,
+    "representative": "b",
+    "size": 2,
+    "members_sample": [
+      "b",
+      "m"
+    ]
+  },
+  "186": {
+    "prime": 1117,
+    "representative": "grateful",
+    "size": 3,
+    "members_sample": [
+      "grateful",
+      "thankful",
+      "kind"
+    ]
+  },
+  "187": {
+    "prime": 1123,
+    "representative": "magic",
+    "size": 2,
+    "members_sample": [
+      "magic",
+      "fairy"
+    ]
+  },
+  "188": {
+    "prime": 1129,
+    "representative": "Sam",
+    "size": 3,
+    "members_sample": [
+      "Sam",
+      "Sam",
+      "Ben"
+    ]
+  },
+  "189": {
+    "prime": 1151,
+    "representative": "pulled",
+    "size": 3,
+    "members_sample": [
+      "pulled",
+      "pull",
+      "pulls"
+    ]
+  },
+  "190": {
+    "prime": 1153,
+    "representative": "poem",
+    "size": 322,
+    "members_sample": [
+      "poem",
+      "get",
+      "suggest",
+      "bble",
+      "ject",
+      "irl",
+      "twirl",
+      "uit",
+      "mug",
+      "unlock"
+    ]
+  },
+  "191": {
+    "prime": 1163,
+    "representative": "everyone",
+    "size": 5,
+    "members_sample": [
+      "everyone",
+      "Everyone",
+      "Everyone",
+      "everything",
+      "people"
+    ]
+  },
+  "192": {
+    "prime": 1171,
+    "representative": "eyes",
+    "size": 1,
+    "members_sample": [
+      "eyes"
+    ]
+  },
+  "193": {
+    "prime": 1181,
+    "representative": "always",
+    "size": 2,
+    "members_sample": [
+      "always",
+      "never"
+    ]
+  },
+  "194": {
+    "prime": 1187,
+    "representative": "light",
+    "size": 1,
+    "members_sample": [
+      "light"
+    ]
+  },
+  "195": {
+    "prime": 1193,
+    "representative": "alligator",
+    "size": 277,
+    "members_sample": [
+      "alligator",
+      "lawyer",
+      "raft",
+      "flash",
+      "octopus",
+      "yacht",
+      "comet",
+      "stranger",
+      "gorilla",
+      "leopard"
+    ]
+  },
+  "196": {
+    "prime": 1201,
+    "representative": "even",
+    "size": 1,
+    "members_sample": [
+      "even"
+    ]
+  },
+  "197": {
+    "prime": 1213,
+    "representative": "sang",
+    "size": 3,
+    "members_sample": [
+      "sang",
+      "singing",
+      "sing"
+    ]
+  },
+  "198": {
+    "prime": 1217,
+    "representative": "s",
+    "size": 2,
+    "members_sample": [
+      "s",
+      "h"
+    ]
+  },
+  "199": {
+    "prime": 1223,
+    "representative": "ers",
+    "size": 2,
+    "members_sample": [
+      "ers",
+      "er"
+    ]
+  },
+  "200": {
+    "prime": 1229,
+    "representative": "race",
+    "size": 1,
+    "members_sample": [
+      "race"
+    ]
+  },
+  "201": {
+    "prime": 1231,
+    "representative": "br",
+    "size": 1,
+    "members_sample": [
+      "br"
+    ]
+  },
+  "202": {
+    "prime": 1237,
+    "representative": "sign",
+    "size": 1,
+    "members_sample": [
+      "sign"
+    ]
+  },
+  "203": {
+    "prime": 1249,
+    "representative": "went",
+    "size": 3,
+    "members_sample": [
+      "went",
+      "goes",
+      "go"
+    ]
+  },
+  "204": {
+    "prime": 1259,
+    "representative": "man",
+    "size": 2,
+    "members_sample": [
+      "man",
+      "lady"
+    ]
+  },
+  "205": {
+    "prime": 1277,
+    "representative": "day",
+    "size": 2,
+    "members_sample": [
+      "day",
+      "time"
+    ]
+  },
+  "206": {
+    "prime": 1279,
+    "representative": "nodded",
+    "size": 3,
+    "members_sample": [
+      "nodded",
+      "nods",
+      "nod"
+    ]
+  },
+  "207": {
+    "prime": 1283,
+    "representative": "paint",
+    "size": 1,
+    "members_sample": [
+      "paint"
+    ]
+  },
+  "208": {
+    "prime": 1289,
+    "representative": "buy",
+    "size": 2,
+    "members_sample": [
+      "buy",
+      "bought"
+    ]
+  },
+  "209": {
+    "prime": 1291,
+    "representative": "bigger",
+    "size": 1,
+    "members_sample": [
+      "bigger"
+    ]
+  },
+  "210": {
+    "prime": 1297,
+    "representative": "car",
+    "size": 2,
+    "members_sample": [
+      "car",
+      "cars"
+    ]
+  },
+  "211": {
+    "prime": 1301,
+    "representative": "fast",
+    "size": 2,
+    "members_sample": [
+      "fast",
+      "quickly"
+    ]
+  },
+  "212": {
+    "prime": 1303,
+    "representative": "a",
+    "size": 3,
+    "members_sample": [
+      "a",
+      "an",
+      "the"
+    ]
+  },
+  "213": {
+    "prime": 1307,
+    "representative": "next",
+    "size": 1,
+    "members_sample": [
+      "next"
+    ]
+  },
+  "214": {
+    "prime": 1319,
+    "representative": "Mr",
+    "size": 2,
+    "members_sample": [
+      "Mr",
+      "Mrs"
+    ]
+  },
+  "215": {
+    "prime": 1321,
+    "representative": "opened",
+    "size": 3,
+    "members_sample": [
+      "opened",
+      "opens",
+      "open"
+    ]
+  },
+  "216": {
+    "prime": 1327,
+    "representative": "be",
+    "size": 2,
+    "members_sample": [
+      "be",
+      "being"
+    ]
+  },
+  "217": {
+    "prime": 1361,
+    "representative": "flew",
+    "size": 3,
+    "members_sample": [
+      "flew",
+      "fly",
+      "flying"
+    ]
+  },
+  "218": {
+    "prime": 1367,
+    "representative": "listened",
+    "size": 3,
+    "members_sample": [
+      "listened",
+      "listen",
+      "listening"
+    ]
+  },
+  "219": {
+    "prime": 1373,
+    "representative": "wh",
+    "size": 1,
+    "members_sample": [
+      "wh"
+    ]
+  },
+  "220": {
+    "prime": 1381,
+    "representative": "He",
+    "size": 2,
+    "members_sample": [
+      "He",
+      "He"
+    ]
+  },
+  "221": {
+    "prime": 1399,
+    "representative": "runs",
+    "size": 4,
+    "members_sample": [
+      "runs",
+      "run",
+      "ran",
+      "running"
+    ]
+  },
+  "222": {
+    "prime": 1409,
+    "representative": "f",
+    "size": 1,
+    "members_sample": [
+      "f"
+    ]
+  },
+  "223": {
+    "prime": 1423,
+    "representative": "Her",
+    "size": 2,
+    "members_sample": [
+      "Her",
+      "Her"
+    ]
+  },
+  "224": {
+    "prime": 1427,
+    "representative": "Mommy",
+    "size": 3,
+    "members_sample": [
+      "Mommy",
+      "Mommy",
+      "mommy"
+    ]
+  },
+  "225": {
+    "prime": 1429,
+    "representative": "touch",
+    "size": 2,
+    "members_sample": [
+      "touch",
+      "touched"
+    ]
+  },
+  "226": {
+    "prime": 1433,
+    "representative": "Daddy",
+    "size": 4,
+    "members_sample": [
+      "Daddy",
+      "dad",
+      "Dad",
+      "daddy"
+    ]
+  },
+  "227": {
+    "prime": 1439,
+    "representative": "wind",
+    "size": 1,
+    "members_sample": [
+      "wind"
+    ]
+  },
+  "228": {
+    "prime": 1447,
+    "representative": "knocked",
+    "size": 2,
+    "members_sample": [
+      "knocked",
+      "knock"
+    ]
+  },
+  "229": {
+    "prime": 1451,
+    "representative": "says",
+    "size": 3,
+    "members_sample": [
+      "says",
+      "said",
+      "say"
+    ]
+  },
+  "230": {
+    "prime": 1453,
+    "representative": "like",
+    "size": 2,
+    "members_sample": [
+      "like",
+      "love"
+    ]
+  },
+  "231": {
+    "prime": 1459,
+    "representative": "t",
+    "size": 1,
+    "members_sample": [
+      "t"
+    ]
+  },
+  "232": {
+    "prime": 1471,
+    "representative": "clouds",
+    "size": 3,
+    "members_sample": [
+      "clouds",
+      "cloud",
+      "sky"
+    ]
+  },
+  "233": {
+    "prime": 1481,
+    "representative": "warm",
+    "size": 1,
+    "members_sample": [
+      "warm"
+    ]
+  },
+  "234": {
+    "prime": 1483,
+    "representative": "iger",
+    "size": 335,
+    "members_sample": [
+      "iger",
+      "er",
+      "cro",
+      "app",
+      "enthus",
+      "itc",
+      "organ",
+      "forg",
+      "sec",
+      "ipp"
+    ]
+  },
+  "235": {
+    "prime": 1487,
+    "representative": "yummy",
+    "size": 17,
+    "members_sample": [
+      "yummy",
+      "exciting",
+      "delicious",
+      "tasty",
+      "lovely",
+      "beautiful",
+      "amazing",
+      "cute",
+      "pretty",
+      "colorful"
+    ]
+  },
+  "236": {
+    "prime": 1489,
+    "representative": "very",
+    "size": 3,
+    "members_sample": [
+      "very",
+      "really",
+      "so"
+    ]
+  },
+  "237": {
+    "prime": 1493,
+    "representative": "They",
+    "size": 4,
+    "members_sample": [
+      "They",
+      "They",
+      "they",
+      "The"
+    ]
+  },
+  "238": {
+    "prime": 1499,
+    "representative": "\"",
+    "size": 2,
+    "members_sample": [
+      "\"",
+      "“"
+    ]
+  },
+  "239": {
+    "prime": 1511,
+    "representative": "turned",
+    "size": 3,
+    "members_sample": [
+      "turned",
+      "turn",
+      "turns"
+    ]
+  },
+  "240": {
+    "prime": 1523,
+    "representative": "yes",
+    "size": 3,
+    "members_sample": [
+      "yes",
+      "Yes",
+      "no"
+    ]
+  },
+  "241": {
+    "prime": 1531,
+    "representative": "enjoyed",
+    "size": 3,
+    "members_sample": [
+      "enjoyed",
+      "enjoy",
+      "liked"
+    ]
+  },
+  "242": {
+    "prime": 1543,
+    "representative": "cloth",
+    "size": 1,
+    "members_sample": [
+      "cloth"
+    ]
+  },
+  "243": {
+    "prime": 1549,
+    "representative": "harder",
+    "size": 5,
+    "members_sample": [
+      "harder",
+      "again",
+      "more",
+      "too",
+      "hard"
+    ]
+  },
+  "244": {
+    "prime": 1553,
+    "representative": "il",
+    "size": 1,
+    "members_sample": [
+      "il"
+    ]
+  },
+  "245": {
+    "prime": 1559,
+    "representative": "as",
+    "size": 1,
+    "members_sample": [
+      "as"
+    ]
+  },
+  "246": {
+    "prime": 1567,
+    "representative": "talked",
+    "size": 3,
+    "members_sample": [
+      "talked",
+      "talk",
+      "talking"
+    ]
+  },
+  "247": {
+    "prime": 1571,
+    "representative": "From",
+    "size": 2,
+    "members_sample": [
+      "From",
+      "From"
+    ]
+  },
+  "248": {
+    "prime": 1579,
+    "representative": "forest",
+    "size": 2,
+    "members_sample": [
+      "forest",
+      "woods"
+    ]
+  },
+  "249": {
+    "prime": 1583,
+    "representative": "costum",
+    "size": 370,
+    "members_sample": [
+      "costum",
+      "ken",
+      "barking",
+      "gum",
+      "costume",
+      "Bye",
+      "vegetable",
+      "haircut",
+      "Ted",
+      "roared"
+    ]
+  },
+  "250": {
+    "prime": 1597,
+    "representative": "Tim",
+    "size": 4,
+    "members_sample": [
+      "Tim",
+      "Timmy",
+      "Timmy",
+      "Tim"
+    ]
+  },
+  "251": {
+    "prime": 1601,
+    "representative": "At",
+    "size": 5,
+    "members_sample": [
+      "At",
+      "When",
+      "At",
+      "When",
+      "at"
+    ]
+  },
+  "252": {
+    "prime": 1607,
+    "representative": "How",
+    "size": 2,
+    "members_sample": [
+      "How",
+      "How"
+    ]
+  },
+  "253": {
+    "prime": 1609,
+    "representative": "'s",
+    "size": 2,
+    "members_sample": [
+      "'s",
+      "’"
+    ]
+  },
+  "254": {
+    "prime": 1613,
+    "representative": "e",
+    "size": 1,
+    "members_sample": [
+      "e"
+    ]
+  },
+  "255": {
+    "prime": 1619,
+    "representative": "dog",
+    "size": 2,
+    "members_sample": [
+      "dog",
+      "bear"
+    ]
+  }
+}

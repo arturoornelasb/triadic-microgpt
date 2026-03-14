@@ -1,0 +1,25 @@
+{
+  "experiment": "dead_bit_regularization",
+  "config": "6L/256D/64bits",
+  "steps": 10000,
+  "baseline_entropy_only": {
+    "final_loss": 1.6913044452667236,
+    "final_entropy": 0.9990385174751282,
+    "final_dead_bits": 0
+  },
+  "L1_targeted_dead_bits": {
+    "final_loss": 1.7970646619796753,
+    "final_entropy": 0.9990110397338867,
+    "final_dead_bits": 0
+  },
+  "L1_global_all_bits": {
+    "final_loss": 1.7724590301513672,
+    "final_entropy": 0.9991624355316162,
+    "final_dead_bits": 0
+  },
+  "L1_variance": {
+    "final_loss": 1.7642390727996826,
+    "final_entropy": 0.9992654323577881,
+    "final_dead_bits": 0
+  }
+}

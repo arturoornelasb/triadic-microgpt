@@ -1,0 +1,67 @@
+{
+  "experiment": "concept_tokenizer",
+  "source": "La Danza Cosmica Cap. 34 \u2014 Conceptual Tokenizer",
+  "n_concepts": 256,
+  "silhouette_score": -0.059146251529455185,
+  "total_tokens": 4086,
+  "group_consistency": {
+    "family": {
+      "n_words": 6,
+      "n_unique_clusters": 4,
+      "consistency": 0.3333333333333333,
+      "mean_shared_factors": 1.4666666666666666
+    },
+    "animals": {
+      "n_words": 6,
+      "n_unique_clusters": 5,
+      "consistency": 0.3333333333333333,
+      "mean_shared_factors": 1.4
+    },
+    "colors": {
+      "n_words": 6,
+      "n_unique_clusters": 3,
+      "consistency": 0.6666666666666666,
+      "mean_shared_factors": 1.5333333333333334
+    },
+    "emotions": {
+      "n_words": 5,
+      "n_unique_clusters": 5,
+      "consistency": 0.2,
+      "mean_shared_factors": 0.6
+    },
+    "royalty": {
+      "n_words": 4,
+      "n_unique_clusters": 3,
+      "consistency": 0.5,
+      "mean_shared_factors": 0.8333333333333334
+    },
+    "nature": {
+      "n_words": 5,
+      "n_unique_clusters": 5,
+      "consistency": 0.2,
+      "mean_shared_factors": 0.8
+    }
+  },
+  "analogies": [
+    {
+      "analogy": "king:queen::man:woman",
+      "predicted_prime": 92718643,
+      "actual_prime": 74936929,
+      "similarity": 0.2
+    },
+    {
+      "analogy": "father:mother::brother:sister",
+      "predicted_prime": 1619274353,
+      "actual_prime": 57648791,
+      "similarity": 0.0
+    },
+    {
+      "analogy": "dog:puppy::cat:kitten",
+      "predicted_prime": 74936929,
+      "actual_prime": 431432999,
+      "similarity": 0.5
+    }
+  ],
+  "mean_cluster_size": 15.9609375,
+  "std_cluster_size": 61.408519658277825
+}

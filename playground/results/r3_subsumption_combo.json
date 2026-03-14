@@ -1,0 +1,519 @@
+{
+  "experiment": "r3_subsumption_combo",
+  "config": "6L/256D/64bits",
+  "steps": 10000,
+  "variants": {
+    "Baseline": {
+      "r3_weight": 0.0,
+      "sub_weight": 0.0,
+      "final_loss": 1.7622370719909668,
+      "eval": {
+        "analogy_train": [
+          {
+            "analogy": "king:queen::man:woman",
+            "offset_cos": 0.586422860622406,
+            "alg_sim": 0.5714285714285714,
+            "K": 0.9383103871470798
+          },
+          {
+            "analogy": "king:queen::boy:girl",
+            "offset_cos": 0.6048182249069214,
+            "alg_sim": 0.6052631578947368,
+            "K": 0.6264711299775432
+          },
+          {
+            "analogy": "father:mother::brother:sister",
+            "offset_cos": 0.4025971591472626,
+            "alg_sim": 0.4878048780487805,
+            "K": 0.9770846724271878
+          },
+          {
+            "analogy": "father:mother::son:daughter",
+            "offset_cos": 0.5399855375289917,
+            "alg_sim": 0.5777777777777777,
+            "K": 1.093057476701885
+          },
+          {
+            "analogy": "dog:puppy::cat:kitten",
+            "offset_cos": 0.41895994544029236,
+            "alg_sim": 0.4375,
+            "K": 0.5439937985430748
+          },
+          {
+            "analogy": "big:small::tall:short",
+            "offset_cos": 0.5834789276123047,
+            "alg_sim": 0.6190476190476191,
+            "K": 0.9518562853880321
+          },
+          {
+            "analogy": "hot:cold::day:night",
+            "offset_cos": 0.5050402879714966,
+            "alg_sim": 0.5416666666666666,
+            "K": 1.216688541791657
+          },
+          {
+            "analogy": "happy:sad::love:hate",
+            "offset_cos": 0.33629676699638367,
+            "alg_sim": 0.5238095238095238,
+            "K": 1.0005571320526898
+          },
+          {
+            "analogy": "doctor:hospital::teacher:school",
+            "offset_cos": 0.4739473760128021,
+            "alg_sim": 0.4318181818181818,
+            "K": 0.5465330886235991
+          },
+          {
+            "analogy": "sun:day::moon:night",
+            "offset_cos": 0.550482988357544,
+            "alg_sim": 0.5714285714285714,
+            "K": 0.6996315597801573
+          },
+          {
+            "analogy": "princess:prince::queen:king",
+            "offset_cos": 0.37441572546958923,
+            "alg_sim": 0.5106382978723404,
+            "K": 1.724734190351439
+          },
+          {
+            "analogy": "bird:fly::fish:swim",
+            "offset_cos": 0.43786653876304626,
+            "alg_sim": 0.45098039215686275,
+            "K": 2.837686830794076
+          },
+          {
+            "analogy": "old:young::big:small",
+            "offset_cos": 0.6241225004196167,
+            "alg_sim": 0.5777777777777777,
+            "K": 1.8773715031584053
+          }
+        ],
+        "analogy_test": [
+          {
+            "analogy": "boy:girl::man:woman",
+            "offset_cos": 0.5428082942962646,
+            "alg_sim": 0.5476190476190477,
+            "K": 0.9014694581265157
+          },
+          {
+            "analogy": "dog:cat::puppy:kitten",
+            "offset_cos": 0.41895994544029236,
+            "alg_sim": 0.4375,
+            "K": 1.838256248608444
+          },
+          {
+            "analogy": "red:blue::green:yellow",
+            "offset_cos": 0.35733041167259216,
+            "alg_sim": 0.5227272727272727,
+            "K": 1.1724934934620814
+          },
+          {
+            "analogy": "morning:evening::day:night",
+            "offset_cos": 0.44643434882164,
+            "alg_sim": 0.5319148936170213,
+            "K": 1.446637265866051
+          }
+        ],
+        "sub_train": {
+          "rate": 0.0,
+          "inheritance": 0.6902889303869695,
+          "total": 45,
+          "hits": 0
+        },
+        "sub_test": {
+          "rate": 0.0,
+          "inheritance": 0.685924369747899,
+          "total": 12,
+          "hits": 0
+        },
+        "semantic_gap": -0.005896031864815243,
+        "dead_bits": 9,
+        "mean_entropy": 0.6607958251761815
+      }
+    },
+    "R3 only": {
+      "r3_weight": 5.0,
+      "sub_weight": 0.0,
+      "final_loss": 1.6989657878875732,
+      "eval": {
+        "analogy_train": [
+          {
+            "analogy": "king:queen::man:woman",
+            "offset_cos": 0.9999715685844421,
+            "alg_sim": 1.0,
+            "K": 1.0000213393753494
+          },
+          {
+            "analogy": "king:queen::boy:girl",
+            "offset_cos": 0.9999578595161438,
+            "alg_sim": 1.0,
+            "K": 1.0000102522334493
+          },
+          {
+            "analogy": "father:mother::brother:sister",
+            "offset_cos": 0.9999632239341736,
+            "alg_sim": 1.0,
+            "K": 0.9999961255150143
+          },
+          {
+            "analogy": "father:mother::son:daughter",
+            "offset_cos": 0.9999364614486694,
+            "alg_sim": 1.0,
+            "K": 1.0000029206726295
+          },
+          {
+            "analogy": "dog:puppy::cat:kitten",
+            "offset_cos": 0.9999187588691711,
+            "alg_sim": 1.0,
+            "K": 1.000001370990599
+          },
+          {
+            "analogy": "big:small::tall:short",
+            "offset_cos": 0.9999592304229736,
+            "alg_sim": 1.0,
+            "K": 1.0000191338150053
+          },
+          {
+            "analogy": "hot:cold::day:night",
+            "offset_cos": 0.9999407529830933,
+            "alg_sim": 1.0,
+            "K": 1.0000343943634682
+          },
+          {
+            "analogy": "happy:sad::love:hate",
+            "offset_cos": 0.9999440312385559,
+            "alg_sim": 1.0,
+            "K": 1.0000170483510358
+          },
+          {
+            "analogy": "doctor:hospital::teacher:school",
+            "offset_cos": 0.9999557137489319,
+            "alg_sim": 1.0,
+            "K": 0.9998910992931452
+          },
+          {
+            "analogy": "sun:day::moon:night",
+            "offset_cos": 0.9999361038208008,
+            "alg_sim": 1.0,
+            "K": 0.9999657855528914
+          },
+          {
+            "analogy": "princess:prince::queen:king",
+            "offset_cos": 0.9999393224716187,
+            "alg_sim": 1.0,
+            "K": 1.000118032124949
+          },
+          {
+            "analogy": "bird:fly::fish:swim",
+            "offset_cos": 0.999961793422699,
+            "alg_sim": 1.0,
+            "K": 1.0000224718021942
+          },
+          {
+            "analogy": "old:young::big:small",
+            "offset_cos": 0.9999495148658752,
+            "alg_sim": 1.0,
+            "K": 1.0000559131355402
+          }
+        ],
+        "analogy_test": [
+          {
+            "analogy": "boy:girl::man:woman",
+            "offset_cos": 0.999947190284729,
+            "alg_sim": 1.0,
+            "K": 1.0000147229652172
+          },
+          {
+            "analogy": "dog:cat::puppy:kitten",
+            "offset_cos": 0.9999187588691711,
+            "alg_sim": 1.0,
+            "K": 0.9999986288112511
+          },
+          {
+            "analogy": "red:blue::green:yellow",
+            "offset_cos": 0.9980450868606567,
+            "alg_sim": 1.0,
+            "K": 1.0004961033072524
+          },
+          {
+            "analogy": "morning:evening::day:night",
+            "offset_cos": 0.9989445209503174,
+            "alg_sim": 1.0,
+            "K": 1.000699548461203
+          }
+        ],
+        "sub_train": {
+          "rate": 1.0,
+          "inheritance": 1.0,
+          "total": 45,
+          "hits": 45
+        },
+        "sub_test": {
+          "rate": 1.0,
+          "inheritance": 1.0,
+          "total": 12,
+          "hits": 12
+        },
+        "semantic_gap": 0.0011221090952554524,
+        "dead_bits": 64,
+        "mean_entropy": -1.4426949695965583e-07
+      }
+    },
+    "Sub only": {
+      "r3_weight": 0.0,
+      "sub_weight": 5.0,
+      "final_loss": 1.6878259181976318,
+      "eval": {
+        "analogy_train": [
+          {
+            "analogy": "king:queen::man:woman",
+            "offset_cos": 0.3539736866950989,
+            "alg_sim": 0.46153846153846156,
+            "K": 5.92414592248013
+          },
+          {
+            "analogy": "king:queen::boy:girl",
+            "offset_cos": 0.7190645337104797,
+            "alg_sim": 0.851063829787234,
+            "K": 1.1557640407385992
+          },
+          {
+            "analogy": "father:mother::brother:sister",
+            "offset_cos": 0.40350812673568726,
+            "alg_sim": 0.45454545454545453,
+            "K": 0.6694795465884937
+          },
+          {
+            "analogy": "father:mother::son:daughter",
+            "offset_cos": 0.622642457485199,
+            "alg_sim": 0.5510204081632653,
+            "K": 0.2569995616260953
+          },
+          {
+            "analogy": "dog:puppy::cat:kitten",
+            "offset_cos": 0.6368257403373718,
+            "alg_sim": 0.5384615384615384,
+            "K": 0.3117027341474214
+          },
+          {
+            "analogy": "big:small::tall:short",
+            "offset_cos": 0.5938035249710083,
+            "alg_sim": 0.5116279069767442,
+            "K": 1.0795504359596626
+          },
+          {
+            "analogy": "hot:cold::day:night",
+            "offset_cos": 0.762990415096283,
+            "alg_sim": 0.7551020408163265,
+            "K": 1.6725893592003152
+          },
+          {
+            "analogy": "happy:sad::love:hate",
+            "offset_cos": 0.6310086250305176,
+            "alg_sim": 0.8367346938775511,
+            "K": 1.022494153834584
+          },
+          {
+            "analogy": "doctor:hospital::teacher:school",
+            "offset_cos": 0.7800534963607788,
+            "alg_sim": 0.8163265306122449,
+            "K": 0.8409001409367622
+          },
+          {
+            "analogy": "sun:day::moon:night",
+            "offset_cos": 0.7660548686981201,
+            "alg_sim": 0.6875,
+            "K": 0.43099184316448413
+          },
+          {
+            "analogy": "princess:prince::queen:king",
+            "offset_cos": 0.8104340434074402,
+            "alg_sim": 0.8333333333333334,
+            "K": 1.804909568616827
+          },
+          {
+            "analogy": "bird:fly::fish:swim",
+            "offset_cos": 0.5538406372070312,
+            "alg_sim": 0.2413793103448276,
+            "K": 0.06522151646857792
+          },
+          {
+            "analogy": "old:young::big:small",
+            "offset_cos": 0.5043801665306091,
+            "alg_sim": 0.6304347826086957,
+            "K": 1.164567854856771
+          }
+        ],
+        "analogy_test": [
+          {
+            "analogy": "boy:girl::man:woman",
+            "offset_cos": 0.4609661102294922,
+            "alg_sim": 0.4090909090909091,
+            "K": 1.8744521521238768
+          },
+          {
+            "analogy": "dog:cat::puppy:kitten",
+            "offset_cos": 0.6368257403373718,
+            "alg_sim": 0.5384615384615384,
+            "K": 3.20818488178517
+          },
+          {
+            "analogy": "red:blue::green:yellow",
+            "offset_cos": 0.11602306365966797,
+            "alg_sim": 0.3333333333333333,
+            "K": 0.9870457949585325
+          },
+          {
+            "analogy": "morning:evening::day:night",
+            "offset_cos": 0.7610871195793152,
+            "alg_sim": 0.7142857142857143,
+            "K": 1.615311794690729
+          }
+        ],
+        "sub_train": {
+          "rate": 1.0,
+          "inheritance": 1.0,
+          "total": 45,
+          "hits": 45
+        },
+        "sub_test": {
+          "rate": 1.0,
+          "inheritance": 1.0,
+          "total": 12,
+          "hits": 12
+        },
+        "semantic_gap": 0.1587684202256302,
+        "dead_bits": 9,
+        "mean_entropy": 0.6928163650235533
+      }
+    },
+    "R3+Sub": {
+      "r3_weight": 5.0,
+      "sub_weight": 5.0,
+      "final_loss": 1.7535264492034912,
+      "eval": {
+        "analogy_train": [
+          {
+            "analogy": "king:queen::man:woman",
+            "offset_cos": 0.9999688267707825,
+            "alg_sim": 1.0,
+            "K": 1.0000094773634485
+          },
+          {
+            "analogy": "king:queen::boy:girl",
+            "offset_cos": 0.9999783635139465,
+            "alg_sim": 1.0,
+            "K": 1.0000047683738698
+          },
+          {
+            "analogy": "father:mother::brother:sister",
+            "offset_cos": 0.9999706745147705,
+            "alg_sim": 1.0,
+            "K": 0.9999817606460624
+          },
+          {
+            "analogy": "father:mother::son:daughter",
+            "offset_cos": 0.99996417760849,
+            "alg_sim": 1.0,
+            "K": 0.9999735946968311
+          },
+          {
+            "analogy": "dog:puppy::cat:kitten",
+            "offset_cos": 0.9998997449874878,
+            "alg_sim": 1.0,
+            "K": 1.0000109074851968
+          },
+          {
+            "analogy": "big:small::tall:short",
+            "offset_cos": 0.999965250492096,
+            "alg_sim": 1.0,
+            "K": 1.000000834387529
+          },
+          {
+            "analogy": "hot:cold::day:night",
+            "offset_cos": 0.999951958656311,
+            "alg_sim": 1.0,
+            "K": 1.0000242006401243
+          },
+          {
+            "analogy": "happy:sad::love:hate",
+            "offset_cos": 0.999930739402771,
+            "alg_sim": 1.0,
+            "K": 1.0000106100810113
+          },
+          {
+            "analogy": "doctor:hospital::teacher:school",
+            "offset_cos": 0.9999557733535767,
+            "alg_sim": 1.0,
+            "K": 0.999974846098442
+          },
+          {
+            "analogy": "sun:day::moon:night",
+            "offset_cos": 0.9999550580978394,
+            "alg_sim": 1.0,
+            "K": 0.9999746673023943
+          },
+          {
+            "analogy": "princess:prince::queen:king",
+            "offset_cos": 0.9999688267707825,
+            "alg_sim": 1.0,
+            "K": 1.00003427401623
+          },
+          {
+            "analogy": "bird:fly::fish:swim",
+            "offset_cos": 0.9999658465385437,
+            "alg_sim": 1.0,
+            "K": 0.9999668589928022
+          },
+          {
+            "analogy": "old:young::big:small",
+            "offset_cos": 0.9999599456787109,
+            "alg_sim": 1.0,
+            "K": 1.0000095965840379
+          }
+        ],
+        "analogy_test": [
+          {
+            "analogy": "boy:girl::man:woman",
+            "offset_cos": 0.9999489784240723,
+            "alg_sim": 1.0,
+            "K": 1.0000308766153425
+          },
+          {
+            "analogy": "dog:cat::puppy:kitten",
+            "offset_cos": 0.9998997449874878,
+            "alg_sim": 1.0,
+            "K": 0.9999890924337543
+          },
+          {
+            "analogy": "red:blue::green:yellow",
+            "offset_cos": 0.9996630549430847,
+            "alg_sim": 1.0,
+            "K": 0.9999139184516407
+          },
+          {
+            "analogy": "morning:evening::day:night",
+            "offset_cos": 0.9998820424079895,
+            "alg_sim": 1.0,
+            "K": 1.000009059468253
+          }
+        ],
+        "sub_train": {
+          "rate": 1.0,
+          "inheritance": 1.0,
+          "total": 45,
+          "hits": 45
+        },
+        "sub_test": {
+          "rate": 1.0,
+          "inheritance": 1.0,
+          "total": 12,
+          "hits": 12
+        },
+        "semantic_gap": 0.0006745198369025873,
+        "dead_bits": 64,
+        "mean_entropy": -1.4426949695965583e-07
+      }
+    }
+  }
+}

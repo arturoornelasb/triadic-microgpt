@@ -1,0 +1,56 @@
+{
+  "experiment": "info_hierarchy_analysis",
+  "source": "Emergent finding from subsumption loss experiment",
+  "method": "Zero-GPU evaluation of Sub(5.0) model bit patterns",
+  "taxonomy_size": 66,
+  "depth_stats": {
+    "0": {
+      "count": 7,
+      "mean": 2.2857142857142856,
+      "min": 1,
+      "max": 6
+    },
+    "1": {
+      "count": 0,
+      "mean": null,
+      "min": null,
+      "max": null
+    },
+    "2": {
+      "count": 0,
+      "mean": null,
+      "min": null,
+      "max": null
+    }
+  },
+  "per_category": {
+    "animal": {
+      "sub_bits": 2,
+      "base_bits": 36
+    },
+    "person": {
+      "sub_bits": 4,
+      "base_bits": 37
+    },
+    "feeling": {
+      "sub_bits": 1,
+      "base_bits": 35
+    },
+    "food": {
+      "sub_bits": 6,
+      "base_bits": 31
+    },
+    "color": {
+      "sub_bits": 1,
+      "base_bits": 42
+    },
+    "place": {
+      "sub_bits": 1,
+      "base_bits": 34
+    },
+    "time": {
+      "sub_bits": 1,
+      "base_bits": 32
+    }
+  }
+}

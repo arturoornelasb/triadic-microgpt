@@ -1,0 +1,64 @@
+{
+  "experiment": "phase_attention",
+  "source": "La Danza Cosmica Cap. 7-9",
+  "config": "6L/256D/8H/64bits",
+  "steps": 10000,
+  "variants": {
+    "Learned": {
+      "final_loss": 1.7579567432403564,
+      "eval": {
+        "semantic_gap": 0.01906571294096382,
+        "mean_offset_cos": 0.4735670139392217,
+        "analogy_verif": 1.0,
+        "dead_bits": 13,
+        "mean_entropy": 0.6984502396529546
+      },
+      "phase_analysis": null
+    },
+    "Sinusoidal": {
+      "final_loss": 2.794245719909668,
+      "eval": {
+        "semantic_gap": 0.05058910400352701,
+        "mean_offset_cos": 0.45872969925403595,
+        "analogy_verif": 1.0,
+        "dead_bits": 17,
+        "mean_entropy": 0.6020031965801499
+      },
+      "phase_analysis": null
+    },
+    "Phase-Aware": {
+      "final_loss": 1.8932960033416748,
+      "eval": {
+        "semantic_gap": -0.03932765387675985,
+        "mean_offset_cos": 0.38305312395095825,
+        "analogy_verif": 1.0,
+        "dead_bits": 12,
+        "mean_entropy": 0.6966786766218318
+      },
+      "phase_analysis": {
+        "amplitude": [
+          0.7337290048599243,
+          0.7443168759346008,
+          0.756700873374939,
+          0.7313554286956787,
+          0.7557594776153564,
+          0.7654138803482056,
+          0.7592836618423462,
+          0.727800726890564
+        ],
+        "mean_phase_per_head": [
+          -0.013431886211037636,
+          0.7616902589797974,
+          1.554033637046814,
+          2.329784393310547,
+          3.09328031539917,
+          3.8568453788757324,
+          4.653294563293457,
+          5.42482852935791
+        ],
+        "phase_spread": 1.7784336805343628,
+        "phase_delta_from_init": 0.041352923134520214
+      }
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "experiment": "soft_signatures",
+  "source": "La Danza Cosmica Cap. 14-16 \u2014 Quantum Superposition",
+  "config": "6L/256D/64bits",
+  "steps": 10000,
+  "tanh_baseline": {
+    "final_loss": 1.7855803966522217,
+    "final_entropy": 0.9990373849868774,
+    "final_dead_bits": 0,
+    "semantic_gap": -0.042412192225456224,
+    "mean_related": 0.47324854135513306,
+    "mean_random": 0.5156607335805893
+  },
+  "sigmoid_soft": {
+    "final_loss": 1.738570213317871,
+    "final_entropy": 0.9991311430931091,
+    "final_dead_bits": 0,
+    "semantic_gap": -0.03848817269007365,
+    "mean_related": 0.5080410440762838,
+    "mean_random": 0.5465292167663575
+  },
+  "sigmoid+anneal": {
+    "final_loss": 1.7283836603164673,
+    "final_entropy": 0.9995490312576294,
+    "final_dead_bits": 0,
+    "semantic_gap": -0.0025752717256546376,
+    "mean_related": 0.5443779826164246,
+    "mean_random": 0.5469532543420792
+  },
+  "gumbel-softmax": {
+    "final_loss": 1.7324109077453613,
+    "final_entropy": 0.9997797608375549,
+    "final_dead_bits": 0,
+    "semantic_gap": -0.002667525211970001,
+    "mean_related": 0.7946746548016866,
+    "mean_random": 0.7973421800136566
+  }
+}
