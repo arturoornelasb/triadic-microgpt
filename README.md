@@ -255,4 +255,4 @@ cd paper && pdflatex triadic_microgpt.tex && pdflatex triadic_microgpt.tex
 
 ## License
 
-MIT
+Proprietary — see [LICENSE](./LICENSE). The `triadic-head/` subpackage is licensed separately under MIT.
