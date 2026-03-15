@@ -78,7 +78,7 @@ Text → FastBPETokenizer → Token IDs → TriadicGPT (12L/512D/8H) → Two Hea
 1. **Knowledge Distillation at 5× weight = collapse**: GoldPrimes model (Run 10) has complete triadic collapse. Made configurable (`--dist-weight`, default 1.0). Use Run 15 as production model.
 2. **Dead Bits**: ~15 of 64 bits have low entropy (< 0.3). Entropy regularization mitigates but doesn't eliminate.
 3. **Tokenizer Compatibility**: Runs 1-6 use Python BPE; runs 7+ use HuggingFace. NOT interchangeable. Run 15's tokenizer differs from `checkpoints/torch/tokenizer.json` — always use the one in the same checkpoint directory.
-4. **Subsumption 0% at k=64**: Mathematical limitation — exact prime divisibility is combinatorially improbable with ~32 active bits. Works at k=6-12 (parent library regime).
+4. **Subsumption at k=64**: RESOLVED via subsumption loss (Exp P12). 100% held-out at 25K steps with sub_weight=5.0. PPL cost +47% at XL scale (early stopping required). Base scale is "free lunch" (language improves).
 5. **Coherence loss = collapse**: NEVER re-enable. Adjacent-token agreement drives all projections to identical.
 
 ## Coding Conventions

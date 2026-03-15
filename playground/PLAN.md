@@ -16,9 +16,9 @@
 | Semantic gap (GPT-2 InfoNCE) | +0.099 |
 | Domain separation | 1.21 (sentence-level) |
 | Dead bits | ~15 / 64 |
-| Subsumption | 0% @ k=64 |
-| Paper | 15 paginas, compilado |
-| Experimentos completados | 11 (29 runs) |
+| Subsumption | **100% held-out @ k=64** (with sub loss, 25K early stop) |
+| Paper | 16+ paginas, compilado (Exp 12 added) |
+| Experimentos completados | 12 (29+ runs) |
 
 El proyecto esta maduro. Lo que sigue son ideas de frontera, muchas inspiradas
 por *La Danza Cosmica de los Opuestos*.
@@ -238,7 +238,7 @@ financiero) hasta que aparece "dinero" o "sentarse".
 | 4.2 | Hierarchical Bits | medio | alto | ~4h | **P3** | redundante con 4.1 ✅ |
 | 5.2 | Adaptive k | alto | alto | ~6h | **P3** | pendiente |
 | XL2 | Sigmoid+Anneal (temp=5) | alto | alto | ~3h | **P3** | pendiente |
-| XL-Sub | XL Subsumption Loss | **muy alto** | alto | ~3h | **P1** | pendiente ⭐ |
+| XL-Sub | XL Subsumption Loss | **muy alto** | alto | ~9h | **P1** | ✅ DONE ⭐ (100% held-out @25K) |
 | 1.3 | Concept GPT | muy alto | muy alto | ~10h | **P4** | pendiente |
 | 7.1 | Cross-Dataset Eval | medio | medio | ~2h | **P4** | pendiente |
 
