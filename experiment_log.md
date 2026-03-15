@@ -1486,3 +1486,63 @@ Evaluate Run 15 perplexity on out-of-distribution text to measure generalization
 **Cross-dataset eval confirms the expected profile**: Run 15 is a TinyStories specialist with strong in-domain performance but no OOD generalization. This is entirely attributable to the training corpus (50K stories, 4096 vocab). The triadic head is neutral — it neither helps nor hurts generalization. Scaling to larger corpora (as noted in the paper's Future Work) would close this gap.
 
 **Experiment P13 Status: COMPLETE. Expected result — corpus-limited OOD degradation, triadic metrics stable.**
+
+---
+
+## Experiment P14: Conceptual Tokenizer Phase 4 — Encoder Training (2026-03-15)
+| Key | Value |
+|-----|-------|
+| **Script** | `conceptual_tokenizer/training/train_phase4.py` |
+| **Config** | MLP (512→256→49), sigmoid+anneal, seed lexicon 443 words (354 train / 89 test) |
+| **GPU time** | ~1 min per run (3 configurations tested) |
+| **Source** | Conceptual Tokenizer Phases 1-3 (Sistema 7×7, 49 primitives) |
+
+### Method
+Train a projection head to map Run 15 embeddings (512D) to 49-dim primitive space supervised by the seed lexicon. Each word maps to 1-5 of 49 primitives with state (+/0/-) and intensity. Three configurations tested:
+
+1. **wte + no sparsity**: Just MSE on supervised positions + subsumption loss
+2. **wte + sparsity=1.0**: MSE + L1 penalty on NA positions + subsumption
+3. **wte + sparsity=0.1**: MSE + mild L1 + subsumption
+
+Also tested contextual embeddings (full transformer forward) — similar results.
+
+### Results — Summary
+
+| Config | Train state_acc | **Test state_acc** | Train cos | Test cos | Test sign_acc |
+|--------|----------------|-------------------|-----------|----------|---------------|
+| No sparsity | 100% | **87.3%** (inflated*) | 0.222 | 0.144 | 89.3% |
+| Sparsity=1.0 | 100% | **25.3%** | 0.997 | 0.082 | 67.3% |
+| Sparsity=0.1 | 100% | **22.7%** | 0.975 | 0.065 | 56.0% |
+
+*The 87.3% without sparsity is inflated: ALL 49 primitives were active for every test word. The model activated everything (including correct ones), giving high state_acc on supervised positions while having 100% spurious activations on NA positions.
+
+### Key Findings — NEGATIVE RESULT
+
+1. **Run 15 embeddings cannot ground the 7×7 system.** Perfect train memorization (100%) but no test generalization (~20-25% true accuracy). The MLP has sufficient capacity (210K params for 354 examples) but the input features don't discriminate.
+
+2. **Sign accuracy ~60% = chance level for binary.** The model can't predict whether a primitive should be active or inactive for unseen words. This confirms that TinyStories BPE embeddings don't encode elemental/sensory/temporal properties.
+
+3. **Consistent with prior findings.** Experiment P2 (Concept Tokenizer): silhouette=-0.059 on BPE clusters. Random Baseline: semantic ordering only emerges at 40M+ params. The 512D embedding space lacks the global semantic structure needed for primitive decomposition.
+
+4. **Contextual embeddings don't help.** Full transformer forward (12 layers) performed worse than raw `wte` lookup. Single isolated words without context don't benefit from the transformer layers.
+
+5. **Sparsity loss works as intended but exposes the real gap.** With sparsity, spurious activations drop to 0% on train but generalization collapses. Without sparsity, everything activates and metrics are artificially inflated.
+
+### Diagnosis
+
+The 7×7 primitives (Fuego, Agua, Orden, etc.) represent a **human-designed ontological decomposition**. TinyStories embeddings encode **distributional co-occurrence patterns** from children's stories. These are fundamentally different representations:
+- "fire" and "water" may have similar embeddings (both are common nouns in similar story contexts)
+- But in the 7×7 system they activate completely different primitives (Fuego vs Agua)
+
+The projection head cannot bridge this gap because the input features don't separate the classes.
+
+### Path Forward
+
+Phase 4 requires richer embeddings than Run 15 can provide. Options:
+1. **Pre-trained sentence encoder** (MiniLM, distilbert) — rich semantic structure from 1B+ sentences
+2. **End-to-end training** — train 49-bit TriadicGPT directly (like Run 15 but with 49 bits mapped to 7×7 primes)
+3. **Sentence-context embeddings** — embed each word in 3+ natural sentences and mean-pool (mirrors successful Exp 11 approach)
+
+Option 2 is most aligned with the project: replace the arbitrary 64-bit head with a structured 49-bit head where each bit corresponds to a named primitive.
+
+**Experiment P14 Status: COMPLETE. Negative result — Run 15 embeddings insufficient for 7×7 grounding. End-to-end training recommended.**

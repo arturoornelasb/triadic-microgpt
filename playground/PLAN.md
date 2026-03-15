@@ -239,7 +239,8 @@ financiero) hasta que aparece "dinero" o "sentarse".
 | 5.2 | Adaptive k | alto | alto | ~6h | **P3** | pendiente |
 | XL2 | Sigmoid+Anneal (temp=5) | alto | alto | ~3h | **P3** | pendiente |
 | XL-Sub | XL Subsumption Loss | **muy alto** | alto | ~9h | **P1** | ✅ DONE ⭐ (100% held-out @25K) |
-| 1.3 | Concept GPT | muy alto | muy alto | ~10h | **P4** | pendiente |
+| P14 | Concept Head (Phase 4) | alto | medio | ~1min | **P2** | ✅ DONE (negativo — embeddings insuficientes) |
+| 1.3 | Concept GPT (49-bit e2e) | muy alto | muy alto | ~10h | **P4** | pendiente (next step for 7×7) |
 | 7.1 | Cross-Dataset Eval | medio | medio | ~2min | **P4** | ✅ DONE (expected OOD degradation) |
 
 ---

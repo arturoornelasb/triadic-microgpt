@@ -1,0 +1,39 @@
+{
+  "config": {
+    "steps": 5000,
+    "lr": 0.001,
+    "batch_size": 64,
+    "hidden": 256,
+    "start_temp": 5.0,
+    "end_temp": 0.5,
+    "sub_weight": 2.0,
+    "train_split": 0.8
+  },
+  "data": {
+    "total_words": 443,
+    "train_words": 354,
+    "test_words": 89,
+    "hierarchy_pairs": 16
+  },
+  "train": {
+    "sign_accuracy": 1.0,
+    "mse": 0.02299437871793421,
+    "mean_cosine": 0.9748274872531999,
+    "state_accuracy": 1.0,
+    "spurious_rate": 0.002981159074648223,
+    "subsumption_rate": 1.0,
+    "subsumption_pairs": 16,
+    "n_words": 354
+  },
+  "test": {
+    "sign_accuracy": 0.56,
+    "mse": 0.42748575846354164,
+    "mean_cosine": 0.06545247437414096,
+    "state_accuracy": 0.22666666666666666,
+    "spurious_rate": 0.29446687247684633,
+    "subsumption_rate": 0.0,
+    "subsumption_pairs": 0,
+    "n_words": 89
+  },
+  "model_params": 210737
+}
