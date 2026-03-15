@@ -240,7 +240,7 @@ financiero) hasta que aparece "dinero" o "sentarse".
 | XL2 | Sigmoid+Anneal (temp=5) | alto | alto | ~3h | **P3** | pendiente |
 | XL-Sub | XL Subsumption Loss | **muy alto** | alto | ~9h | **P1** | ✅ DONE ⭐ (100% held-out @25K) |
 | 1.3 | Concept GPT | muy alto | muy alto | ~10h | **P4** | pendiente |
-| 7.1 | Cross-Dataset Eval | medio | medio | ~2h | **P4** | pendiente |
+| 7.1 | Cross-Dataset Eval | medio | medio | ~2min | **P4** | ✅ DONE (expected OOD degradation) |
 
 ---
 

@@ -1,0 +1,29 @@
+{
+  "checkpoint": "C:\\Github\\triadic-microgpt\\checkpoints\\torch_run15_strongalign\\model_L12_D512_B64_best.pt",
+  "perplexity": {
+    "tinystories": 6.603955352813576,
+    "wikitext2": 3032.8958409671873,
+    "lambada": 345.66033010868614
+  },
+  "tokens": {
+    "tinystories": 96170,
+    "wikitext2": 99965,
+    "lambada": 51287
+  },
+  "triadic": {
+    "semantic_gap": 0.03107607905681309,
+    "analogy_verification": 1.0,
+    "dead_bits": 9,
+    "mean_bit_entropy": 0.6883158350714904,
+    "unique_signatures": 46
+  },
+  "model_config": {
+    "vocab_size": 4096,
+    "block_size": 256,
+    "n_layer": 12,
+    "n_embd": 512,
+    "n_head": 8,
+    "n_triadic_bits": 64,
+    "dropout": 0.1
+  }
+}
