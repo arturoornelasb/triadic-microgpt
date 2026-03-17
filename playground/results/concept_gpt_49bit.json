@@ -1,0 +1,80 @@
+{
+  "config": {
+    "scale": "xl",
+    "steps": 50000,
+    "batch_size": 64,
+    "lr": 0.0003,
+    "alpha": 0.05,
+    "sub_weight": 5.0,
+    "sub_sample": 32,
+    "sup_weight": 10.0,
+    "sup_sample": 64,
+    "entropy_weight": 2.0,
+    "align_weight": 3.0,
+    "align_mode": "mse",
+    "activation": "tanh",
+    "start_temp": 1.0,
+    "end_temp": 5.0,
+    "triadic_warmup_pct": 0.5,
+    "stories": 50000,
+    "vocab": 4096,
+    "block": 256,
+    "dropout": 0.1,
+    "tokenizer": null,
+    "print_every": 50,
+    "save_every": 2500,
+    "eval_every": 1000,
+    "no_distill": true
+  },
+  "model_params": 40027648,
+  "training_time_s": 10745.267918109894,
+  "final_lang_loss": 0.7849797010421753,
+  "subsumption_train": 0.9800664451827242,
+  "subsumption_test": 0.9733333333333334,
+  "subsumption_train_n": 301,
+  "subsumption_test_n": 75,
+  "primary_accuracy": 0.7861842105263158,
+  "dead_bits": 0,
+  "mean_entropy": 0.8476974518335476,
+  "per_category": {
+    "ELEMENTOS": {
+      "top1": 48,
+      "top3": 51,
+      "total": 61
+    },
+    "ESPACIO": {
+      "top1": 27,
+      "top3": 28,
+      "total": 32
+    },
+    "CARACTER\u00cdSTICAS": {
+      "top1": 38,
+      "top3": 41,
+      "total": 49
+    },
+    "TIEMPO": {
+      "top1": 29,
+      "top3": 30,
+      "total": 40
+    },
+    "SENTIDOS": {
+      "top1": 34,
+      "top3": 36,
+      "total": 46
+    },
+    "PRINCIPIOS_DUALES": {
+      "top1": 28,
+      "top3": 30,
+      "total": 37
+    },
+    "OBSERVADORES": {
+      "top1": 35,
+      "top3": 36,
+      "total": 39
+    }
+  },
+  "sup_train_acc": 0.8845070422535212,
+  "sup_test_acc": 0.17045454545454544,
+  "sup_train_words": 355,
+  "sup_test_words": 88
+}

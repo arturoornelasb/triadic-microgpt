@@ -1,0 +1,30 @@
+{
+  "variant": "no_entropy",
+  "description": "No entropy regularization (entropy=0)",
+  "align_weight": 5.0,
+  "entropy_weight": 0.0,
+  "alpha": 0.05,
+  "seed": 42,
+  "ppl": 10.874145953521563,
+  "avg_loss": 2.386388040881358,
+  "final_train_loss": 0.7241177558898926,
+  "training_time_min": 145.4352413535118,
+  "total_params": 40035328,
+  "config": "12L/512D/8H/64bits",
+  "samples": [
+    "Once upon a time, there was a little girl named Lily. She loved to play outside in the sun and pick flowers. One day, sh",
+    "Once upon a time, a little boy named Timmy went to the park with his mommy. Timmy loved to play on the swings and slide.",
+    "Once upon a time, there was a little girl named Lily. She loved to play with her toys and her favorite toy was a teddy b"
+  ],
+  "semantic_gap": 0.023279583783356816,
+  "mean_related_sim": 0.6427655783475816,
+  "mean_random_sim": 0.6194859945642248,
+  "analogy_verification": 1.0,
+  "analogy_correct": 13,
+  "analogy_total": 13,
+  "dead_bits": 12,
+  "mean_entropy": 0.6234379829145817,
+  "ordering_correct": true,
+  "king_queen_sim": 0.39862049627391266,
+  "king_dog_sim": 0.3436566004255921
+}

@@ -1,0 +1,1 @@
+{"special_tokens": {"<PAD>": 0, "<BOS>": 1, "<EOS>": 2, "<UNK>": 3, "<USER>": 4, "<ASSISTANT>": 5}, "type": "fast_bpe"}

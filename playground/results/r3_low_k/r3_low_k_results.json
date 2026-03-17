@@ -1,0 +1,209 @@
+{
+  "experiment": "E7_r3_low_k",
+  "description": "R3 loss at k=6,8,12 \u2014 does it avoid the dead-bit collapse seen at k=64?",
+  "config": {
+    "scale": "base",
+    "arch": "6L/256D/8H",
+    "steps": 10000,
+    "batch_size": 32,
+    "alpha": 0.05,
+    "entropy_weight": 1.0,
+    "align_weight": 3.0,
+    "align_mode": "mse",
+    "triadic_warmup_pct": 0.25
+  },
+  "train_triples": [
+    "king:queen::man:woman",
+    "father:mother::brother:sister",
+    "father:mother::son:daughter",
+    "dog:puppy::cat:kitten",
+    "big:small::tall:short",
+    "hot:cold::day:night",
+    "happy:sad::love:hate",
+    "princess:prince::queen:king",
+    "bird:fly::fish:swim",
+    "old:young::big:small",
+    "doctor:hospital::teacher:school",
+    "sun:day::moon:night",
+    "red:blue::green:yellow",
+    "husband:wife::boy:girl",
+    "teacher:student::doctor:patient",
+    "morning:night::summer:winter"
+  ],
+  "test_triples": [
+    "brother:sister::uncle:aunt",
+    "run:walk::fly:swim",
+    "black:white::dark:light",
+    "mother:father::daughter:son"
+  ],
+  "results": {
+    "k=6": {
+      "Baseline": {
+        "dead_bits": 2,
+        "total_bits": 6,
+        "entropy": 0.5062059877806342,
+        "r3_train_acc": 0.0,
+        "r3_train_cos_mean": 0.1644364045932889,
+        "r3_test_acc": 0.0,
+        "r3_test_cos_mean": -0.01712045446038246,
+        "r3_test_cos_detail": [
+          0.1778719276189804,
+          -0.23945271968841553,
+          -0.6371111273765564,
+          0.6302101016044617
+        ],
+        "semantic_gap": -0.03682316255755724,
+        "lang_loss": 1.7351638078689575,
+        "params": 5840896
+      },
+      "R3 w=1.0": {
+        "dead_bits": 1,
+        "total_bits": 6,
+        "entropy": 0.6954901931538865,
+        "r3_train_acc": 1.0,
+        "r3_train_cos_mean": 0.9986949004232883,
+        "r3_test_acc": 0.25,
+        "r3_test_cos_mean": 0.42976152896881104,
+        "r3_test_cos_detail": [
+          0.6470492482185364,
+          -0.8029428720474243,
+          0.8762754201889038,
+          0.9986643195152283
+        ],
+        "semantic_gap": -0.3998032213211991,
+        "lang_loss": 1.7191698551177979,
+        "params": 5840896
+      },
+      "R3 w=5.0": {
+        "dead_bits": 1,
+        "total_bits": 6,
+        "entropy": 0.7082987043204688,
+        "r3_train_acc": 1.0,
+        "r3_train_cos_mean": 0.9982138052582741,
+        "r3_test_acc": 0.5,
+        "r3_test_cos_mean": 0.9168616086244583,
+        "r3_test_cos_detail": [
+          0.8607019186019897,
+          0.8397618532180786,
+          0.9726480841636658,
+          0.9943345785140991
+        ],
+        "semantic_gap": -0.3369765164596902,
+        "lang_loss": 1.7198896408081055,
+        "params": 5840896
+      }
+    },
+    "k=8": {
+      "Baseline": {
+        "dead_bits": 3,
+        "total_bits": 8,
+        "entropy": 0.5325336355308572,
+        "r3_train_acc": 0.0,
+        "r3_train_cos_mean": 0.11700908641796559,
+        "r3_test_acc": 0.0,
+        "r3_test_cos_mean": -0.08812401443719864,
+        "r3_test_cos_detail": [
+          -0.37717336416244507,
+          0.07129375636577606,
+          -0.1927216500043869,
+          0.14610520005226135
+        ],
+        "semantic_gap": -0.08075959958136081,
+        "lang_loss": 1.7158780097961426,
+        "params": 5841408
+      },
+      "R3 w=1.0": {
+        "dead_bits": 3,
+        "total_bits": 8,
+        "entropy": 0.6064890643276463,
+        "r3_train_acc": 1.0,
+        "r3_train_cos_mean": 0.9989487379789352,
+        "r3_test_acc": 0.25,
+        "r3_test_cos_mean": 0.36996638774871826,
+        "r3_test_cos_detail": [
+          -0.8954892158508301,
+          0.5381082892417908,
+          0.8385701179504395,
+          0.9986763596534729
+        ],
+        "semantic_gap": -0.27146852167556057,
+        "lang_loss": 1.7192201614379883,
+        "params": 5841408
+      },
+      "R3 w=5.0": {
+        "dead_bits": 2,
+        "total_bits": 8,
+        "entropy": 0.7008213102819838,
+        "r3_train_acc": 1.0,
+        "r3_train_cos_mean": 0.9992697760462761,
+        "r3_test_acc": 0.25,
+        "r3_test_cos_mean": 0.5058534368872643,
+        "r3_test_cos_detail": [
+          0.06043204665184021,
+          0.7338192462921143,
+          0.23084676265716553,
+          0.998315691947937
+        ],
+        "semantic_gap": -0.2833604447999096,
+        "lang_loss": 1.6606028079986572,
+        "params": 5841408
+      }
+    },
+    "k=12": {
+      "Baseline": {
+        "dead_bits": 4,
+        "total_bits": 12,
+        "entropy": 0.5648107704064679,
+        "r3_train_acc": 0.0,
+        "r3_train_cos_mean": 0.1337513132020831,
+        "r3_test_acc": 0.0,
+        "r3_test_cos_mean": 0.3766386955976486,
+        "r3_test_cos_detail": [
+          0.3522728681564331,
+          0.30695682764053345,
+          0.3222423791885376,
+          0.5250827074050903
+        ],
+        "semantic_gap": -0.006253068704390907,
+        "lang_loss": 1.679418683052063,
+        "params": 5842432
+      },
+      "R3 w=1.0": {
+        "dead_bits": 4,
+        "total_bits": 12,
+        "entropy": 0.6564728271219925,
+        "r3_train_acc": 1.0,
+        "r3_train_cos_mean": 0.9979966729879379,
+        "r3_test_acc": 0.5,
+        "r3_test_cos_mean": 0.3208518698811531,
+        "r3_test_cos_detail": [
+          0.9206061363220215,
+          0.14658674597740173,
+          -0.7822296619415283,
+          0.9984442591667175
+        ],
+        "semantic_gap": -0.31033989912306426,
+        "lang_loss": 1.6896779537200928,
+        "params": 5842432
+      },
+      "R3 w=5.0": {
+        "dead_bits": 3,
+        "total_bits": 12,
+        "entropy": 0.7651578640401556,
+        "r3_train_acc": 1.0,
+        "r3_train_cos_mean": 0.9993365816771984,
+        "r3_test_acc": 0.25,
+        "r3_test_cos_mean": 0.19417031668126583,
+        "r3_test_cos_detail": [
+          -0.8176666498184204,
+          0.6747391819953918,
+          -0.08023396879434586,
+          0.9998427033424377
+        ],
+        "semantic_gap": -0.41831177803338504,
+        "lang_loss": 1.7418619394302368,
+        "params": 5842432
+      }
+    }
+  }
+}

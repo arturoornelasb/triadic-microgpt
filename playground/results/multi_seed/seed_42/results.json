@@ -1,0 +1,13 @@
+{
+  "seed": 42,
+  "ppl": 10.862904130312476,
+  "final_loss": 0.7246382832527161,
+  "training_time_min": 145.6038011709849,
+  "semantic_gap": 0.041399206926043264,
+  "analogy_verification": 1.0,
+  "dead_bits": 10,
+  "mean_entropy": 0.6270850559797324,
+  "ordering_correct": true,
+  "king_queen_sim": 0.39961013197898865,
+  "king_dog_sim": 0.34167149662971497
+}

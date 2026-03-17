@@ -1,0 +1,30 @@
+{
+  "variant": "full",
+  "description": "Run 15 exact (control)",
+  "align_weight": 5.0,
+  "entropy_weight": 1.0,
+  "alpha": 0.05,
+  "seed": 42,
+  "ppl": 10.858522021894412,
+  "avg_loss": 2.3849502114959824,
+  "final_train_loss": 0.7239134311676025,
+  "training_time_min": 145.6871452331543,
+  "total_params": 40035328,
+  "config": "12L/512D/8H/64bits",
+  "samples": [
+    "Once upon a time, there was a little girl named Lily. She loved to play outside in the sun and pick flowers. One day, sh",
+    "Once upon a time, a little boy named Timmy went to the park with his mommy. Timmy loved to play on the swings and slide.",
+    "Once upon a time, there was a little girl named Lily. She loved to play with her toys and her favorite toy was a teddy b"
+  ],
+  "semantic_gap": 0.024794308475988958,
+  "mean_related_sim": 0.6445333370920918,
+  "mean_random_sim": 0.6197390286161029,
+  "analogy_verification": 1.0,
+  "analogy_correct": 13,
+  "analogy_total": 13,
+  "dead_bits": 11,
+  "mean_entropy": 0.6238205147015125,
+  "ordering_correct": true,
+  "king_queen_sim": 0.4000464498210378,
+  "king_dog_sim": 0.34408391022929913
+}

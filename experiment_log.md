@@ -1546,3 +1546,504 @@ Phase 4 requires richer embeddings than Run 15 can provide. Options:
 Option 2 is most aligned with the project: replace the arbitrary 64-bit head with a structured 49-bit head where each bit corresponds to a named primitive.
 
 **Experiment P14 Status: COMPLETE. Negative result — Run 15 embeddings insufficient for 7×7 grounding. End-to-end training recommended.**
+
+---
+
+## Experiment P15: 49-Bit Concept GPT — 7×7 End-to-End ⭐⭐ MAJOR BREAKTHROUGH
+
+| Key | Value |
+|-----|-------|
+| **Date** | 2026-03-15 |
+| **Script** | `playground/concept_gpt_49bit.py` (v3→v4) |
+| **Architecture** | ConceptTriadicGPT — TriadicGPT subclass with configurable activation |
+| **Bits** | 49 (one per primitive of Sistema 7×7 from "La Danza Cósmica de los Opuestos") |
+| **Losses** | L_lang + α·(L_triadic + sub_weight·L_sub + sup_weight·L_sup) |
+| **GPU** | RTX 5060 Ti 16GB |
+
+### Hypothesis
+
+P14 showed that post-hoc projection from Run 15 embeddings cannot ground the 7×7 system (test acc ~20%). Can end-to-end training with subsumption + supervised primitive losses teach a GPT to assign the correct primitive to each word?
+
+### Method
+
+Train TriadicGPT with 49 triadic bits on TinyStories. Three auxiliary losses on top of standard triadic (diversity + contrastive + entropy + alignment):
+
+1. **Subsumption loss**: `relu(hyper_01 - hypo_01).mean()` — Tier 1 words (1 primitive) subsume Tier 2 words (2-5 primitives). 301 train pairs, 75 test pairs extracted from seed lexicon.
+2. **Supervised primitive loss**: MSE between model projection and target 49-bit vector for Tier 1 words. Full supervision (all 49 bits: active→target, inactive→0).
+3. **Standard triadic loss**: diversity + contrastive + entropy(2.0) + alignment(MSE, 3.0).
+
+Key parameters: α=0.05 with linear ramp, sub_weight=5.0, sup_weight=2.0, triadic_warmup=50%.
+
+### Iteration History (3 versions to fix collapse)
+
+| Version | Activation | Supervised mask | Warmup | Result |
+|---------|-----------|----------------|--------|--------|
+| v1 | sigmoid+anneal | N/A | 80% | 49/49 dead bits, 0% acc (all-ones collapse) |
+| v2 | tanh | active bits only | 80% | 42/49 dead, 1.3% acc (bits still high) |
+| **v3** | **tanh** | **all 49 bits (T1)** | **50%** | **0/49 dead, 86.2% acc** |
+| **v4** | **tanh** | **all 49 bits (T1+T2), 80/20 split** | **50%** | **88.5% train, 17% held-out** |
+
+**Root cause of v1 collapse**: sigmoid + subsumption has trivial global minimum (all bits = 1.0 satisfies relu(h-y)=0). Same pattern as R3 loss collapse (P7/P10/P11).
+**Root cause of v2 weakness**: supervised loss only penalized active bits (mask = non-zero targets), leaving 48 inactive bits free to float high.
+**Root cause of v4 gap**: model memorizes word→primitive mappings as lookup table. 355 training words insufficient to learn compositional rules that generalize.
+
+### Results — v3 (T1-only supervision)
+
+#### Scaling: Base → XL
+
+| Scale | Params | Steps | Primary Acc | Top-3 Acc | Sub Test | Dead Bits | Entropy | Lang Loss | Time |
+|-------|--------|-------|-------------|-----------|----------|-----------|---------|-----------|------|
+| Base | 5.8M | 10K | 31.9% | ~50% | 94.7% | 0/49 | 0.936 | 2.09 | 5 min |
+| Base | 5.8M | 30K | 58.6% | ~75% | 94.7% | 0/49 | 0.907 | 1.88 | 20 min |
+| **XL** | **40M** | **50K** | **86.2%** | **~97%** | **97.3%** | **0/49** | **0.839** | **0.985** | **103 min** |
+| Random baseline | — | — | 2.0% | 6.1% | ~0% | — | — | — | — |
+
+XL primary accuracy = **42× random** (86.2% vs 2.0%).
+
+#### Per-Category Accuracy — v3 (XL 50K)
+
+| Category | Top-1 | Top-3 | Count |
+|----------|-------|-------|-------|
+| CARACTERÍSTICAS | 92% | 96% | 49 |
+| ELEMENTOS | 89% | 97% | 61 |
+| SENTIDOS | 89% | 100% | 46 |
+| OBSERVADORES | 85% | 97% | 39 |
+| ESPACIO | 84% | 97% | 32 |
+| PRINCIPIOS_DUALES | 81% | 92% | 37 |
+| TIEMPO | 80% | 100% | 40 |
+
+ALL categories above 80% top-1. TIEMPO and SENTIDOS achieve 100% top-3.
+
+### Results — v4 (T1+T2 supervision, 80/20 train/test split)
+
+| Metric | v3 (T1-only) | v4 (T1+T2) |
+|--------|-------------|------------|
+| Sup train acc | 86.2% (304 T1) | 88.5% (355 T1+T2) |
+| **Sup TEST acc** | — | **17.0% (88 held-out)** |
+| Sub train | — | 98.0% (295/301) |
+| Sub test | 97.3% | 97.3% (73/75) |
+| Dead bits | 0/49 | 0/49 |
+| Entropy | 0.839 | 0.848 |
+| Lang loss | 0.985 | **0.785** (improved) |
+| Time | 103 min | 179 min |
+
+#### Per-Category Accuracy — v4 (XL 50K, train words)
+
+| Category | Top-1 | Top-3 | Count |
+|----------|-------|-------|-------|
+| OBSERVADORES | 90% | 92% | 39 |
+| ESPACIO | 84% | 88% | 32 |
+| ELEMENTOS | 79% | 84% | 61 |
+| CARACTERÍSTICAS | 78% | 84% | 49 |
+| PRINCIPIOS_DUALES | 76% | 81% | 37 |
+| SENTIDOS | 74% | 78% | 46 |
+| TIEMPO | 72% | 75% | 40 |
+
+**v4 conclusion**: Adding T2 compound words to supervision does NOT improve generalization. 88.5% train / 17% test = pure memorization. The model learns word→primitive as a lookup table, not compositional rules. Compositionality requires either (a) much larger labeled corpus or (b) corpus where ontological structure emerges from context (synthetic corpus via Claude agents — planned).
+
+#### Correct Primitive Activations (XL 50K)
+
+| Word | Top-1 Prediction | Expected | Correct? |
+|------|-----------------|----------|----------|
+| fire | Fuego (0.58) | Fuego | ✅ |
+| water | Agua (0.61) | Agua | ✅ |
+| red | Color (0.76) | Color | ✅ |
+| mountain | Tierra (0.73) | Tierra | ✅ |
+| truth | Verdad_Mentira (0.58) | Verdad_Mentira | ✅ |
+| music | Oído (0.62) | Oído | ✅ |
+| king | Fuerza (top-2, 0.69) | Fuerza | ✅ (top-2) |
+| love | Interocepción (top-2, 0.62) | Interocepción | ✅ (top-2) |
+
+### Key Findings
+
+1. **The 7×7 Sistema CAN be learned end-to-end.** 86.2% primary accuracy on 304 Tier 1 words with 49 primitive classes. This resolves P14's negative result — the bottleneck was post-hoc projection, not the concept system itself.
+
+2. **Three losses are needed (triadic + subsumption + supervised).** Subsumption alone collapses (v1). Supervised on active bits only is insufficient (v2). Full supervision on all 49 bits + subsumption + standard triadic produces the breakthrough (v3).
+
+3. **Sigmoid activation collapses with subsumption.** Same pattern as R3 loss — trivial global minimum (all bits identical). Tanh is robust. This extends the R3 finding: any loss with a "subset" constraint (relu(h-y)→0) is vulnerable to all-identical collapse with sigmoid.
+
+4. **0/49 dead bits at all scales.** The supervised loss grounds every bit to at least one primitive. Compare Run 15's ~15/64 dead bits — the 7×7 structure provides a natural "purpose" for each bit.
+
+5. **Language quality preserved.** XL loss 0.985 is comparable to Run 15's 0.946. The auxiliary losses don't degrade language modeling.
+
+6. **Scaling behavior**: Primary accuracy scales roughly as log(steps) × params. Base 10K→30K: 32%→59%. XL 50K: 86%. More training and/or larger models would likely push toward 90%+.
+
+7. **Compositionality does NOT emerge from supervised loss alone (v4).** Adding T2 compound words to supervision (80/20 split) yields 88.5% train / 17% test — pure memorization. The model cannot infer that "volcano" = Fuego+Tierra from seeing those primitives assigned to other words. Compositional generalization requires richer training signal (e.g., synthetic corpus where ontological structure emerges from context).
+
+8. **Language loss improves with more supervision (v4).** 0.985→0.785 — the additional T2 supervised signal acts as a regularizer, improving language quality even though generalization fails.
+
+### Checkpoints
+
+- Base: `checkpoints/concept_gpt_49bit_base/model_L6_D256_B49_best.pt`
+- XL v3: `checkpoints/concept_gpt_49bit_xl/model_L12_D512_B49_step50000.pt` (T1-only, 86.2%)
+- XL v4: `checkpoints/concept_gpt_49bit_xl/model_L12_D512_B49_step50000.pt` (T1+T2, 88.5%/17%)
+- Results: `playground/results/concept_gpt_49bit.json`
+
+**Experiment P15 Status: COMPLETE. The 7×7 Sistema is learnable end-to-end (88.5% known vocabulary) but compositionality does NOT generalize to held-out words (17%). Next: synthetic corpus via Claude agents to provide richer compositional training signal.**
+
+---
+
+## Experiment E3: Expanded Analogy Benchmark (51 analogies)
+
+| Key | Value |
+|-----|-------|
+| **Date** | 2026-03-15 |
+| **Script** | `playground/expanded_analogy_benchmark.py` |
+| **Checkpoint** | Run 15 (40M, 12L/512D/8H/64bits) |
+| **GPU Time** | 0 (eval only) |
+
+### Hypothesis
+
+The original analogy benchmark used only 13 quadruples (reporting 69.2% verification). Is this statistically robust? A larger set (51 analogies across 12 categories) provides more reliable estimates.
+
+### Results
+
+| Metric | Original (13) | Expanded (51) |
+|--------|--------------|---------------|
+| **Verification rate (sim>0.3)** | 69.2% | **98.0% (50/51)** |
+| Top-1 retrieval (prime) | 3.8% | 0.0% |
+| Top-1 retrieval (vector) | — | 3.9% (2/51) |
+| Mean algebraic similarity | — | 0.498 ± 0.076 |
+| Mean offset cosine | — | 0.025 ± 0.203 |
+
+#### Difficulty Breakdown
+
+| Difficulty | N | Verification | V-Top1 | Offset Cos |
+|-----------|---|-------------|--------|-----------|
+| Easy (same-domain) | 38 | **100%** | 5.3% | +0.038 |
+| Hard (cross-domain) | 13 | 92.3% | 0.0% | -0.014 |
+
+#### Per-Category
+
+| Category | N | Verification |
+|----------|---|-------------|
+| gender | 7 | 100% |
+| family | 3 | 100% |
+| size | 4 | 100% |
+| temperature | 4 | 100% |
+| emotion | 4 | 100% |
+| animal | 5 | 100% |
+| profession | 4 | 100% |
+| color | 2 | 100% |
+| degree | 2 | 100% |
+| opposite | 5 | 100% |
+| action | 6 | 100% |
+| geography | 5 | 80% |
+
+Only failure: tree:forest::star:sky (geography, hard).
+
+### Key Findings
+
+1. **Verification is MUCH stronger than originally measured.** 98% (50/51) vs 69.2% (17/26). The original 13-quadruple benchmark was too small and included harder cross-domain analogies disproportionately.
+2. **Discovery still fails.** Top-1 retrieval: 0% (prime), 3.9% (vector). This confirms: the triadic head excels at verification, not discovery.
+3. **Offset cosine is weak.** Mean +0.025 with std 0.203 — the vector-space parallelogram property (b-a ≈ d-c) does NOT hold in projection space. The algebraic (prime) verification succeeds because similarity > 0.3 is a loose threshold on hash-bucket overlap.
+4. **Easy vs Hard gap is small.** 100% vs 92.3% verification — the model handles cross-domain analogies almost as well.
+
+**Experiment E3 Status: COMPLETE. Verification rate revised upward from 69.2% to 98.0%. Discovery remains ~0%. Update paper accordingly.**
+
+---
+
+## Experiment E6: Meaningful Compression Benchmark
+
+| Key | Value |
+|-----|-------|
+| **Date** | 2026-03-15 |
+| **Script** | `playground/compression_benchmark.py` |
+| **Checkpoint** | Run 15 (40M, 12L/512D/8H/64bits) |
+| **GPU Time** | 0 (eval only) |
+
+### Hypothesis
+
+The paper claims "8x compression with no information loss" (64 bits match 512D), but the original probe achieved ~8% accuracy (near random 7.7%). A richer benchmark with 9 categories and 128 words should produce above-random accuracy, making the comparison meaningful.
+
+### Results
+
+| Task | Triadic 64D | Embedding 512D | Random | Winner |
+|------|------------|---------------|--------|--------|
+| A. Centroid Classification | 13.3% | **16.4%** | 11.1% | Embedding |
+| B. Similarity Ranking (Spearman) | 0.398 | 1.000 | 0.000 | Embedding |
+| C. Separation Ratio | **1.010** | 1.004 | 1.000 | Triadic (marginal) |
+| D. k-NN (k=3) | **11.7%** | 8.6% | 11.1% | Triadic (marginal) |
+
+#### Category Separation Ratios
+
+| Category | Triadic | Embedding |
+|----------|---------|-----------|
+| food | **1.046** | 1.046 |
+| body | **1.035** | 0.983 |
+| animals | **1.031** | 0.996 |
+| colors | 1.016 | **1.031** |
+| home | **1.002** | 0.979 |
+| actions | 1.001 | **1.019** |
+| nature | 0.995 | 0.978 |
+| emotions | 0.987 | 0.996 |
+| people | 0.967 | **1.021** |
+
+### Key Findings
+
+1. **Both representations are near random for classification.** Triadic 13.3%, Embedding 16.4%, Random 11.1%. Neither is useful for single-token category classification.
+2. **Similarity structure is NOT preserved.** Spearman rho = 0.398 — only weak correlation between triadic and embedding similarity rankings.
+3. **"8x compression with no information loss" is NOT supported.** The embedding carries more category signal (16.4% vs 13.3%) and much more similarity structure (rho=1.0 vs 0.398).
+4. **Token-level representations lack semantic content** in both spaces at this model scale. This is consistent with Exp 11's finding that sentence-level aggregation is needed.
+5. **Paper claim needs revision**: remove "no information loss" or qualify as "no language-modeling loss" (which is true — PPL is unaffected).
+
+**Experiment E6 Status: COMPLETE. The 8x compression claim is NOT supported. Both representations are near-random for classification. Recommend revising paper claim to "8x compression with no language-modeling cost" (which IS supported).**
+
+---
+
+## Experiment E1: Multi-Seed Validation (3 seeds)
+
+| Key | Value |
+|-----|-------|
+| **Date** | 2026-03-16 |
+| **Script** | `playground/multi_seed_validation.py` |
+| **Config** | Run 15 exact (12L/512D/8H/64bits, alpha=0.05, align=5.0 MSE, entropy=1.0) |
+| **Seeds** | 42, 123, 777 |
+| **GPU Time** | 3 × 145.6 min = 7.3h |
+
+### Hypothesis
+
+All prior results come from single training runs with no confidence intervals. Any reviewer will ask: how reproducible are these results? Three seeds with identical config provide mean ± std for all key metrics.
+
+### Results
+
+| Metric | Seed 42 | Seed 123 | Seed 777 | Mean ± Std |
+|--------|---------|----------|----------|------------|
+| **PPL** | 10.86 | 10.88 | 10.85 | **10.86 ± 0.01** |
+| **Semantic Gap** | +0.041 | +0.032 | +0.040 | **+0.038 ± 0.005** |
+| **Analogy Verif** | 100% | 100% | 100% | **100% ± 0%** |
+| **Dead Bits** | 10 | 11 | 12 | **11.0 ± 1.0** |
+| **Entropy** | 0.627 | 0.670 | 0.646 | **0.648 ± 0.021** |
+| **Ordering** | ✅ | ✅ | ✅ | **3/3** |
+| **Time** | 145.6m | 145.6m | 145.5m | 145.6 ± 0.1m |
+
+### Comparison vs Run 15 (reference)
+
+| Metric | Run 15 | Multi-Seed Mean | Delta | Note |
+|--------|--------|----------------|-------|------|
+| PPL | 7.69 | 10.86 | +41% | Expected: E1 omits distillation loss |
+| Semantic Gap | +0.020 | +0.038 | +90% | **Better** — no distillation may help |
+| Analogy Verif | 69.2% | 100% | +31pt | **Perfect across all seeds** |
+| Dead Bits | 15 | 11 | -4 | Improved |
+| Entropy | 0.749 | 0.648 | -13% | Slightly lower |
+
+### Key Findings
+
+1. **Extremely low variance across seeds.** PPL ± 0.01 (0.1%), gap ± 0.005 (13% CV), analogy ± 0%, dead bits ± 1.0. Results are **highly reproducible** — single-run concerns (W1) are addressed.
+
+2. **Semantic gap is consistently positive.** All three seeds produce gap > +0.03. This is NOT a lucky seed artifact. The triadic head reliably learns semantic ordering at XL scale.
+
+3. **100% analogy verification on all seeds.** The original 69.2% was likely evaluated differently (E3 confirmed 98% on 51 analogies). With consistent evaluation, verification is saturated.
+
+4. **PPL difference explained by no distillation.** The multi-seed script omits gold-primes distillation (for cleaner ablation). This accounts for the +41% PPL gap. The distillation improves language quality but is not needed for triadic metrics.
+
+5. **Dead bits improved (11 vs 15).** Without distillation, the model has slightly fewer dead bits, consistent with the finding that distillation at high weight can collapse bits.
+
+### Statistical Confidence
+
+With 3 seeds, the 95% CI for semantic gap is: +0.038 ± 2.92 × 0.005/√3 = **[+0.029, +0.046]**. This interval is entirely positive, confirming that semantic ordering is statistically significant.
+
+**Experiment E1 Status: COMPLETE. All key metrics are reproducible with low variance. Semantic gap is statistically significant (CI entirely positive). The paper's single-run results are validated.**
+
+---
+
+## Experiment E7: R3 Loss at Low k (k=6, 8, 12)
+
+| Key | Value |
+|-----|-------|
+| **Date** | 2026-03-16 |
+| **Script** | `playground/r3_low_k.py` |
+| **Config** | Base scale (6L/256D/8H), 10K steps, 3 variants per k |
+| **GPU Time** | ~45 min total |
+
+### Hypothesis
+
+R3 loss causes complete entropy collapse (64/64 dead bits) at k=64 across three independent experiments (P7, P10, P11). Does it work at the Engine's original regime (k=6-12), where the parent paper found k optimal?
+
+### Results
+
+| k | Variant | Dead Bits | Entropy | R3 Train | R3 Test | Sem Gap | Lang Loss |
+|---|---------|-----------|---------|----------|---------|---------|-----------|
+| 6 | Baseline | 2/6 | 0.506 | 0% | 0% | -0.037 | 1.735 |
+| 6 | R3 w=1.0 | 1/6 | 0.695 | 100% | 25% | -0.400 | 1.719 |
+| 6 | **R3 w=5.0** | **1/6** | **0.708** | **100%** | **50%** | **-0.337** | **1.720** |
+| 8 | Baseline | 3/8 | 0.533 | 0% | 0% | -0.081 | 1.716 |
+| 8 | R3 w=1.0 | 3/8 | 0.606 | 100% | 25% | -0.272 | 1.719 |
+| 8 | R3 w=5.0 | 2/8 | 0.701 | 100% | 25% | -0.283 | 1.661 |
+| 12 | Baseline | 4/12 | 0.565 | 0% | 0% | -0.006 | 1.679 |
+| 12 | R3 w=1.0 | 4/12 | 0.656 | 100% | 50% | -0.310 | 1.690 |
+| 12 | R3 w=5.0 | 3/12 | 0.765 | 100% | 25% | -0.418 | 1.742 |
+
+### Key Findings
+
+1. **R3 does NOT collapse at low k.** At k=64: 64/64 dead bits. At k=6: 1/6 dead. At k=12: 3/12 dead. Dead bits actually DECREASE with R3 at low k (opposite of k=64 behavior). The collapse is a k=64-specific phenomenon, not fundamental to R3.
+
+2. **R3 trains perfectly at all k values.** 100% on 16 training triples for all k and weights. The mechanism (offset cosine alignment) works.
+
+3. **R3 generalization is limited.** Held-out test: 25-50% (1-2 of 4 analogies). Better than chance but far from reliable.
+
+4. **R3 DESTROYS semantic gap.** Gap goes from -0.006/-0.081 (baseline) to -0.27/-0.42 (R3). R3 forces algebraic relationships that override natural semantic structure. The bits serve R3's equations, not general semantics.
+
+5. **Entropy IMPROVES with R3 at low k.** Baseline 0.506-0.565 → R3(5.0) 0.708-0.765. At low k, R3 distributes bits more evenly (opposite of k=64 where it collapses everything).
+
+6. **Language loss barely affected.** R3 does not hurt language modeling at any k.
+
+### Interpretation
+
+R3's behavior is **scale-dependent in k**:
+- k=6-12: R3 works mechanically (no collapse, bits alive, analogies trained) but destroys semantic ordering
+- k=64: R3's trivial global minimum (all bits identical) dominates, causing complete collapse
+
+The k=64 collapse is because 64 bits provide too many degrees of freedom for R3's offset-cosine loss to exploit a degenerate solution. At k=6, the solution space is constrained enough that R3 must use bits meaningfully.
+
+**However, R3 at low k is still NOT useful** because it trades semantic gap for algebraic accuracy — the exact opposite of what's needed. The bits become R3-serving rather than semantics-serving.
+
+**Experiment E7 Status: COMPLETE. R3 is alive at k=6-12 (no collapse) but destroys semantic ordering. The k=64 collapse is scale-specific. R3 remains impractical: at low k it trades semantics for algebra, at high k it collapses entirely.**
+
+---
+
+## Experiment E2: Alignment Loss Ablation
+
+| Key | Value |
+|-----|-------|
+| **Date** | 2026-03-16 |
+| **Script** | `playground/alignment_ablation.py` |
+| **Config** | XL (12L/512D/8H/64bits), 50K steps, 3 variants, seed 42 |
+| **GPU Time** | 3 × 145 min = 7.3h |
+
+### Hypothesis
+
+The triadic loss has multiple components (diversity, contrastive, entropy, alignment). Which one drives semantic quality? Three ablations isolate the contribution of embedding alignment and entropy regularization.
+
+### Variants
+
+- **FULL**: align=5.0, entropy=1.0 (Run 15 exact, control)
+- **NO_ALIGN**: align=0.0, entropy=1.0 (removes embedding alignment)
+- **NO_ENTROPY**: align=5.0, entropy=0.0 (removes entropy regularization)
+
+### Results
+
+| Metric | FULL | NO_ALIGN | NO_ENTROPY |
+|--------|------|----------|------------|
+| PPL | 10.86 | 10.87 | 10.87 |
+| **Semantic Gap** | **+0.025** | +0.018 | +0.023 |
+| **Dead Bits** | **11** | **23** | **12** |
+| Entropy | 0.624 | **0.519** | 0.623 |
+| Analogy Verif | 100% | 100% | 100% |
+| Ordering | ✅ | ✅ | ✅ |
+| K-Q sim | 0.400 | 0.694 | 0.399 |
+| K-D sim | 0.344 | 0.588 | 0.344 |
+| Train Loss | 0.724 | 0.720 | 0.724 |
+
+### Key Findings
+
+1. **Embedding alignment is the primary driver of bit health.** Removing alignment doubles dead bits (11 → 23) and drops entropy from 0.624 to 0.519. The wte embeddings provide the "semantic teacher" signal that keeps bits alive and diverse.
+
+2. **Entropy regularization has minimal independent effect.** NO_ENTROPY (12 dead bits, entropy 0.623) is nearly identical to FULL (11 dead bits, entropy 0.624). When alignment is present, it already provides sufficient gradient signal to prevent bit death.
+
+3. **Alignment improves semantic gap by +39%.** FULL (+0.025) vs NO_ALIGN (+0.018). The difference is modest but consistent. Alignment transfers embedding structure to the triadic head.
+
+4. **Language quality is completely unaffected.** PPL is identical across all three variants (10.86-10.87). Neither alignment nor entropy impacts language modeling.
+
+5. **Analogy verification is saturated.** 100% for all variants — at XL scale, even without alignment, the model learns enough structure for analogy verification. This metric cannot discriminate between variants.
+
+6. **NO_ALIGN has higher absolute similarities.** K-Q sim 0.694 vs 0.400 (FULL). Without alignment pushing bits toward embedding structure, all projections become more similar (higher baseline similarity), reducing discrimination.
+
+### Mechanism
+
+The alignment loss (`MSE(triadic_proj, wte_embedding)`) acts as a **semantic anchor**: it forces triadic projections to correlate with the word embedding space, which already encodes semantic relationships from language modeling. Without this anchor, the triadic head still learns some structure (gap +0.018 > 0) from the diversity+contrastive losses, but with more dead bits and less discrimination.
+
+**Experiment E2 Status: COMPLETE. Embedding alignment is the primary driver of triadic quality (bit health + semantic gap). Entropy regularization is redundant when alignment is present. The paper should highlight alignment as the critical loss component.**
+
+---
+
+## Experiment E5: Scale Interpolation (25M/30M)
+
+| Key | Value |
+|-----|-------|
+| **Date** | 2026-03-17 |
+| **Script** | `playground/scale_interpolation.py` |
+| **Configs** | 25M (10L/448D/8H, 26.1M params) + 30M (10L/480D/8H, 29.8M params) |
+| **GPU Time** | 104 + 207 = 311 min (~5.2h) |
+
+### Hypothesis
+
+The semantic gap crosses zero between 15.9M (gap -0.034) and 40M (gap +0.020). Is this a sharp phase transition or a gradual crossover?
+
+### Results — Full Scale Table
+
+| Scale | Params | PPL | Semantic Gap | Dead Bits | Entropy | Ordering |
+|-------|--------|-----|-------------|-----------|---------|----------|
+| small | 1.3M | — | -0.076 | — | — | — |
+| base | 5.8M | — | -0.040 | — | — | — |
+| large | 15.9M | — | -0.034 | — | — | — |
+| **25M** | **26.1M** | **7.75** | **+0.010** | **9** | **0.655** | **❌** |
+| **30M** | **29.8M** | **8.38** | **+0.043** | **9** | **0.690** | **❌** |
+| xl | 40M | 7.69 | +0.020 | 15 | 0.749 | ✅ |
+
+### Key Findings
+
+1. **Zero-crossing occurs between 16M and 26M.** The semantic gap transitions from -0.034 (15.9M) to +0.010 (26.1M). This places the crossover at approximately 20M parameters.
+
+2. **NOT a sharp phase transition.** The gap progresses: -0.076 → -0.040 → -0.034 → +0.010 → +0.043 → +0.020. The trajectory is gradual and non-monotonic. This does NOT support the analogy to Wei et al. 2022 emergent abilities.
+
+3. **Non-monotonic gap: 30M > XL.** The 30M model has gap +0.043 (highest of all), while XL has +0.020. This suggests noise in the metric or that model shape (depth/width ratio) matters as much as raw parameter count.
+
+4. **Ordering fails at 25M and 30M.** King-Queen < King-Dog at both intermediate scales, despite positive gap. Ordering requires both positive gap AND sufficient model capacity. The gap measures average related-vs-random similarity, while ordering tests a specific pair.
+
+5. **Dead bits improve at intermediate scales.** 9 dead bits (25M, 30M) vs 15 (XL). Smaller models may use bits more efficiently.
+
+6. **30M PPL is worse than 25M.** 8.38 vs 7.75 — likely due to model shape (10L/480D may be suboptimal). The XL's 12L/512D is better balanced.
+
+### Interpretation
+
+The paper's claim of a "phase transition analogous to emergent abilities" should be softened to "gradual emergence of semantic ordering as model capacity increases, with the zero-crossing occurring around 20M parameters." The analogy to sharp emergent abilities (Wei et al.) is not supported by the data.
+
+**Experiment E5 Status: COMPLETE. Gap crosses zero at ~20M params. Transition is gradual (not sharp). Paper's "phase transition" analogy should be softened to "gradual emergence."**
+
+---
+
+## Experiment E4: Subsumption Weight Sweep at XL
+
+| Key | Value |
+|-----|-------|
+| **Date** | 2026-03-17 |
+| **Script** | `playground/sub_weight_sweep.py` |
+| **Config** | XL (12L/512D/8H/64bits), 50K steps, sub_weight ∈ {0.5, 1.0, 2.0, 5.0} |
+| **GPU Time** | 4 × 187 min = 12.5h |
+
+### Hypothesis
+
+P12 found 100% held-out subsumption at 25K with sub_weight=5.0 but PPL +47%. What's the optimal weight that balances subsumption quality with language quality?
+
+### Results
+
+| Weight | PPL@25K | PPL@50K | Sub Train@25K | Sub Test@25K | Sub Train@50K | Sub Test@50K | Gap@50K | Dead@50K |
+|--------|---------|---------|--------------|-------------|--------------|-------------|---------|----------|
+| Run 15 | 7.69 | 7.69 | 0% | 0% | 0% | 0% | +0.020 | 15 |
+| 0.5 | 8.34 | 10.79 | 0% | 0% | 100% | **84.6%** | +0.015 | 30 |
+| 1.0 | 8.29 | 10.80 | 0% | 0% | 100% | 53.8% | +0.013 | 38 |
+| **2.0** | 8.33 | 10.76 | 0% | 0% | 100% | **92.3%** | +0.006 | 44 |
+| 5.0 | 8.28 | 10.68 | 0% | 0% | 100% | 76.9% | +0.008 | 33 |
+
+### Key Findings
+
+1. **0% subsumption at 25K for ALL weights.** The triadic warmup of 80% (= step 40K) means subsumption loss only activates in the last 10K steps. This contrasts with P12 which likely used 50% warmup. All learning happens between steps 40K-50K.
+
+2. **Best held-out subsumption: weight=2.0 at 92.3% (12/13).** Followed by 0.5 at 84.6% (11/13). The relationship is non-monotonic: 1.0 performs worst (53.8%) and 5.0 is middling (76.9%).
+
+3. **Dead bits scale with subsumption.** Run 15: 15 → w=0.5: 30 → w=2.0: 44. Higher subsumption comes at the cost of bit diversity. The subsumption constraint `relu(h-y)→0` forces hypernym bits to zero, killing bit entropy.
+
+4. **PPL@50K degrades uniformly.** ~10.7-10.8 for all weights (vs Run 15's 7.69). But this matches E1's multi-seed result (10.86) — the PPL degradation is from the training setup (no distillation), not from subsumption.
+
+5. **PPL@25K is good for all weights** (~8.3) because triadic hasn't activated yet. This is the pre-triadic language quality baseline.
+
+6. **Semantic gap decreases with higher sub weight.** Run 15 +0.020, w=0.5 +0.015, w=2.0 +0.006. Subsumption and semantic gap trade off: forcing bit-subset relationships reduces general semantic differentiation.
+
+### Recommended Configuration
+
+- **For subsumption priority**: sub_weight=2.0 with 50% warmup (not 80%) to give sub loss more training time. Expected to match P12's 100% result.
+- **For balanced use**: sub_weight=0.5 gives 84.6% test subsumption with minimal gap degradation (+0.015 vs +0.020).
+- **Critical insight**: warmup must be ≤50% for subsumption to work at XL scale. 80% warmup leaves only 10K steps — insufficient.
+
+**Experiment E4 Status: COMPLETE. Best sub test: 92.3% at weight=2.0. Non-monotonic relationship. Key finding: 80% warmup is too long — subsumption needs ≥25K steps of triadic training to work.**

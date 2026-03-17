@@ -17,8 +17,16 @@
 | Domain separation | 1.21 (sentence-level) |
 | Dead bits | ~15 / 64 |
 | Subsumption | **100% held-out @ k=64** (with sub loss, 25K early stop) |
+| 7×7 Concept GPT | **86.2% primary acc** (49 bits, XL, 0 dead bits) |
 | Paper | 16+ paginas, compilado (Exp 12 added) |
-| Experimentos completados | 12 (29+ runs) |
+| Experimentos completados | 22 (15 playground + 7 validation E1-E7) |
+| Multi-seed validation | Gap +0.038 ± 0.005, 100% analogy, reproducible (E1) |
+| Analogy verification (51 quads) | **98.0%** (revised up from 69.2%) (E3) |
+| Compression claim | **NOT supported** — both repr near-random for classification (E6) |
+| Alignment is THE driver | 2x dead bits without it, entropy reg redundant (E2) |
+| Scale crossover | ~20M params, gradual (not sharp phase transition) (E5) |
+| R3 at low k | Alive (no collapse) but destroys semantic gap (E7) |
+| Sub weight sweep | Best 92.3% @ w=2.0, warmup ≤50% critical (E4) |
 
 El proyecto esta maduro. Lo que sigue son ideas de frontera, muchas inspiradas
 por *La Danza Cosmica de los Opuestos*.
@@ -240,8 +248,41 @@ financiero) hasta que aparece "dinero" o "sentarse".
 | XL2 | Sigmoid+Anneal (temp=5) | alto | alto | ~3h | **P3** | pendiente |
 | XL-Sub | XL Subsumption Loss | **muy alto** | alto | ~9h | **P1** | ✅ DONE ⭐ (100% held-out @25K) |
 | P14 | Concept Head (Phase 4) | alto | medio | ~1min | **P2** | ✅ DONE (negativo — embeddings insuficientes) |
-| 1.3 | Concept GPT (49-bit e2e) | muy alto | muy alto | ~10h | **P4** | pendiente (next step for 7×7) |
+| 1.3 | Concept GPT (49-bit e2e) | muy alto | muy alto | ~2h | **P1** | ✅ DONE ⭐⭐ 86.2% acc, 0 dead bits |
 | 7.1 | Cross-Dataset Eval | medio | medio | ~2min | **P4** | ✅ DONE (expected OOD degradation) |
+| **E1** | Multi-Seed Validation (3 seeds) | **critico** | alto | ~7h | **P0** | ✅ DONE — gap +0.038 ± 0.005 |
+| **E2** | Alignment Ablation | **alto** | alto | ~7h | **P1** | ✅ DONE — alignment is driver |
+| **E3** | Expanded Analogy (51 quads) | **alto** | 0 | 0 | **P0** | ✅ DONE — 98% verification |
+| **E4** | Sub Weight Sweep (XL, 80% warmup) | alto | muy alto | ~12h | **P2** | ✅ DONE — comprometido por warmup 80% |
+| **E4b** | Sub Weight Sweep (XL, **50% warmup**) | **critico** | muy alto | ~12h | **P1** | 🔄 EN CURSO — smoke test w=2.0 |
+| **E5** | Scale Interpolation (25M/30M) | alto | alto | ~5h | **P1** | ✅ DONE — crossover ~20M |
+| **E6** | Compression Benchmark | **alto** | 0 | 0 | **P0** | ✅ DONE — claim NOT supported |
+| **E7** | R3 at Low k (6/8/12) | medio | bajo | ~45m | **P2** | ✅ DONE — alive but kills gap |
+
+---
+
+## Bugs y re-tests pendientes (2026-03-17)
+
+Los siguientes scripts tienen bugs identificados. Los resultados originales estan
+documentados en `experiment_log.md` y `playground/results/` pero necesitan corregirse
+y re-ejecutarse para resultados definitivos.
+
+| Script | Bug | Impacto | Accion |
+|--------|-----|---------|--------|
+| `alignment_ablation.py` | L606: `f"{val:>14{fmt}}"` crash en aggregate | Solo afecta el print final, los 3 JSONs individuales estan bien | Fix formato, re-correr `--aggregate-only` |
+| `alignment_ablation.py` | Warmup 80% = triadic activa en 40K, solo 10K steps activos | Resultados validos pero sub-optimos | Considerar re-run con 50% warmup (~7h) |
+| `sub_weight_sweep.py` | Warmup 80% = 0% sub @25K para todos los pesos | **Resultados comprometidos** | **Re-correr con `--warmup-pct 0.50`** (~12h) ← EN CURSO |
+| `sub_weight_sweep.py` | "castle" en train Y test | Data leak menor (1 palabra) | Ya corregido (reemplazado por "park") |
+| `subsumption_loss.py` | "castle" en train Y test (mismo leak) | P6 base ya corrio, resultados documentados | Fix para consistencia |
+| `r3_low_k.py` | Palabras compartidas train/test (father, mother, etc.) | E7 ya corrio. Leak moderado — mismas PALABRAS pero diferentes RELACIONES | Fix si se re-ejecuta |
+| `xl_sigmoid_anneal.py` | PPL +116% (overfitting con temp=10) | Resultado negativo documentado | Re-run con `--final-temp 5.0` (~76 min) |
+
+### Prioridad de re-tests
+
+1. **E4b** — Sub weight sweep con 50% warmup (~12h) ← **PROXIMO**
+2. **XL2** — Sigmoid+anneal con temp=5 (~76 min) — rapido, vale la pena
+3. **E2b** — Alignment ablation con 50% warmup (~7h) — si E4b mejora
+4. **E7** — R3 low k con test words limpias (~45 min) — bajo impacto
 
 ---
 

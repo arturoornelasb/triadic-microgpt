@@ -1,0 +1,30 @@
+{
+  "variant": "no_align",
+  "description": "No embedding alignment (align=0)",
+  "align_weight": 0.0,
+  "entropy_weight": 1.0,
+  "alpha": 0.05,
+  "seed": 42,
+  "ppl": 10.87256158905592,
+  "avg_loss": 2.3862423301372977,
+  "final_train_loss": 0.719915509223938,
+  "training_time_min": 145.32612094481786,
+  "total_params": 40035328,
+  "config": "12L/512D/8H/64bits",
+  "samples": [
+    "Once upon a time, there was a little girl named Lily. She loved to play with her toys and her favorite toy was a teddy b",
+    "Once upon a time, there was a little girl named Lily. She loved to play with her toys all day long. One day, she found a",
+    "Once upon a time, there was a little girl named Lily. She loved to play with her toys and her favorite was a big, red ba"
+  ],
+  "semantic_gap": 0.018331394093208053,
+  "mean_related_sim": 0.7397889115798759,
+  "mean_random_sim": 0.7214575174866679,
+  "analogy_verification": 1.0,
+  "analogy_correct": 13,
+  "analogy_total": 13,
+  "dead_bits": 23,
+  "mean_entropy": 0.5186817969933408,
+  "ordering_correct": true,
+  "king_queen_sim": 0.693564338475448,
+  "king_dog_sim": 0.5884513390488003
+}

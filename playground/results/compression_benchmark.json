@@ -1,0 +1,127 @@
+{
+  "experiment": "E6_compression_benchmark",
+  "checkpoint": "C:\\Github\\triadic-microgpt\\checkpoints\\torch_run15_strongalign\\model_L12_D512_B64_best.pt",
+  "model_config": "12L/512D/8H/64bits",
+  "n_words": 128,
+  "n_categories": 9,
+  "compression_ratio": 8.0,
+  "random_baseline": 0.1111111111111111,
+  "task_A_centroid": {
+    "triadic_accuracy": 0.1328125,
+    "embedding_accuracy": 0.1640625
+  },
+  "task_B_similarity_ranking": {
+    "spearman_rho": 0.397862446561164,
+    "n_pairs": 200
+  },
+  "task_C_separation": {
+    "triadic_overall": 1.0096995211205717,
+    "embedding_overall": 1.0040981787177448,
+    "triadic_per_category": {
+      "actions": {
+        "intra": 0.580356240272522,
+        "inter": 0.5795808434486389,
+        "ratio": 1.0013378579237873
+      },
+      "animals": {
+        "intra": 0.6033511757850647,
+        "inter": 0.5851724147796631,
+        "ratio": 1.0310656492791899
+      },
+      "body": {
+        "intra": 0.5837526321411133,
+        "inter": 0.5639458298683167,
+        "ratio": 1.035121817067823
+      },
+      "colors": {
+        "intra": 0.5920143723487854,
+        "inter": 0.5826102495193481,
+        "ratio": 1.0161413618061057
+      },
+      "emotions": {
+        "intra": 0.5591856241226196,
+        "inter": 0.5664390921592712,
+        "ratio": 0.9871946196209705
+      },
+      "food": {
+        "intra": 0.5964183807373047,
+        "inter": 0.5701547265052795,
+        "ratio": 1.0460640822764133
+      },
+      "home": {
+        "intra": 0.5756191611289978,
+        "inter": 0.5744708776473999,
+        "ratio": 1.0019988541217275
+      },
+      "nature": {
+        "intra": 0.5644878149032593,
+        "inter": 0.5672369599342346,
+        "ratio": 0.9951534451646203
+      },
+      "people": {
+        "intra": 0.541127622127533,
+        "inter": 0.5594741106033325,
+        "ratio": 0.9672076184972798
+      }
+    },
+    "embedding_per_category": {
+      "actions": {
+        "intra": 0.5110620856285095,
+        "inter": 0.5012871026992798,
+        "ratio": 1.0194997694466792
+      },
+      "animals": {
+        "intra": 0.49595215916633606,
+        "inter": 0.49806642532348633,
+        "ratio": 0.9957550518371578
+      },
+      "body": {
+        "intra": 0.46845924854278564,
+        "inter": 0.4767966866493225,
+        "ratio": 0.9825136408452667
+      },
+      "colors": {
+        "intra": 0.5178192257881165,
+        "inter": 0.5024158954620361,
+        "ratio": 1.0306585250689868
+      },
+      "emotions": {
+        "intra": 0.49708855152130127,
+        "inter": 0.4989624321460724,
+        "ratio": 0.9962444454651397
+      },
+      "food": {
+        "intra": 0.5270600318908691,
+        "inter": 0.5036585927009583,
+        "ratio": 1.0464629007209358
+      },
+      "home": {
+        "intra": 0.4759799838066101,
+        "inter": 0.4860908091068268,
+        "ratio": 0.9791997192483541
+      },
+      "nature": {
+        "intra": 0.47563982009887695,
+        "inter": 0.48616427183151245,
+        "ratio": 0.9783520666934511
+      },
+      "people": {
+        "intra": 0.508184015750885,
+        "inter": 0.4977858066558838,
+        "ratio": 1.0208889224159607
+      }
+    }
+  },
+  "task_D_knn": {
+    "triadic_accuracy": 0.1171875,
+    "embedding_accuracy": 0.0859375,
+    "k": 3
+  },
+  "summary": {
+    "triadic_above_random": false,
+    "embedding_above_random": false,
+    "centroid_retention": 0.8095238095238095,
+    "knn_retention": 1.3636363636363635,
+    "similarity_preserved": false
+  }
+}

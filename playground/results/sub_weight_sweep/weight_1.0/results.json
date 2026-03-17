@@ -1,0 +1,43 @@
+{
+  "experiment": "sub_weight_sweep",
+  "sub_weight": 1.0,
+  "config": "12L/512D/8H/64bits (XL, 40M params)",
+  "steps": 50000,
+  "batch_size": 64,
+  "block_size": 256,
+  "alpha": 0.05,
+  "entropy_weight": 1.0,
+  "align_weight": 5.0,
+  "warmup_pct": 0.8,
+  "training_time_min": 187.16722954114277,
+  "total_params": 40035328,
+  "best_lang_loss": 0.7583944797515869,
+  "eval_25k": {
+    "ppl": 8.285657387074101,
+    "avg_loss": 2.114525994390264,
+    "semantic_gap": 0.023810058155885105,
+    "mean_bit_entropy": 0.5228192660904977,
+    "dead_bits": 20,
+    "active_bits": 44,
+    "sub_train_rate": 0.0,
+    "sub_train_inheritance": 0.7960897530499803,
+    "sub_train_n": 44,
+    "sub_test_rate": 0.0,
+    "sub_test_inheritance": 0.8108417317976142,
+    "sub_test_n": 13
+  },
+  "eval_50k": {
+    "ppl": 10.795725151707911,
+    "avg_loss": 2.3791502364867383,
+    "semantic_gap": 0.01306676839406673,
+    "mean_bit_entropy": 0.3171813486966173,
+    "dead_bits": 38,
+    "active_bits": 26,
+    "sub_train_rate": 1.0,
+    "sub_train_inheritance": 1.0,
+    "sub_train_n": 44,
+    "sub_test_rate": 0.5384615384615384,
+    "sub_test_inheritance": 0.9498520710059173,
+    "sub_test_n": 13
+  }
+}
