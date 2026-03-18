@@ -180,6 +180,13 @@ class TriadicGPT(nn.Module):
         self.triadic_head.weight.copy_(pca_weights)
         print("Triadic head initialized with PCA components.")
 
+    def gradient_checkpointing_enable(self):
+        """Enable gradient checkpointing to trade compute for VRAM."""
+        self._gradient_checkpointing = True
+
+    def gradient_checkpointing_disable(self):
+        self._gradient_checkpointing = False
+
     def forward(self, input_ids, targets=None):
         """
         Forward pass.
@@ -204,7 +211,10 @@ class TriadicGPT(nn.Module):
 
         # Transformer blocks
         for block in self.blocks:
-            x = block(x)
+            if getattr(self, '_gradient_checkpointing', False) and self.training:
+                x = torch.utils.checkpoint.checkpoint(block, x, use_reentrant=False)
+            else:
+                x = block(x)
         x = self.ln_f(x)                    # (B, T, n_embd)
 
         # LM Head

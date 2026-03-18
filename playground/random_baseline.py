@@ -94,7 +94,9 @@ def train_model(model, tokenizer, all_tokens, device, label, use_triadic=True):
         [p for p in model.parameters() if p.requires_grad],
         lr=LR, weight_decay=0.01, betas=(0.9, 0.95)
     )
-    scaler = torch.amp.GradScaler('cuda', enabled=(device.type == 'cuda'))
+    amp_dtype = torch.bfloat16
+    use_scaler = False  # bfloat16 doesn't need loss scaling
+    scaler = torch.amp.GradScaler('cuda', enabled=use_scaler)
     triadic_warmup = int(STEPS * TRIADIC_WARMUP_PCT)
 
     model.train()
@@ -120,7 +122,7 @@ def train_model(model, tokenizer, all_tokens, device, label, use_triadic=True):
         for pg in optimizer.param_groups:
             pg['lr'] = lr_t
 
-        with torch.amp.autocast('cuda', enabled=(device.type == 'cuda')):
+        with torch.amp.autocast('cuda', dtype=amp_dtype, enabled=(device.type == 'cuda')):
             logits, triadic_proj, lang_loss = model(x, targets=y)
             total_loss = lang_loss
 

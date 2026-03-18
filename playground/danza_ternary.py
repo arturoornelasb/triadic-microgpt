@@ -1,18 +1,34 @@
 """
-D-A5/D-A6: Bootstrap Test for 63-Bit Danza Cosmica.
+D-A8: Ternary Triadic Head — BitNet-style {-1, 0, +1} quantization.
 
-Central question: can 24 hand-factorized anchor concepts + algebraic
-constraints PREDICT the bits of 23 held-out concepts?
+Replaces tanh with absmean + STE ternary quantization in the triadic head.
+Inspired by BitNet b1.58 (Ma et al., 2024): every projection value is
+constrained to exactly {-1, 0, +1}, giving three semantic states:
 
-D-A5: Train with 24 anchors, predict 23 holdout algebraically.
-D-A6: Iterative bootstrap loop with confidence gating.
+    -1 = ausencia  (active negation — the concept explicitly excludes this primitive)
+     0 = vacio     (not applicable — the dimension is irrelevant)
+    +1 = presencia (the primitive is actively present)
+
+This is a direct extension of D-A5 (danza_bootstrap.py): same 24/23 split,
+same analogy quads, same losses. The ONLY architectural change is the
+activation function on the triadic head output.
+
+Key hypothesis:
+    - Zero becomes a real semantic state instead of a dead-bit failure mode
+    - Each concept gains 58% more info capacity (63 ternary trits = 99.5 bits)
+    - Natural ~40% zero rate should emerge (matching BitNet's 42.3%)
+    - Dead bits should decrease (model can intentionally output 0)
+
+Note on gold labels: anclas.json uses binary {-1, +1} targets. MSE loss
+still works since ternary output can approximate those targets (the model
+will learn to avoid 0 for bits that should be strongly +/-1). Future work
+could introduce ternary gold labels with explicit 0 for irrelevant primitives.
 
 Usage:
-  python playground/danza_bootstrap.py --phase split                     # show split
-  python playground/danza_bootstrap.py --phase train --scale xl --steps 50000  # ~76 min
-  python playground/danza_bootstrap.py --phase predict --checkpoint checkpoints/danza_bootstrap_xl/
-  python playground/danza_bootstrap.py --phase bootstrap --scale xl --steps 50000 --cycles 3
-  python playground/danza_bootstrap.py --phase all --scale xl --steps 50000    # train+predict
+  python playground/danza_ternary.py --phase split
+  python playground/danza_ternary.py --phase train --scale xl --steps 50000
+  python playground/danza_ternary.py --phase predict --checkpoint checkpoints/danza_ternary_xl/
+  python playground/danza_ternary.py --phase all --scale xl --steps 50000
 """
 
 import os
@@ -43,196 +59,215 @@ from danza_63bit import (
     ANCHOR_TRANSLATIONS, SKIP_ANCHORS,
     N_BITS, STORY_SEPARATOR,
 )
-from src.torch_transformer import TriadicGPTConfig
+from src.torch_transformer import TriadicGPT, TriadicGPTConfig
 try:
     from src.fast_tokenizer import FastBPETokenizer as BPETokenizer
 except ImportError:
     from src.tokenizer import BPETokenizer
 
-
-# ============================================================
-# Strategic Split (deterministic, pre-registered)
-# ============================================================
-
-# 24 Spanish concepts for TRAINING.
-# Chosen to provide 3-of-4 in as many analogy quads as possible,
-# maximizing algebraic reachability of holdout concepts.
-TRAIN_CONCEPTS = {
-    # Gender axis anchors (both poles + king for queen prediction)
-    'hombre', 'mujer', 'rey',
-    # Temperature (both poles for cold:hot transform)
-    'caliente', 'frío',
-    # Emotion (3 of 4 for happy:sad=love:hate)
-    'feliz', 'triste', 'amor',
-    # Freedom axis (3 of 4 for open:close=free:prisoner)
-    'abrir', 'cerrar', 'libre',
-    # Intensity high poles (template for mas/menos predictions)
-    'brillante', 'ruidoso', 'rápido', 'dulce', 'rico', 'orgulloso',
-    # Knowledge/thinking (one pole each)
-    'enseñar', 'sabio', 'creativo',
-    # Moral + vitality (one pole each)
-    'bueno', 'vivo',
-    # Material + light (needed for bright:dark template)
-    'sólido', 'oscuro',
-}
-
-# Holdout concepts with reachability classification.
-# R3 = reachable via regla de tres, CTRL = control (no algebraic path).
-HOLDOUT_INFO = {
-    'reina':          ('R3',   'man:woman=king:queen'),
-    'odio':           ('R3',   'happy:sad=love:hate'),
-    'preso':          ('R3',   'open:close=free:prisoner'),
-    'silencioso':     ('R3',   'hot:cold=loud:quiet'),
-    'líquido':        ('R3',   'man:woman=solid:liquid (tierra-agua)'),
-    'lógico':         ('R3',   'hot:cold=creative:logical (fuego-tierra)'),
-    'lento':          ('R3',   'bright:dark=fast:slow (mas-menos)'),
-    'pobre':          ('R3',   'bright:dark=rich:poor'),
-    'amargo':         ('R3',   'bright:dark=sweet:bitter'),
-    'humilde':        ('R3',   'bright:dark=proud:humble'),
-    'malo':           ('R3',   'happy:sad=good:bad'),
-    'muerto':         ('R3',   'happy:sad=alive:dead'),
-    'aprender':       ('R3',   'open:close=teach:learn'),
-    'ignorante':      ('R3',   'hot:cold=wise:ignorant'),
-    # Controls — no clear algebraic path from training concepts
-    'luna':           ('CTRL', 'no algebraic path'),
-    'sol':            ('CTRL', 'no algebraic path'),
-    'indiferencia':   ('CTRL', 'no algebraic path'),
-    'gaseoso':        ('CTRL', 'no algebraic path'),
-    'inmóvil':        ('CTRL', 'no algebraic path'),
-    'oscuridad':      ('CTRL', 'no algebraic path'),
-    'orden_concepto': ('CTRL', 'no algebraic path'),
-    'caos_concepto':  ('CTRL', 'no algebraic path'),
-    'apatía':         ('CTRL', 'no algebraic path'),
-}
-
-# Analogy quads for prediction.
-# (A, B, C, D_holdout) — predict D = C + (B - A) in neural projection space.
-# A, B, C must map to TRAIN concepts; D must map to HOLDOUT.
-BOOTSTRAP_QUADS = [
-    # --- Exact axis matches ---
-    ('man', 'woman', 'king', 'queen'),          # tierra<->agua
-    ('happy', 'sad', 'love', 'hate'),            # placer<->dolor + union<->separacion
-    ('open', 'close', 'free', 'prisoner'),       # libertad<->control + sep<->union
-    ('man', 'woman', 'solid', 'liquid'),          # tierra<->agua (same as gender)
-    ('hot', 'cold', 'creative', 'logical'),       # fuego<->tierra + caos<->orden
-
-    # --- Partial axis (share primary component) ---
-    ('hot', 'cold', 'loud', 'quiet'),             # partial: includes orden<->caos
-    ('bright', 'dark', 'loud', 'quiet'),          # partial: mas<->menos component
-
-    # --- Approximate mas<->menos (bright:dark as template) ---
-    ('bright', 'dark', 'fast', 'slow'),
-    ('bright', 'dark', 'rich', 'poor'),
-    ('bright', 'dark', 'sweet', 'bitter'),
-    ('bright', 'dark', 'proud', 'humble'),
-
-    # --- Approximate valence (happy:sad as template) ---
-    ('happy', 'sad', 'good', 'bad'),              # positive<->negative
-    ('happy', 'sad', 'alive', 'dead'),             # very approximate
-
-    # --- Approximate action direction ---
-    ('open', 'close', 'teach', 'learn'),           # transmit<->receive
-
-    # --- Knowledge reduction ---
-    ('hot', 'cold', 'wise', 'ignorant'),           # structured<->empty (approximate)
-]
-
-
-def get_split(all_anchors):
-    """Split anchors into train/holdout dicts by Spanish concept."""
-    train_anchors = {}
-    holdout_anchors = {}
-    for eng_word, data in all_anchors.items():
-        spanish = data['spanish']
-        if spanish in TRAIN_CONCEPTS:
-            train_anchors[eng_word] = data
-        elif spanish in HOLDOUT_INFO:
-            holdout_anchors[eng_word] = data
-    return train_anchors, holdout_anchors
-
-
-def get_holdout_type(eng_word, all_anchors):
-    """Return ('R3'|'CTRL', description) for a holdout English word."""
-    spanish = all_anchors[eng_word]['spanish']
-    return HOLDOUT_INFO.get(spanish, ('CTRL', 'unknown'))
+# Reuse the strategic split and quads from danza_bootstrap
+from danza_bootstrap import (
+    TRAIN_CONCEPTS, HOLDOUT_INFO, BOOTSTRAP_QUADS,
+    get_split, get_holdout_type, phase_split,
+    build_partial_subsumption_pairs,
+)
 
 
 # ============================================================
-# Phase: split — display and validate
+# Ternary quantization — two modes for A/B testing
 # ============================================================
 
-def phase_split(all_anchors, prim_data):
-    """Show the strategic split and validate reachability."""
-    train_a, holdout_a = get_split(all_anchors)
+def ternary_quantize_absmean(x):
+    """Absmean quantization to {-1, 0, +1} with STE (BitNet b1.58 style).
 
-    print(f"\n{'=' * 70}")
-    print(f"  STRATEGIC SPLIT — D-A5 Bootstrap Test")
-    print(f"{'=' * 70}")
-    print(f"  Train:   {len(TRAIN_CONCEPTS)} Spanish concepts -> {len(train_a)} English words")
-    print(f"  Holdout: {len(HOLDOUT_INFO)} Spanish concepts -> {len(holdout_a)} English words")
+    Algorithm (from BitNet b1.58):
+        1. Compute per-row absmean scale: gamma = mean(|x|) per last dim
+        2. Scale: x_scaled = x / gamma
+        3. Round + clamp to {-1, 0, +1}
+        4. STE: forward uses quantized values, backward uses identity
 
-    n_r3 = sum(1 for v in HOLDOUT_INFO.values() if v[0] == 'R3')
-    n_ctrl = sum(1 for v in HOLDOUT_INFO.values() if v[0] == 'CTRL')
-    print(f"  Reachable (R3): {n_r3}  |  Controls: {n_ctrl}")
+    The division by gamma centers the distribution so that round()
+    naturally produces a balanced mix of -1, 0, +1. Empirically,
+    BitNet sees ~42.3% zeros — we expect a similar natural zero rate.
+    """
+    gamma = x.abs().mean(dim=-1, keepdim=True) + 1e-8
+    x_scaled = x / gamma
+    x_q = x_scaled.round().clamp(-1, 1)
+    return x + (x_q - x).detach()  # STE: forward=quantized, backward=identity
 
-    print(f"\n  TRAIN concepts:")
-    for sp in sorted(TRAIN_CONCEPTS):
-        words = ANCHOR_TRANSLATIONS.get(sp, [])
-        print(f"    {sp:20s} -> {', '.join(words)}")
 
-    print(f"\n  HOLDOUT concepts:")
-    for sp, (rtype, desc) in sorted(HOLDOUT_INFO.items()):
-        words = ANCHOR_TRANSLATIONS.get(sp, [])
-        tag = 'R3  ' if rtype == 'R3' else 'CTRL'
-        print(f"    [{tag}] {sp:20s} -> {', '.join(words):20s}  ({desc})")
+def ternary_quantize_fsq(x):
+    """FSQ-style ternary quantization {-1, 0, +1} with iFSQ activation fix.
 
-    # Validate quads
-    print(f"\n  ANALOGY QUADS ({len(BOOTSTRAP_QUADS)}):")
-    for a, b, c, d in BOOTSTRAP_QUADS:
-        a_ok = a in train_a
-        b_ok = b in train_a
-        c_ok = c in train_a
-        d_ok = d in holdout_a
-        status = 'OK' if (a_ok and b_ok and c_ok and d_ok) else 'ERR'
-        print(f"    [{status}] {a}:{b} = {c}:{d}")
+    Uses 2*sigmoid(1.6*x) - 1 instead of tanh(x) for bounding.
+    iFSQ (Tencent, 2025) showed tanh concentrates values near 0,
+    causing dead bits. sigmoid(1.6*x) has a flatter middle region,
+    distributing activations uniformly across quantization bins.
 
-    # Check completeness
-    all_sp = set(ANCHOR_TRANSLATIONS.keys())
-    covered = TRAIN_CONCEPTS | set(HOLDOUT_INFO.keys())
-    missing = all_sp - covered
-    if missing:
-        print(f"\n  WARNING: {len(missing)} concepts not in either set: {missing}")
-    extra = covered - all_sp
-    if extra:
-        print(f"\n  WARNING: {len(extra)} concepts not in ANCHOR_TRANSLATIONS: {extra}")
+    STE: forward uses quantized values, backward passes through.
+    """
+    z_bounded = 2 * torch.sigmoid(1.6 * x) - 1  # iFSQ fix: uniform bin utilization
+    z_q = z_bounded.round().clamp(-1, 1)          # snap to {-1, 0, +1}
+    return z_bounded + (z_q - z_bounded).detach()  # STE
 
-    return train_a, holdout_a
+
+# Legacy alias for backward compatibility
+ternary_quantize = ternary_quantize_absmean
 
 
 # ============================================================
-# Training (mirrors danza_63bit.py with partial anchors)
+# Ternary model
 # ============================================================
 
-def build_partial_subsumption_pairs(anchors):
-    """Build subsumption pairs from the given anchor subset only."""
-    items = list(anchors.items())
-    pairs = []
-    for i, (w_a, d_a) in enumerate(items):
-        bits_a = set(d_a['expanded'])
-        for j, (w_b, d_b) in enumerate(items):
-            if i == j:
-                continue
-            bits_b = set(d_b['expanded'])
-            if bits_a < bits_b:
-                pairs.append((w_a, w_b, d_a, d_b))
-    random.seed(42)
-    random.shuffle(pairs)
-    n_test = max(1, int(len(pairs) * 0.2))
-    return pairs[n_test:], pairs[:n_test]
+class TernaryDanzaGPT(TriadicGPT):
+    """TriadicGPT with ternary {-1, 0, +1} triadic head.
+
+    Identical to DanzaTriadicGPT except the triadic head uses
+    ternary quantization instead of torch.tanh. All other architecture
+    (embeddings, transformer blocks, LM head) is unchanged.
+
+    Supports two quantization modes for A/B testing:
+        - 'fsq':     iFSQ sigmoid-based bounding (default)
+        - 'absmean': BitNet absmean + STE
+    """
+
+    def __init__(self, config, quantize_mode='fsq'):
+        super().__init__(config)
+        self.quantize_mode = quantize_mode
+
+    def gradient_checkpointing_enable(self):
+        """Enable gradient checkpointing to reduce VRAM at cost of ~33% speed."""
+        self._grad_checkpoint = True
+
+    def forward(self, input_ids, targets=None):
+        B, T = input_ids.shape
+        assert T <= self.config.block_size
+
+        pos = torch.arange(0, T, dtype=torch.long, device=input_ids.device)
+        tok_emb = self.wte(input_ids)
+        pos_emb = self.wpe(pos)
+        x = self.drop(tok_emb + pos_emb)
+
+        for block in self.blocks:
+            if getattr(self, '_grad_checkpoint', False) and self.training:
+                x = torch.utils.checkpoint.checkpoint(block, x, use_reentrant=False)
+            else:
+                x = block(x)
+        x = self.ln_f(x)
+
+        logits = self.lm_head(x)
+
+        # --- THE KEY CHANGE: ternary instead of tanh ---
+        if self.quantize_mode == 'fsq':
+            triadic_proj = ternary_quantize_fsq(self.triadic_head(x))
+        elif self.quantize_mode == 'absmean':
+            triadic_proj = ternary_quantize_absmean(self.triadic_head(x))
+
+        loss = None
+        if targets is not None:
+            loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
+
+        return logits, triadic_proj, loss
 
 
-def run_training(args, train_anchors, holdout_anchors, prim_data, ckpt_dir, cycle=0):
-    """Train DanzaTriadicGPT with partial anchor supervision. Returns (model, tokenizer, device)."""
+# ============================================================
+# Ternary-specific metrics
+# ============================================================
+
+@torch.no_grad()
+def compute_ternary_stats(model, word_tensors):
+    """Compute ternary distribution and zero rate from anchor projections.
+
+    Returns:
+        zero_rate: fraction of projection values that are exactly 0
+        dist: dict with fractions for -1, 0, +1
+    """
+    if word_tensors.shape[0] == 0:
+        return 0.0, {'neg': 0.0, 'zero': 0.0, 'pos': 0.0}
+
+    was_training = model.training
+    model.eval()
+    _, proj, _ = model(word_tensors)       # (N, T, 63)
+    pred = proj.mean(dim=1)                # (N, 63)
+    model.train(was_training)
+
+    # After ternary_quantize, values are exactly {-1, 0, +1} in forward pass.
+    # But due to STE, the stored tensor may have continuous residuals in
+    # autograd graph. For stats, snap to nearest integer.
+    snapped = pred.round().clamp(-1, 1)
+
+    total = snapped.numel()
+    n_neg = (snapped == -1).sum().item()
+    n_zero = (snapped == 0).sum().item()
+    n_pos = (snapped == 1).sum().item()
+
+    zero_rate = n_zero / total if total > 0 else 0.0
+    dist = {
+        'neg': n_neg / total if total > 0 else 0.0,
+        'zero': n_zero / total if total > 0 else 0.0,
+        'pos': n_pos / total if total > 0 else 0.0,
+    }
+    return zero_rate, dist
+
+
+@torch.no_grad()
+def compute_batch_ternary_stats(proj):
+    """Compute ternary stats from a raw projection batch (no model call).
+
+    Args:
+        proj: (B, T, K) tensor from forward pass
+
+    Returns:
+        zero_rate, dist dict
+    """
+    snapped = proj.round().clamp(-1, 1)
+    total = snapped.numel()
+    if total == 0:
+        return 0.0, {'neg': 0.0, 'zero': 0.0, 'pos': 0.0}
+
+    n_neg = (snapped == -1).sum().item()
+    n_zero = (snapped == 0).sum().item()
+    n_pos = (snapped == 1).sum().item()
+
+    return n_zero / total, {
+        'neg': n_neg / total,
+        'zero': n_zero / total,
+        'pos': n_pos / total,
+    }
+
+
+# ============================================================
+# Progress bar helper
+# ============================================================
+
+def format_progress_bar(step, total, width=30):
+    """Render a text-based progress bar with ETA."""
+    frac = step / total
+    filled = int(width * frac)
+    bar = '#' * filled + '-' * (width - filled)
+    return f"[{bar}] {frac:5.1%}"
+
+
+def format_eta(elapsed, step, total):
+    """Estimate time remaining."""
+    if step == 0:
+        return "??:??"
+    rate = elapsed / step
+    remaining = rate * (total - step)
+    mins = int(remaining // 60)
+    secs = int(remaining % 60)
+    return f"{mins:02d}:{secs:02d}"
+
+
+# ============================================================
+# Training
+# ============================================================
+
+def run_training(args, train_anchors, holdout_anchors, prim_data, ckpt_dir):
+    """Train TernaryDanzaGPT with partial anchor supervision.
+
+    Returns (model, tokenizer, device).
+    """
     SCALES = {
         'base': {'layers': 6,  'dim': 256,  'heads': 8},
         'xl':   {'layers': 12, 'dim': 512,  'heads': 8},
@@ -246,11 +281,14 @@ def run_training(args, train_anchors, holdout_anchors, prim_data, ckpt_dir, cycl
     os.makedirs(ckpt_dir, exist_ok=True)
 
     print(f"\n{'=' * 70}")
-    print(f"  BOOTSTRAP TRAINING — Cycle {cycle}")
+    print(f"  D-A8 TERNARY TRIADIC HEAD — Training")
     print(f"{'=' * 70}")
     print(f"  Device: {device}")
     if device.type == 'cuda':
         print(f"  GPU: {torch.cuda.get_device_name(0)}")
+    qmode = getattr(args, 'quantize_mode', 'fsq')
+    qmode_desc = 'iFSQ sigmoid' if qmode == 'fsq' else 'absmean + STE'
+    print(f"  Activation: ternary_quantize_{qmode} ({qmode_desc}) -> {{-1, 0, +1}}")
     print(f"  Train anchors: {len(train_anchors)} words")
     print(f"  Holdout anchors: {len(holdout_anchors)} words (eval only, NO supervision)")
 
@@ -282,7 +320,7 @@ def run_training(args, train_anchors, holdout_anchors, prim_data, ckpt_dir, cycl
         all_tokens.extend(tokenizer.encode(story, add_special=True))
     print(f"  Total: {len(all_tokens):,} tokens")
 
-    # --- Model ---
+    # --- Model (TERNARY, not tanh) ---
     config = TriadicGPTConfig(
         vocab_size=tokenizer.vocab_size,
         block_size=args.block,
@@ -292,24 +330,38 @@ def run_training(args, train_anchors, holdout_anchors, prim_data, ckpt_dir, cycl
         n_triadic_bits=N_BITS,
         dropout=args.dropout,
     )
-    model = DanzaTriadicGPT(config).to(device)
+    model = TernaryDanzaGPT(config, quantize_mode=qmode).to(device)
     total_params = model.num_params()
-    print(f"  Model: {args.scale} ({total_params/1e6:.1f}M params, {N_BITS} bits)")
+    print(f"  Model: TernaryDanzaGPT {args.scale} ({total_params/1e6:.1f}M params, {N_BITS} ternary trits, quantize={qmode})")
 
     if args.grad_checkpoint:
         model.gradient_checkpointing_enable()
+        print(f"  Gradient checkpointing: ON")
+
     if device.type == 'cuda' and not getattr(args, 'no_compile', False):
         try:
             import triton  # noqa: F401
             model = torch.compile(model)
             print("  torch.compile: ON")
         except ImportError:
-            print("  torch.compile: SKIPPED (triton not available on Windows)")
+            print("  torch.compile: SKIPPED (triton not available)")
 
     # Mixed precision
     use_amp = device.type == 'cuda'
     amp_dtype = {'float32': torch.float32, 'float16': torch.float16,
                  'bfloat16': torch.bfloat16}[args.dtype]
+    if use_amp and amp_dtype != torch.float32:
+        print(f"  Mixed precision: {args.dtype}")
+    else:
+        print(f"  Precision: float32")
+
+    # GradScaler: disabled for bfloat16 (not needed), enabled only for float16
+    use_scaler = use_amp and amp_dtype == torch.float16
+    scaler = torch.amp.GradScaler('cuda') if use_scaler else None
+    if use_scaler:
+        print(f"  GradScaler: ON (float16)")
+    elif use_amp:
+        print(f"  GradScaler: OFF (bfloat16 — no loss scaling needed)")
 
     # --- Pre-encode anchors ---
     def _pack_anchors(anchor_dict):
@@ -368,13 +420,20 @@ def run_training(args, train_anchors, holdout_anchors, prim_data, ckpt_dir, cycl
     csv_path = os.path.join(ckpt_dir, 'training_log.csv')
     csv_file = open(csv_path, 'w', newline='')
     csv_writer = csv.writer(csv_file)
-    csv_writer.writerow(['step', 'loss', 'lang_loss', 'tri_loss', 'sup_loss', 'sub_loss',
-                          'bit_acc_train', 'bit_acc_holdout', 'dead_bits'])
+    csv_writer.writerow([
+        'step', 'loss', 'lang_loss', 'tri_loss', 'sup_loss', 'sub_loss',
+        'bit_acc_train', 'bit_acc_holdout', 'dead_bits',
+        'zero_rate', 'ternary_neg', 'ternary_zero', 'ternary_pos',
+    ])
 
     data_iter = iter(loader)
     t0 = time.time()
     best_train_acc = 0.0
     best_hold_acc = 0.0
+
+    # Running ternary stats (updated every print step)
+    last_zero_rate = 0.0
+    last_ternary_dist = {'neg': 0.33, 'zero': 0.34, 'pos': 0.33}
 
     for step in range(1, args.steps + 1):
         try:
@@ -384,7 +443,7 @@ def run_training(args, train_anchors, holdout_anchors, prim_data, ckpt_dir, cycl
             x, y = next(data_iter)
         x, y = x.to(device), y.to(device)
 
-        # LR schedule
+        # LR schedule: linear warmup + cosine decay
         if step <= warmup_steps:
             lr = args.lr * step / warmup_steps
         else:
@@ -393,7 +452,7 @@ def run_training(args, train_anchors, holdout_anchors, prim_data, ckpt_dir, cycl
         for pg in optimizer.param_groups:
             pg['lr'] = lr
 
-        # Forward
+        # Forward + backward
         if use_amp:
             with torch.amp.autocast('cuda', dtype=amp_dtype):
                 logits, proj, lang_loss = model(x, y)
@@ -404,10 +463,18 @@ def run_training(args, train_anchors, holdout_anchors, prim_data, ckpt_dir, cycl
                     l_sub = subsumption_loss(model, sub_train_h, sub_train_y)
                 total = lang_loss + args.alpha * (
                     l_tri + args.sup_weight * l_sup + args.sub_weight * l_sub)
+
             optimizer.zero_grad(set_to_none=True)
-            total.backward()
-            nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-            optimizer.step()
+            if scaler:  # float16 path
+                scaler.scale(total).backward()
+                scaler.unscale_(optimizer)
+                nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+                scaler.step(optimizer)
+                scaler.update()
+            else:  # bfloat16 or float32 path
+                total.backward()
+                nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+                optimizer.step()
         else:
             logits, proj, lang_loss = model(x, y)
             l_tri = l_sup = l_sub = torch.tensor(0.0, device=device)
@@ -417,20 +484,36 @@ def run_training(args, train_anchors, holdout_anchors, prim_data, ckpt_dir, cycl
                 l_sub = subsumption_loss(model, sub_train_h, sub_train_y)
             total = lang_loss + args.alpha * (
                 l_tri + args.sup_weight * l_sup + args.sub_weight * l_sub)
+
             optimizer.zero_grad(set_to_none=True)
             total.backward()
             nn.utils.clip_grad_norm_(model.parameters(), 1.0)
             optimizer.step()
 
-        # Print
+        # --- Print with progress bar ---
         if step % args.print_every == 0:
             elapsed = time.time() - t0
-            tri_str = (f"tri={l_tri.item():.4f} sup={l_sup.item():.4f} sub={l_sub.item():.4f}"
-                       if step >= triadic_start else "warmup")
-            print(f"  [{step:>6d}/{args.steps}] loss={total.item():.4f} lang={lang_loss.item():.4f} "
-                  f"{tri_str} lr={lr:.2e} ({elapsed:.0f}s)")
+            bar = format_progress_bar(step, args.steps)
+            eta = format_eta(elapsed, step, args.steps)
 
-        # Evaluate
+            # Ternary stats from the batch projection
+            last_zero_rate, last_ternary_dist = compute_batch_ternary_stats(proj.detach())
+
+            if step >= triadic_start:
+                tri_str = (f"tri={l_tri.item():.4f} sup={l_sup.item():.4f} "
+                           f"sub={l_sub.item():.4f}")
+            else:
+                tri_str = "warmup"
+
+            print(f"  {bar} [{step:>6d}/{args.steps}] ETA {eta} | "
+                  f"loss={total.item():.4f} lang={lang_loss.item():.4f} {tri_str} | "
+                  f"zero={last_zero_rate:.1%} "
+                  f"(-1:{last_ternary_dist['neg']:.1%} "
+                  f"0:{last_ternary_dist['zero']:.1%} "
+                  f"+1:{last_ternary_dist['pos']:.1%}) | "
+                  f"lr={lr:.2e}")
+
+        # --- Evaluate ---
         if step % args.eval_every == 0 or step == args.steps:
             eval_train = evaluate_anchors(model, sup_train_t, sup_train_tgt, sup_train_words)
             eval_hold = evaluate_anchors(model, sup_hold_t, sup_hold_tgt, sup_hold_words)
@@ -439,9 +522,15 @@ def run_training(args, train_anchors, holdout_anchors, prim_data, ckpt_dir, cycl
             hold_acc = eval_hold.get('mean_bit_accuracy', 0)
             dead = eval_train.get('dead_bits', N_BITS)
 
+            # Ternary stats from anchor projections
+            zero_rate, tern_dist = compute_ternary_stats(model, sup_train_t)
+
             print(f"  --- Eval @ step {step} ---")
             print(f"  Bit accuracy:  train={train_acc:.1%}  holdout={hold_acc:.1%} (no supervision!)")
             print(f"  Dead bits: {dead}/{N_BITS}")
+            print(f"  Zero rate (anchors): {zero_rate:.1%}")
+            print(f"  Ternary dist (anchors): "
+                  f"-1={tern_dist['neg']:.1%}  0={tern_dist['zero']:.1%}  +1={tern_dist['pos']:.1%}")
 
             csv_writer.writerow([
                 step, total.item(), lang_loss.item(),
@@ -449,6 +538,7 @@ def run_training(args, train_anchors, holdout_anchors, prim_data, ckpt_dir, cycl
                 l_sup.item() if step >= triadic_start else 0,
                 l_sub.item() if step >= triadic_start else 0,
                 train_acc, hold_acc, dead,
+                zero_rate, tern_dist['neg'], tern_dist['zero'], tern_dist['pos'],
             ])
             csv_file.flush()
 
@@ -463,13 +553,16 @@ def run_training(args, train_anchors, holdout_anchors, prim_data, ckpt_dir, cycl
                         'n_layer': config.n_layer, 'n_embd': config.n_embd,
                         'n_head': config.n_head, 'n_triadic_bits': config.n_triadic_bits,
                     },
-                    'cycle': cycle,
+                    'model_class': 'TernaryDanzaGPT',
+                    'quantize_mode': qmode,
                     'train_concepts': sorted(TRAIN_CONCEPTS),
                     'bit_accuracy_train': train_acc,
                     'bit_accuracy_holdout': hold_acc,
+                    'zero_rate': zero_rate,
+                    'ternary_dist': tern_dist,
                 }, os.path.join(ckpt_dir, 'model_best.pt'))
 
-            # Save best by holdout accuracy (more meaningful than train)
+            # Save best by holdout accuracy
             if hold_acc > best_hold_acc:
                 best_hold_acc = hold_acc
                 torch.save({
@@ -480,7 +573,11 @@ def run_training(args, train_anchors, holdout_anchors, prim_data, ckpt_dir, cycl
                         'n_layer': config.n_layer, 'n_embd': config.n_embd,
                         'n_head': config.n_head, 'n_triadic_bits': config.n_triadic_bits,
                     },
+                    'model_class': 'TernaryDanzaGPT',
+                    'quantize_mode': qmode,
                     'bit_accuracy_holdout': hold_acc,
+                    'zero_rate': zero_rate,
+                    'ternary_dist': tern_dist,
                 }, os.path.join(ckpt_dir, 'model_best_holdout.pt'))
 
         # Periodic checkpoint
@@ -493,11 +590,14 @@ def run_training(args, train_anchors, holdout_anchors, prim_data, ckpt_dir, cycl
                     'n_layer': config.n_layer, 'n_embd': config.n_embd,
                     'n_head': config.n_head, 'n_triadic_bits': config.n_triadic_bits,
                 },
+                'model_class': 'TernaryDanzaGPT',
+                'quantize_mode': qmode,
             }, os.path.join(ckpt_dir, f'model_step{step}.pt'))
 
     csv_file.close()
     elapsed = time.time() - t0
-    print(f"\n  Training complete: {elapsed/60:.1f} min, best train acc: {best_train_acc:.1%}, best holdout: {best_hold_acc:.1%}")
+    print(f"\n  Training complete: {elapsed/60:.1f} min")
+    print(f"  Best train acc: {best_train_acc:.1%}  |  Best holdout acc: {best_hold_acc:.1%}")
 
     return model, tokenizer, device
 
@@ -508,7 +608,11 @@ def run_training(args, train_anchors, holdout_anchors, prim_data, ckpt_dir, cycl
 
 @torch.no_grad()
 def phase_predict(model, tokenizer, train_anchors, holdout_anchors, all_anchors, device):
-    """Predict holdout concepts via direct encoding + regla de tres + ensemble."""
+    """Predict holdout concepts via direct encoding + regla de tres + ensemble.
+
+    Same logic as danza_bootstrap.phase_predict, but with additional
+    ternary distribution reporting per holdout concept.
+    """
     model.eval()
 
     def get_proj(word):
@@ -521,7 +625,7 @@ def phase_predict(model, tokenizer, train_anchors, holdout_anchors, all_anchors,
 
     # --- 1. Direct encoding ---
     print(f"\n{'=' * 70}")
-    print(f"  HOLDOUT PREDICTION — D-A5 Bootstrap Test")
+    print(f"  D-A8 TERNARY HOLDOUT PREDICTION")
     print(f"{'=' * 70}")
 
     direct = {}
@@ -533,14 +637,22 @@ def phase_predict(model, tokenizer, train_anchors, holdout_anchors, all_anchors,
         gold_bits = (data['target'] > 0).float().to(device)
         acc = (pred_bits == gold_bits).float().mean().item()
         confidence = proj.abs().mean().item()
+
+        # Ternary distribution for this concept
+        snapped = proj.round().clamp(-1, 1)
+        n_neg = (snapped == -1).sum().item()
+        n_zero = (snapped == 0).sum().item()
+        n_pos = (snapped == 1).sum().item()
+
         direct[word] = {
             'bit_accuracy': acc,
             'confidence': confidence,
             'proj': proj,
+            'ternary': {'neg': n_neg, 'zero': n_zero, 'pos': n_pos},
         }
 
     # --- 2. Regla de tres predictions ---
-    r3_preds = defaultdict(list)  # holdout_word -> list of predictions
+    r3_preds = defaultdict(list)
 
     for a_word, b_word, c_word, d_word in BOOTSTRAP_QUADS:
         pa = get_proj(a_word)
@@ -549,7 +661,7 @@ def phase_predict(model, tokenizer, train_anchors, holdout_anchors, all_anchors,
         if any(p is None for p in [pa, pb, pc]):
             continue
 
-        # Find all English words for the holdout concept
+        # Find the holdout concept's Spanish name
         d_spanish = None
         for eng, data in all_anchors.items():
             if eng == d_word:
@@ -600,8 +712,9 @@ def phase_predict(model, tokenizer, train_anchors, holdout_anchors, all_anchors,
         }
 
     # --- Display results ---
-    print(f"\n  {'Concept':20s} {'Type':5s} {'Direct':>8s} {'BestR3':>8s} {'Ensem':>8s} {'#Q':>3s} {'Delta':>8s}")
-    print(f"  {'-'*20} {'-'*5} {'-'*8} {'-'*8} {'-'*8} {'-'*3} {'-'*8}")
+    print(f"\n  {'Concept':20s} {'Type':5s} {'Direct':>8s} {'BestR3':>8s} "
+          f"{'Ensem':>8s} {'#Q':>3s} {'Delta':>8s} {'Zeros':>6s}")
+    print(f"  {'-'*20} {'-'*5} {'-'*8} {'-'*8} {'-'*8} {'-'*3} {'-'*8} {'-'*6}")
 
     results_per_concept = {}
 
@@ -619,16 +732,15 @@ def phase_predict(model, tokenizer, train_anchors, holdout_anchors, all_anchors,
         eng_words = by_spanish.get(sp, [])
         if not eng_words:
             continue
-        # Use primary English word for display
         primary = eng_words[0]
 
         d_acc = direct[primary]['bit_accuracy'] if primary in direct else 0
+        d_zeros = direct[primary]['ternary']['zero'] if primary in direct else 0
         r3_acc = best_r3[primary]['bit_accuracy'] if primary in best_r3 else 0
         r3_quad = best_r3[primary]['quad'] if primary in best_r3 else ''
         ens_acc = ensemble[primary]['bit_accuracy'] if primary in ensemble else 0
         n_q = ensemble[primary]['n_quads'] if primary in ensemble else 0
 
-        # Best algebraic = max of best_r3 and ensemble
         alg_acc = max(r3_acc, ens_acc) if primary in best_r3 else 0
         delta = alg_acc - d_acc if alg_acc > 0 else 0
 
@@ -637,7 +749,8 @@ def phase_predict(model, tokenizer, train_anchors, holdout_anchors, all_anchors,
         ens_str = f"{ens_acc:.1%}" if primary in ensemble else '  ---  '
         delta_str = f"{delta:+.1%}" if alg_acc > 0 else '  ---  '
 
-        print(f"  {sp:20s} {tag:5s} {d_acc:8.1%} {r3_str:>8s} {ens_str:>8s} {n_q:3d} {delta_str:>8s}")
+        print(f"  {sp:20s} {tag:5s} {d_acc:8.1%} {r3_str:>8s} "
+              f"{ens_str:>8s} {n_q:3d} {delta_str:>8s} {d_zeros:6d}")
 
         results_per_concept[sp] = {
             'english': eng_words,
@@ -648,6 +761,7 @@ def phase_predict(model, tokenizer, train_anchors, holdout_anchors, all_anchors,
             'ensemble_acc': ens_acc,
             'n_quads': n_q,
             'algebraic_improvement': delta,
+            'n_zeros': d_zeros,
         }
 
         if rtype == 'R3':
@@ -673,11 +787,26 @@ def phase_predict(model, tokenizer, train_anchors, holdout_anchors, all_anchors,
     print(f"  Control concepts ({len(control_direct)}):")
     print(f"    Direct encoding:    {mean_direct_c:.1%}")
 
-    print(f"\n  D-A5 SUCCESS CRITERIA:")
-    print(f"    Holdout direct > 75%:          {'PASS' if mean_direct_r > 0.75 else 'FAIL'} ({mean_direct_r:.1%})")
-    print(f"    Algebraic > 80%:               {'PASS' if mean_alg_r > 0.80 else 'FAIL'} ({mean_alg_r:.1%})")
-    print(f"    Algebraic > direct + 5%:       {'PASS' if (mean_alg_r - mean_direct_r) > 0.05 else 'FAIL'} ({mean_alg_r - mean_direct_r:+.1%})")
-    print(f"    Reachable > control + 10%:     {'PASS' if (mean_alg_r - mean_direct_c) > 0.10 else 'FAIL'} ({mean_alg_r - mean_direct_c:+.1%})")
+    # Ternary-specific summary
+    all_zeros = [direct[w]['ternary']['zero'] for w in direct]
+    mean_zeros = np.mean(all_zeros) if all_zeros else 0
+    overall_zero_rate = mean_zeros / N_BITS if N_BITS > 0 else 0
+    print(f"\n  Ternary summary:")
+    print(f"    Mean zeros per concept: {mean_zeros:.1f}/{N_BITS} ({overall_zero_rate:.1%})")
+
+    print(f"\n  D-A8 SUCCESS CRITERIA:")
+    print(f"    Holdout direct > 75%:          "
+          f"{'PASS' if mean_direct_r > 0.75 else 'FAIL'} ({mean_direct_r:.1%})")
+    print(f"    Algebraic > 80%:               "
+          f"{'PASS' if mean_alg_r > 0.80 else 'FAIL'} ({mean_alg_r:.1%})")
+    print(f"    Algebraic > direct + 5%:       "
+          f"{'PASS' if (mean_alg_r - mean_direct_r) > 0.05 else 'FAIL'} "
+          f"({mean_alg_r - mean_direct_r:+.1%})")
+    print(f"    Reachable > control + 10%:     "
+          f"{'PASS' if (mean_alg_r - mean_direct_c) > 0.10 else 'FAIL'} "
+          f"({mean_alg_r - mean_direct_c:+.1%})")
+    print(f"    Natural zero rate > 20%:       "
+          f"{'PASS' if overall_zero_rate > 0.20 else 'FAIL'} ({overall_zero_rate:.1%})")
 
     # Regla de tres evaluation (original quads)
     r3_results = evaluate_regla_de_tres(model, tokenizer, all_anchors, device)
@@ -694,147 +823,13 @@ def phase_predict(model, tokenizer, train_anchors, holdout_anchors, all_anchors,
 
 
 # ============================================================
-# Phase: bootstrap — D-A6 iterative self-improvement
-# ============================================================
-
-def confidence_gate(direct, ensemble, holdout_anchors, threshold=0.7):
-    """Accept holdout predictions as pseudo-anchors if confidence is high enough.
-
-    Returns dict of accepted pseudo-anchors: {eng_word: target_tensor}.
-    """
-    accepted = {}
-
-    for word in ensemble:
-        proj = ensemble[word]['proj']
-        ens_acc = ensemble[word]['bit_accuracy']
-        n_quads = ensemble[word]['n_quads']
-
-        # Gate 1: bit certainty — fraction of bits with |proj| > 0.5
-        certainty = (proj.abs() > 0.5).float().mean().item()
-
-        # Gate 2: minimum quads for cross-validation
-        if n_quads < 2:
-            continue
-
-        # Gate 3: ensemble accuracy must exceed threshold
-        if ens_acc < threshold:
-            continue
-
-        # Gate 4: high certainty
-        if certainty < 0.85:
-            continue
-
-        # Accept: create pseudo-target from ensemble prediction
-        pseudo_target = torch.where(proj > 0,
-                                     torch.ones_like(proj),
-                                     torch.full_like(proj, -1.0))
-        accepted[word] = {
-            'target': pseudo_target.cpu(),
-            'spanish': holdout_anchors[word]['spanish'],
-            'frontier': holdout_anchors[word]['frontier'],
-            'expanded': holdout_anchors[word]['expanded'],
-            'n_active': holdout_anchors[word]['n_active'],
-            'razon': f'PSEUDO (cycle bootstrap, ens_acc={ens_acc:.1%}, certainty={certainty:.1%})',
-            'is_pseudo': True,
-        }
-
-    return accepted
-
-
-def phase_bootstrap(args, all_anchors, prim_data):
-    """D-A6: Iterative bootstrap loop."""
-    train_anchors, holdout_anchors = get_split(all_anchors)
-
-    print(f"\n{'=' * 70}")
-    print(f"  D-A6 BOOTSTRAP LOOP — {args.cycles} cycles")
-    print(f"{'=' * 70}")
-
-    cycle_results = []
-
-    for cycle in range(args.cycles):
-        print(f"\n  ========== CYCLE {cycle} ==========")
-        print(f"  Train anchors: {len(train_anchors)} | Holdout: {len(holdout_anchors)}")
-
-        # Train
-        ckpt_dir = os.path.join(_PROJECT, 'checkpoints',
-                                 f'danza_bootstrap_{args.scale}', f'cycle{cycle}')
-        model, tokenizer, device = run_training(
-            args, train_anchors, holdout_anchors, prim_data, ckpt_dir, cycle=cycle)
-
-        # Predict
-        results, direct, r3_preds, ensemble = phase_predict(
-            model, tokenizer, train_anchors, holdout_anchors, all_anchors, device)
-
-        # Confidence gate
-        accepted = confidence_gate(direct, ensemble, holdout_anchors,
-                                    threshold=args.confidence_threshold)
-
-        n_accepted = len(accepted)
-        print(f"\n  Cycle {cycle}: accepted {n_accepted} pseudo-anchors")
-
-        if accepted:
-            for word in sorted(accepted.keys()):
-                sp = accepted[word]['spanish']
-                ens_acc = ensemble[word]['bit_accuracy']
-                print(f"    + {word} ({sp}): ensemble acc = {ens_acc:.1%}")
-
-        cycle_results.append({
-            'cycle': cycle,
-            'n_train': len(train_anchors),
-            'n_holdout': len(holdout_anchors),
-            'n_accepted': n_accepted,
-            'accepted': sorted(accepted.keys()),
-            'results': results,
-        })
-
-        if n_accepted == 0:
-            print(f"\n  No new pseudo-anchors accepted. Bootstrap converged.")
-            break
-
-        # Add pseudo-anchors to training set, remove from holdout
-        for word in accepted:
-            train_anchors[word] = accepted[word]
-            # Also add all English translations of the same concept
-            sp = accepted[word]['spanish']
-            for eng, data in list(holdout_anchors.items()):
-                if data['spanish'] == sp:
-                    if eng not in train_anchors:
-                        train_anchors[eng] = accepted[word]
-                    del holdout_anchors[eng]
-
-        # Cleanup GPU
-        del model
-        torch.cuda.empty_cache()
-
-    # Save bootstrap results
-    results_path = os.path.join(_PROJECT, 'checkpoints',
-                                 f'danza_bootstrap_{args.scale}', 'bootstrap_results.json')
-    os.makedirs(os.path.dirname(results_path), exist_ok=True)
-
-    # Convert non-serializable data
-    serializable = []
-    for cr in cycle_results:
-        s = {k: v for k, v in cr.items() if k != 'results'}
-        s['per_concept'] = {}
-        for sp, r in cr.get('results', {}).items():
-            s['per_concept'][sp] = {k: v for k, v in r.items()
-                                     if not isinstance(v, torch.Tensor)}
-        serializable.append(s)
-
-    with open(results_path, 'w') as f:
-        json.dump(serializable, f, indent=2)
-    print(f"\n  Bootstrap results: {results_path}")
-
-    return cycle_results
-
-
-# ============================================================
 # Main
 # ============================================================
 
 def main():
-    parser = argparse.ArgumentParser(description='D-A5/D-A6 Bootstrap Test')
-    parser.add_argument('--phase', choices=['split', 'train', 'predict', 'bootstrap', 'all'],
+    parser = argparse.ArgumentParser(
+        description='D-A8: Ternary Triadic Head (BitNet-style {-1,0,+1})')
+    parser.add_argument('--phase', choices=['split', 'train', 'predict', 'all'],
                         default='split')
     parser.add_argument('--scale', choices=['base', 'xl', 'xxl'], default='base')
     parser.add_argument('--steps', type=int, default=10000)
@@ -849,20 +844,20 @@ def main():
     parser.add_argument('--vocab', type=int, default=4096)
     parser.add_argument('--block', type=int, default=256)
     parser.add_argument('--dropout', type=float, default=0.1)
-    parser.add_argument('--grad-checkpoint', action='store_true')
+    parser.add_argument('--grad-checkpoint', action='store_true',
+                        help='Use gradient checkpointing (saves VRAM, +33%% time)')
     parser.add_argument('--no-compile', action='store_true',
                         help='Disable torch.compile')
+    parser.add_argument('--quantize-mode', choices=['fsq', 'absmean'], default='fsq',
+                        help='Ternary quantization: fsq (iFSQ sigmoid, default) or absmean (BitNet)')
     parser.add_argument('--dtype', choices=['float32', 'float16', 'bfloat16'],
-                        default='bfloat16')
+                        default='bfloat16',
+                        help='Mixed precision dtype (default: bfloat16)')
     parser.add_argument('--print-every', type=int, default=50)
     parser.add_argument('--save-every', type=int, default=5000)
     parser.add_argument('--eval-every', type=int, default=2500)
     parser.add_argument('--checkpoint', type=str, default=None,
                         help='Checkpoint dir for --phase predict')
-    parser.add_argument('--cycles', type=int, default=3,
-                        help='Number of bootstrap cycles (D-A6)')
-    parser.add_argument('--confidence-threshold', type=float, default=0.7,
-                        help='Minimum ensemble accuracy to accept pseudo-anchor')
     args = parser.parse_args()
 
     # Load data
@@ -875,7 +870,7 @@ def main():
 
     if args.phase == 'train' or args.phase == 'all':
         train_anchors, holdout_anchors = get_split(all_anchors)
-        ckpt_dir = os.path.join(_PROJECT, 'checkpoints', f'danza_bootstrap_{args.scale}')
+        ckpt_dir = os.path.join(_PROJECT, 'checkpoints', f'danza_ternary_{args.scale}')
         model, tokenizer, device = run_training(
             args, train_anchors, holdout_anchors, prim_data, ckpt_dir)
 
@@ -884,7 +879,7 @@ def main():
                 model, tokenizer, train_anchors, holdout_anchors, all_anchors, device)
 
             # Save results
-            results_path = os.path.join(ckpt_dir, 'bootstrap_results.json')
+            results_path = os.path.join(ckpt_dir, 'ternary_results.json')
             serializable = {}
             for sp, r in results.items():
                 serializable[sp] = {k: v for k, v in r.items()
@@ -895,16 +890,14 @@ def main():
         return
 
     if args.phase == 'predict':
-        # Load checkpoint — prefer latest step checkpoint over model_best.pt
-        # because model_best.pt uses train_acc which saturates at 100% early
         ckpt_dir = args.checkpoint or os.path.join(
-            _PROJECT, 'checkpoints', f'danza_bootstrap_{args.scale}')
+            _PROJECT, 'checkpoints', f'danza_ternary_{args.scale}')
 
         # Find latest step checkpoint
         import glob as glob_mod
         step_ckpts = sorted(glob_mod.glob(os.path.join(ckpt_dir, 'model_step*.pt')))
         if step_ckpts:
-            ckpt_path = step_ckpts[-1]  # latest step
+            ckpt_path = step_ckpts[-1]
             print(f"  Using latest checkpoint: {os.path.basename(ckpt_path)}")
         else:
             ckpt_path = os.path.join(ckpt_dir, 'model_best.pt')
@@ -923,7 +916,9 @@ def main():
             n_layer=cfg['n_layer'], n_embd=cfg['n_embd'],
             n_head=cfg['n_head'], n_triadic_bits=cfg['n_triadic_bits'],
         )
-        model = DanzaTriadicGPT(config).to(device)
+        # Use quantize_mode from checkpoint if available, else from CLI args
+        qmode = ckpt.get('quantize_mode', args.quantize_mode)
+        model = TernaryDanzaGPT(config, quantize_mode=qmode).to(device)
         model.load_state_dict(ckpt['model_state_dict'])
 
         tok_path = os.path.join(ckpt_dir, 'tokenizer.json')
@@ -935,7 +930,7 @@ def main():
             model, tokenizer, train_anchors, holdout_anchors, all_anchors, device)
 
         # Save
-        results_path = os.path.join(ckpt_dir, 'bootstrap_results.json')
+        results_path = os.path.join(ckpt_dir, 'ternary_results.json')
         serializable = {}
         for sp, r in results.items():
             serializable[sp] = {k: v for k, v in r.items()
@@ -943,10 +938,6 @@ def main():
         with open(results_path, 'w') as f:
             json.dump(serializable, f, indent=2)
         print(f"\n  Results: {results_path}")
-        return
-
-    if args.phase == 'bootstrap':
-        phase_bootstrap(args, all_anchors, prim_data)
         return
 
 

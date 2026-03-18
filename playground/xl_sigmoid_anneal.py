@@ -373,7 +373,9 @@ def main():
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=0.01, betas=(0.9, 0.95))
     dataset = TextDataset(all_tokens, args.block)
     dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, drop_last=True, num_workers=0)
-    scaler = torch.amp.GradScaler('cuda', enabled=(device.type == 'cuda'))
+    amp_dtype = torch.bfloat16
+    use_scaler = False  # bfloat16 doesn't need loss scaling
+    scaler = torch.amp.GradScaler('cuda', enabled=use_scaler)
 
     triadic_warmup = int(args.steps * args.warmup_pct)
 
@@ -444,7 +446,7 @@ def main():
             pg['lr'] = lr_t
 
         # Forward
-        with torch.amp.autocast('cuda', enabled=(device.type == 'cuda')):
+        with torch.amp.autocast('cuda', dtype=amp_dtype, enabled=(device.type == 'cuda')):
             logits, triadic_proj, lang_loss = model(x, targets=y)
             total_loss = lang_loss
             tri_loss_val = 0.0

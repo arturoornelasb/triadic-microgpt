@@ -96,13 +96,14 @@ def get_batch(data, batch_size, device):
 def train_phase(model, data, phase_name, steps, lr, batch_size, seq_len,
                 alpha, entropy_weight, align_weight, warmup_pct,
                 device, checkpoint_dir, log_writer, global_step_offset=0,
-                backbone_frozen=False, align_mode='mse'):
+                backbone_frozen=False, align_mode='mse',
+                amp_dtype=torch.bfloat16, use_scaler=False):
     """Run one training phase."""
     optimizer = torch.optim.AdamW(
         filter(lambda p: p.requires_grad, model.parameters()),
         lr=lr, betas=(0.9, 0.999), weight_decay=0.01
     )
-    scaler = GradScaler('cuda')
+    scaler = GradScaler('cuda', enabled=use_scaler)
     warmup_steps = int(steps * warmup_pct)
 
     trainable = model.num_params(trainable_only=True)
@@ -135,7 +136,7 @@ def train_phase(model, data, phase_name, steps, lr, batch_size, seq_len,
 
         optimizer.zero_grad(set_to_none=True)
 
-        with autocast('cuda', dtype=torch.float16):
+        with autocast('cuda', dtype=amp_dtype):
             logits, triadic_proj, lang_loss = model(batch, labels=batch)
 
             if triadic_active:
@@ -248,8 +249,14 @@ if __name__ == '__main__':
     parser.add_argument('--entropy-weight', type=float, default=1.0)
     parser.add_argument('--align-weight', type=float, default=5.0)
     parser.add_argument('--warmup-pct', type=float, default=0.25)
-    parser.add_argument('--align-mode', default='mse', choices=['mse', 'rank', 'infonce'],
+    parser.add_argument('--align-mode', default='infonce', choices=['mse', 'rank', 'infonce'],
                         help='Alignment loss mode: mse (original), rank (margin ranking), infonce (contrastive)')
+    parser.add_argument('--dtype', default='bfloat16', choices=['float32', 'float16', 'bfloat16'],
+                        help='AMP precision (default: bfloat16 for Ampere+/Blackwell)')
+    parser.add_argument('--no-compile', action='store_true',
+                        help='Disable torch.compile')
+    parser.add_argument('--grad-checkpoint', action='store_true',
+                        help='Enable gradient checkpointing')
 
     parser.add_argument('--checkpoint-dir', default='experiment10/checkpoints')
     parser.add_argument('--skip-phase1', action='store_true', help='Skip Phase 1 (load from checkpoint)')
@@ -258,6 +265,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    amp_dtype = {'float32': torch.float32, 'float16': torch.float16,
+                 'bfloat16': torch.bfloat16}[args.dtype]
+    use_scaler = (device.type == 'cuda' and amp_dtype == torch.float16)
+    if device.type == 'cuda':
+        torch.set_float32_matmul_precision('high')
+        torch.backends.cudnn.benchmark = True
     os.makedirs(args.checkpoint_dir, exist_ok=True)
 
     print()
@@ -271,6 +284,12 @@ if __name__ == '__main__':
     print(f"  Triadic params: alpha={args.alpha}, entropy={args.entropy_weight}, align={args.align_weight}")
     print(f"  Align mode:     {args.align_mode}")
     print(f"  Device:         {device}")
+    gpu_name = torch.cuda.get_device_name(0) if device.type == 'cuda' else 'N/A'
+    print(f"  GPU:            {gpu_name}")
+    print(f"  Precision:      {args.dtype} (amp_dtype={amp_dtype})")
+    print(f"  Grad scaler:    {'ON' if use_scaler else 'OFF'}")
+    compile_status = 'PENDING'  # updated after torch.compile attempt
+    print(f"  torch.compile:  {compile_status}")
     print("=" * 80)
 
     # Load GPT-2
@@ -280,6 +299,15 @@ if __name__ == '__main__':
     model = GPT2TriadicModel(gpt2, n_triadic_bits=args.n_bits)
     model = model.to(device)
     print(f"  Total params: {model.num_params() / 1e6:.1f}M")
+
+    # torch.compile with triton guard (Blackwell optimization)
+    if device.type == 'cuda' and not args.no_compile:
+        try:
+            import triton  # noqa: F401
+            model = torch.compile(model)
+            print("  torch.compile: ON")
+        except ImportError:
+            print("  torch.compile: SKIPPED (triton not available on Windows)")
 
     # Load data
     data = load_data(tokenizer, args.data, args.seq_len)
@@ -312,6 +340,8 @@ if __name__ == '__main__':
             global_step_offset=0,
             backbone_frozen=True,
             align_mode=args.align_mode,
+            amp_dtype=amp_dtype,
+            use_scaler=use_scaler,
         )
         generate_samples(model, tokenizer, device)
     else:
@@ -344,6 +374,8 @@ if __name__ == '__main__':
             log_writer=log_writer,
             global_step_offset=global_step,
             align_mode=args.align_mode,
+            amp_dtype=amp_dtype,
+            use_scaler=use_scaler,
         )
         generate_samples(model, tokenizer, device)
 

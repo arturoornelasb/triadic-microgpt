@@ -126,6 +126,55 @@ conda run -n triadic-microgpt python tests/test_all.py
 
 All 37 tests should pass.
 
+## Mixed Precision (MANDATORY)
+
+**All training MUST use bfloat16** on the RTX 5060 Ti (Blackwell, 4th gen Tensor Cores).
+
+### Optimization stack (all mandatory for new scripts)
+
+| Optimization | Speedup | What it does |
+|---|---|---|
+| **bfloat16** | 2-8x vs float32 | Tensor Core peak throughput, no GradScaler needed |
+| **torch.compile** | 10-30% | Fuses CUDA kernels, eliminates Python overhead |
+| **TF32 matmul** | 5-15% | Uses TensorFloat-32 for residual float32 operations |
+| **cudnn.benchmark** | ~5% | Kernel autotuning for optimal algorithm selection |
+| **Gradient checkpointing** | Saves VRAM | Trade recompute for memory (enables larger batches) |
+| **Flash Attention** | Already active | `F.scaled_dot_product_attention(is_causal=True)` in model |
+
+### Boilerplate
+
+```python
+# Args
+parser.add_argument('--dtype', default='bfloat16', choices=['float32','float16','bfloat16'])
+parser.add_argument('--grad-checkpoint', action='store_true')
+parser.add_argument('--no-compile', action='store_true')
+
+# Device + global settings
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+amp_dtype = {'float32': torch.float32, 'float16': torch.float16,
+             'bfloat16': torch.bfloat16}[args.dtype]
+use_scaler = (device.type == 'cuda' and amp_dtype == torch.float16)
+if device.type == 'cuda':
+    torch.set_float32_matmul_precision('high')
+    torch.backends.cudnn.benchmark = True
+
+# Model
+model = TriadicGPT(config).to(device)
+if args.grad_checkpoint:
+    model.gradient_checkpointing_enable()
+if device.type == 'cuda' and not args.no_compile:
+    model = torch.compile(model)
+scaler = torch.amp.GradScaler('cuda', enabled=use_scaler)
+
+# Training loop
+with torch.amp.autocast('cuda', dtype=amp_dtype, enabled=(device.type == 'cuda')):
+    logits, proj, loss = model(x, targets=y)
+```
+
+**Fully optimized:** `danza_bootstrap.py`, `sub_weight_sweep.py`
+**bfloat16 only:** `danza_63bit.py`
+**Legacy (float16):** ~15 older playground scripts (completed experiments)
+
 ## Key Hyperparameters
 
 | Param | Pretrain | Fine-tune | Notes |
@@ -135,6 +184,9 @@ All 37 tests should pass.
 | `triadic-warmup-pct` | 0.3 | 0 | Start triadic loss after 30% of pretrain steps |
 | `dropout` | 0.1 | 0.1 | Regularization |
 | `batch-size` | 32 | 16 | Smaller for fine-tune (less data) |
+| `dtype` | bfloat16 | bfloat16 | Blackwell Tensor Core peak throughput |
+| `no-compile` | False | False | Only set True for debugging |
+| `grad-checkpoint` | False | False | Enable if VRAM-constrained |
 
 ## Known Issues
 

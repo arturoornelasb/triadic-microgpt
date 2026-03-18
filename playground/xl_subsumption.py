@@ -147,7 +147,7 @@ def compute_subsumption_loss(model, sub_pairs, device):
     for pair in sub_pairs:
         hyper_x = pair['hyper_ids'].unsqueeze(0)
         hypo_x = pair['hypo_ids'].unsqueeze(0)
-        with torch.amp.autocast('cuda', enabled=(device.type == 'cuda')):
+        with torch.amp.autocast('cuda', dtype=torch.bfloat16, enabled=(device.type == 'cuda')):
             _, proj_hyper, _ = model(hyper_x)
             _, proj_hypo, _ = model(hypo_x)
         h = proj_hyper[0].mean(dim=0)
@@ -464,7 +464,9 @@ def main():
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=0.01, betas=(0.9, 0.95))
     dataset = TextDataset(all_tokens, args.block)
     dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, drop_last=True, num_workers=0)
-    scaler = torch.amp.GradScaler('cuda', enabled=(device.type == 'cuda'))
+    amp_dtype = torch.bfloat16
+    use_scaler = False  # bfloat16 doesn't need loss scaling
+    scaler = torch.amp.GradScaler('cuda', enabled=use_scaler)
     mapper = PrimeMapper(64)
 
     triadic_warmup = int(args.steps * args.warmup_pct)
@@ -531,7 +533,7 @@ def main():
             pg['lr'] = lr_t
 
         # Forward
-        with torch.amp.autocast('cuda', enabled=(device.type == 'cuda')):
+        with torch.amp.autocast('cuda', dtype=amp_dtype, enabled=(device.type == 'cuda')):
             logits, triadic_proj, lang_loss = model(x, targets=y)
             total_loss = lang_loss
             tri_loss_val = 0.0

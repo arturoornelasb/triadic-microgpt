@@ -167,7 +167,7 @@ def compute_subsumption_loss(model, sub_pairs, device):
         hyper_x = pair['hyper_ids'].unsqueeze(0)
         hypo_x = pair['hypo_ids'].unsqueeze(0)
 
-        with torch.amp.autocast('cuda', enabled=(device.type == 'cuda')):
+        with torch.amp.autocast('cuda', dtype=torch.bfloat16, enabled=(device.type == 'cuda')):
             _, proj_hyper, _ = model(hyper_x)
             _, proj_hypo, _ = model(hypo_x)
 
@@ -276,7 +276,9 @@ def train_model(model, tokenizer, all_tokens, device, label,
     dataset = TextDataset(all_tokens, BLOCK_SIZE)
     dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True, num_workers=0)
     optimizer = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=0.01, betas=(0.9, 0.95))
-    scaler = torch.amp.GradScaler('cuda', enabled=(device.type == 'cuda'))
+    amp_dtype = torch.bfloat16
+    use_scaler = False  # bfloat16 doesn't need loss scaling
+    scaler = torch.amp.GradScaler('cuda', enabled=use_scaler)
     triadic_warmup = int(STEPS * TRIADIC_WARMUP_PCT)
 
     model.train()
@@ -302,7 +304,7 @@ def train_model(model, tokenizer, all_tokens, device, label,
         for pg in optimizer.param_groups:
             pg['lr'] = lr_t
 
-        with torch.amp.autocast('cuda', enabled=(device.type == 'cuda')):
+        with torch.amp.autocast('cuda', dtype=amp_dtype, enabled=(device.type == 'cuda')):
             logits, triadic_proj, lang_loss = model(x, targets=y)
             total_loss = lang_loss
             tri_loss_val = 0.0

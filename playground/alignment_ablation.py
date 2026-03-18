@@ -344,7 +344,9 @@ def train_variant(variant_name, device):
                             num_workers=0, generator=torch.Generator().manual_seed(SEED))
 
     # Mixed precision scaler
-    scaler = torch.amp.GradScaler('cuda', enabled=(device.type == 'cuda'))
+    amp_dtype = torch.bfloat16
+    use_scaler = False  # bfloat16 doesn't need loss scaling
+    scaler = torch.amp.GradScaler('cuda', enabled=use_scaler)
 
     # Triadic warmup
     triadic_warmup = int(cfg['steps'] * cfg['triadic_warmup_pct'])
@@ -389,7 +391,7 @@ def train_variant(variant_name, device):
             pg['lr'] = lr_t
 
         # Forward pass with mixed precision
-        with torch.amp.autocast('cuda', enabled=(device.type == 'cuda')):
+        with torch.amp.autocast('cuda', dtype=amp_dtype, enabled=(device.type == 'cuda')):
             logits, triadic_proj, lang_loss = model(x, targets=y)
 
             total_loss = lang_loss

@@ -62,7 +62,7 @@ Across 29 training runs and systematic ablation studies, we demonstrate five pri
 (1)~the triadic head adds \textbf{zero measurable cost} to language quality (perplexity 7.69 vs.\ 7.56 ablation baseline, within noise);
 (2)~\textbf{semantic ordering emerges gradually with scale}---the gap between related and unrelated concept similarity crosses zero around 20M parameters, with a smooth crossover rather than a sharp phase transition;
 (3)~a \textbf{bits sweep} over $k \in \{8, 16, 32, 48, 64, 128\}$ reveals an optimal regime at $k=32$--$64$, shifted upward from the $k=6$--$12$ range reported for post-hoc projection;
-(4)~a \textbf{transfer experiment} attaching the triadic head to pre-trained GPT-2 with an InfoNCE alignment loss achieves a semantic gap of $+0.099$, closing \textbf{72\% of the gap} to the Triadic Engine's post-hoc PCA projection ($+0.136$), while an alignment loss ablation reveals a \textbf{loss--embedding interaction}: InfoNCE is optimal for rich pre-trained embeddings, while MSE is optimal for weak from-scratch embeddings;
+(4)~a \textbf{transfer experiment} attaching the triadic head to pre-trained GPT-2 with an InfoNCE alignment loss achieves a semantic gap of $+0.099$, closing \textbf{70\% of the gap} to the Triadic Engine's post-hoc PCA projection ($+0.136$), while an alignment loss ablation reveals a \textbf{loss--embedding interaction}: InfoNCE is optimal for rich pre-trained embeddings, while MSE is optimal for weak from-scratch embeddings;
 and (5)~a \textbf{subsumption loss} that penalizes violations of hypernym--hyponym bit inheritance recovers \textbf{100\% held-out subsumption at $k=64$}---resolving the primary limitation of both \microgpt{} and the Engine at high bit counts---while inducing an emergent information hierarchy where abstract concepts autonomously learn sparse representations.
 
 \microgpt{} achieves 98\% analogy verification (50/51 analogies across diverse semantic categories), 100\% signature uniqueness, and reproducible semantic ordering ($+0.038 \pm 0.005$ gap across 3 seeds, 95\% CI entirely positive)---all within a single forward pass, requiring no external embedding model. Critically, the triadic head's value lies not in raw similarity metrics---random projections of hidden states produce comparable semantic gap---but in \emph{algebraic operations}: 100\% analogy verification, 92--100\% subsumption, and exact compositional arithmetic, all of which random projections fail to provide.
@@ -101,7 +101,7 @@ Our contributions are:
 
     \item \textbf{Direct comparison with post-hoc projection.} We benchmark \microgpt{} against the Triadic Engine on identical concept sets, showing that while the Engine achieves higher raw metrics (leveraging pre-trained MiniLM), \microgpt{} is self-contained, requires a single forward pass, and demonstrates emergent rather than injected semantics (Section~\ref{sec:comparison}).
 
-    \item \textbf{Transfer learning and alignment loss ablation.} Attaching the triadic head to pre-trained GPT-2 and testing three alignment losses (MSE, margin ranking, InfoNCE), we discover a \emph{loss--embedding interaction}: InfoNCE is optimal for rich pre-trained embeddings (closing 72\% of the gap to Engine PCA), while MSE is optimal for weak from-scratch embeddings. This identifies the alignment loss formulation---not embedding quality---as the primary bottleneck (Section~\ref{sec:transfer}).
+    \item \textbf{Transfer learning and alignment loss ablation.} Attaching the triadic head to pre-trained GPT-2 and testing three alignment losses (MSE, margin ranking, InfoNCE), we discover a \emph{loss--embedding interaction}: InfoNCE is optimal for rich pre-trained embeddings (closing 70\% of the gap to Engine PCA), while MSE is optimal for weak from-scratch embeddings. This identifies the alignment loss formulation---not embedding quality---as the primary bottleneck (Section~\ref{sec:transfer}).
 
     \item \textbf{Subsumption recovery via auxiliary loss.} A differentiable subsumption loss recovers exact algebraic subsumption ($\Phi(A) \mid \Phi(B)$) at $k=64$---previously reported as impractical at high bit counts by both \microgpt{} and the Engine. The model achieves 100\% held-out subsumption and autonomously discovers an emergent information hierarchy where abstract concepts use fewer active bits (Section~\ref{sec:subsumption}).
 \end{enumerate}
@@ -412,7 +412,7 @@ Several findings emerge from the full comparison:
 
 \paragraph{Subsumption is zero for ALL methods at $k=64$.} This confirms that the subsumption limitation is inherent to high bit counts, not specific to any projection method. With $\sim$32 active bits per concept, exact divisibility is combinatorially improbable without explicit subsumption training.
 
-\paragraph{Engine advantages are embedding-driven.} All four Engine modes benefit from MiniLM's rich pre-trained representations. The gap between Engine modes (PCA gap $+0.136$ vs.\ Random $+0.105$) is smaller than the gap between the best Engine mode and \microgpt{} ($+0.136$ vs.\ $+0.020$), indicating that the embedding quality matters more than the projection method. This hypothesis is confirmed by the transfer experiment (Section~\ref{sec:transfer}): attaching the triadic head to GPT-2's rich embeddings with InfoNCE alignment closes 72\% of this gap ($+0.099$).
+\paragraph{Engine advantages are embedding-driven.} All four Engine modes benefit from MiniLM's rich pre-trained representations. The gap between Engine modes (PCA gap $+0.136$ vs.\ Random $+0.105$) is smaller than the gap between the best Engine mode and \microgpt{} ($+0.136$ vs.\ $+0.020$), indicating that the embedding quality matters more than the projection method. This hypothesis is confirmed by the transfer experiment (Section~\ref{sec:transfer}): attaching the triadic head to GPT-2's rich embeddings with InfoNCE alignment closes 70\% of this gap ($+0.099$).
 
 \paragraph{Architectural advantages of \microgpt{}.}
 \begin{itemize}
@@ -469,7 +469,7 @@ Unique Sigs     & 100\%    & 100\%    & 100\%             & 100\%    & 100\% \\
 \end{tabular}
 \end{table}
 
-\paragraph{InfoNCE closes 72\% of the gap to Engine PCA.} The semantic gap improves from $+0.011$ (MSE) to $+0.099$ (InfoNCE)---a $9\times$ improvement from changing only the loss function. InfoNCE's structured positive/negative mining leverages GPT-2's rich 768-dimensional embeddings far more effectively than MSE's absolute similarity matching.
+\paragraph{InfoNCE closes 70\% of the gap to Engine PCA.} The semantic gap improves from $+0.011$ (MSE) to $+0.099$ (InfoNCE)---a $9\times$ improvement from changing only the loss function. InfoNCE's structured positive/negative mining leverages GPT-2's rich 768-dimensional embeddings far more effectively than MSE's absolute similarity matching.
 
 \paragraph{Rank loss achieves the best analogy verification.} At 83.3\%, margin ranking produces the most structured relational representations, outperforming InfoNCE (66.7\%) on analogy despite a lower semantic gap ($+0.047$). This suggests that ordering-based losses better preserve the fine-grained factor transforms needed for algebraic analogy.
 
@@ -595,6 +595,40 @@ food    & 31 & 6 & 81\% \\
 \end{table}
 
 This emergent hierarchy arises because the optimization finds that the easiest way to satisfy $\Phi(Y) \bmod \Phi(H) = 0$ for all hyponyms $Y$ is to minimize the hypernym's active bits---fewer hypernym bits means fewer constraints on each hyponym. The gradient naturally pushes abstract concepts toward sparse representations and concrete concepts toward dense ones, matching set-theoretic expectations: the intension of ``animal'' (few defining features) should be a subset of the intension of ``dog'' (many specific features).
+
+
+\subsection{Bootstrap Compositionality Test (D-A5)}
+\label{sec:bootstrap}
+
+The preceding experiments demonstrate that \microgpt{} learns algebraic structure---analogy verification, subsumption---but always evaluate concepts the model saw during training.
+A stronger test asks: \emph{can algebraic composition generalize to concepts the model has never directly encoded?}
+
+We train an XL model (40M parameters, 50K steps) with supervised triadic targets on 24 anchor concepts drawn from the 63-primitive inventory, then evaluate 23 held-out concepts partitioned into two groups: 14 \emph{R3-reachable} concepts, each derivable via at least one analogy quad (e.g., \texttt{king:queen::man:?} $\rightarrow$ \texttt{woman}), and 9 \emph{control} concepts with no algebraic path.
+The per-bit majority-class baseline for this inventory is 90.2\%.
+
+\begin{table}[h]
+\centering
+\caption{Bootstrap compositionality (D-A5 XL). \emph{Direct}: bit accuracy of the model's own encoding. \emph{Algebraic}: bit accuracy after R3 analogy transfer $D = C + (B{-}A)$ in tanh space. The algebraic path exceeds the trivial baseline; direct encoding does not.}
+\label{tab:bootstrap}
+\begin{tabular}{lccc}
+\toprule
+Group & Direct & Algebraic & $\Delta$ \\
+\midrule
+R3-reachable (14 concepts)  & 87.5\% & \textbf{90.7\%} & $+3.2$ pp \\
+Control (9 concepts)        & 85.9\% & ---              & ---       \\
+\midrule
+Trivial baseline (majority) & \multicolumn{3}{c}{90.2\%}           \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The algebraic path (90.7\%) surpasses the trivial baseline (90.2\%) by $+0.5$~pp, while direct encoding (87.5\%) falls below it.
+The model thus sacrificed direct encoding fidelity ($-2.8$~pp vs.\ a smaller baseline model) in exchange for stronger algebraic compositionality ($+3.2$~pp algebraic improvement, a 6.4$\times$ gain over the baseline's $+0.5$~pp).
+Across the 14 R3-reachable concepts, direct accuracy and algebraic improvement are anti-correlated ($r = -0.30$): algebra rescues weakly encoded concepts (mean $+11.6$~pp when direct $< 85\%$) but can hurt strongly encoded ones ($-4.3$~pp when direct $> 91\%$).
+
+The star case is \textbf{reina} (\emph{queen}): direct encoding reaches only 77.8\%, but the analogy \texttt{man:woman::king:?}\ recovers all 63 bits perfectly---\textbf{100\% algebraic accuracy}.
+The XL model learned a gender-direction vector clean enough that prime-factor arithmetic in tanh space is exact, even though the concept was never a supervised target.
+This result provides the strongest single-concept evidence that the triadic head supports genuine compositional generalization, not merely memorization.
 
 
 % ============================================================
@@ -725,7 +759,7 @@ We have presented \microgpt{}, a generative language model that jointly learns n
     \item The triadic projection head adds \textbf{zero measurable cost} to language modeling quality, acting as a free semantic annotation layer.
     \item Meaningful semantic ordering in prime-factor space is an \textbf{emergent property of scale}, crossing zero around $\sim$20M parameters in a gradual crossover. Multi-seed validation confirms reproducibility (gap $+0.038 \pm 0.005$, $n=3$).
     \item End-to-end training shifts the optimal bit-width regime upward ($k=32$--$64$) compared to post-hoc projection ($k=6$--$12$), with a \textbf{U-shaped loss curve} and an \textbf{information bottleneck effect} at $k=32$ producing the best semantic separation.
-    \item The alignment loss formulation is the \textbf{primary bottleneck}: replacing MSE with InfoNCE on GPT-2 transfer achieves semantic gap $+0.099$ (closing 72\% of the gap to post-hoc Engine PCA), while a \textbf{loss--embedding interaction} dictates that InfoNCE is optimal for rich embeddings and MSE for weak ones.
+    \item The alignment loss formulation is the \textbf{primary bottleneck}: replacing MSE with InfoNCE on GPT-2 transfer achieves semantic gap $+0.099$ (closing 70\% of the gap to post-hoc Engine PCA), while a \textbf{loss--embedding interaction} dictates that InfoNCE is optimal for rich embeddings and MSE for weak ones.
     \item A differentiable subsumption loss recovers \textbf{exact algebraic subsumption at $k=64$}---100\% on held-out hypernym--hyponym pairs---resolving the primary limitation of both end-to-end and post-hoc methods at high bit counts, while inducing an \textbf{emergent information hierarchy} where abstract concepts autonomously converge to sparse representations.
 \end{enumerate}
 

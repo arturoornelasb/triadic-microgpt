@@ -81,6 +81,66 @@ Text → FastBPETokenizer → Token IDs → TriadicGPT (12L/512D/8H) → Two Hea
 4. **Subsumption at k=64**: RESOLVED via subsumption loss (Exp P12). 100% held-out at 25K steps with sub_weight=5.0. PPL cost +47% at XL scale (early stopping required). Base scale is "free lunch" (language improves).
 5. **Coherence loss = collapse**: NEVER re-enable. Adjacent-token agreement drives all projections to identical.
 
+## GPU Optimization Standard (RTX 5060 Ti — Blackwell)
+
+**All training scripts MUST use bfloat16 mixed precision.** This is not optional.
+
+```python
+# CORRECT — bfloat16 on Blackwell Tensor Cores (2-8x faster than float32)
+amp_dtype = torch.bfloat16
+use_scaler = False  # bfloat16 has 8-bit exponent like float32, no underflow risk
+scaler = torch.amp.GradScaler('cuda', enabled=use_scaler)
+
+with torch.amp.autocast('cuda', dtype=amp_dtype, enabled=(device.type == 'cuda')):
+    logits, proj, loss = model(x, targets=y)
+
+# WRONG — float16 wastes Tensor Core throughput, needs GradScaler overhead
+with torch.amp.autocast('cuda', enabled=(device.type == 'cuda')):  # defaults to float16!
+    ...
+```
+
+**Why bfloat16 over float16:**
+- Blackwell Tensor Cores execute bfloat16 matmuls at peak throughput (4th gen)
+- Same exponent range as float32 (8 bits) → no gradient underflow → no GradScaler needed
+- GradScaler adds CPU-GPU sync overhead on every step — removing it is free speedup
+
+**Checklist for new training scripts:**
+1. Add `--dtype` arg with `default='bfloat16'`
+2. Map to `torch.bfloat16` via dict lookup
+3. Pass `dtype=amp_dtype` to `torch.amp.autocast()`
+4. Disable `GradScaler` when dtype != float16
+5. Print precision in training log header for verification
+6. Add `torch.set_float32_matmul_precision('high')` — uses TF32 for residual float32 ops
+7. Add `torch.backends.cudnn.benchmark = True` — autotuning for kernel selection
+8. Add `torch.compile(model)` — fuses CUDA kernels (10-30% speedup). **Requires Triton (Linux only).** On Windows, guard with `try: import triton` and skip gracefully
+9. Add `--no-compile` flag for debugging, `--grad-checkpoint` for VRAM savings
+
+```python
+# Full Blackwell optimization boilerplate
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+amp_dtype = {'float32': torch.float32, 'float16': torch.float16,
+             'bfloat16': torch.bfloat16}[args.dtype]
+use_scaler = (device.type == 'cuda' and amp_dtype == torch.float16)
+
+if device.type == 'cuda':
+    torch.set_float32_matmul_precision('high')   # TF32 for residual ops
+    torch.backends.cudnn.benchmark = True         # kernel autotuning
+
+model = TriadicGPT(config).to(device)
+if args.grad_checkpoint:
+    model.gradient_checkpointing_enable()         # trade compute for VRAM
+if device.type == 'cuda' and not args.no_compile:
+    model = torch.compile(model)                  # fuse kernels (10-30% faster)
+
+scaler = torch.amp.GradScaler('cuda', enabled=use_scaler)
+
+# Training loop
+with torch.amp.autocast('cuda', dtype=amp_dtype, enabled=(device.type == 'cuda')):
+    logits, proj, loss = model(x, targets=y)
+```
+
+**Conda environment:** Must use `triadic-microgpt` (PyTorch 2.12+cu128), NOT `base` (CPU-only).
+
 ## Coding Conventions
 - All PyTorch training code is in `src/torch_*.py`
 - Legacy pure-Python code is in `src/autograd.py`, `src/transformer.py`, `src/train.py` (DO NOT modify unless asked)

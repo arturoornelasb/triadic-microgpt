@@ -406,6 +406,14 @@ def full_eval(model, tokenizer, device, data_path, block_size, n_bits,
 def train_single_weight(sub_weight, args):
     """Train XL model with a given sub_weight, evaluate at 25K and 50K."""
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    amp_dtype = {'float32': torch.float32, 'float16': torch.float16,
+                 'bfloat16': torch.bfloat16}[args.dtype]
+    use_scaler = (device.type == 'cuda' and amp_dtype == torch.float16)
+
+    # Blackwell optimizations
+    if device.type == 'cuda':
+        torch.set_float32_matmul_precision('high')
+        torch.backends.cudnn.benchmark = True
     n_bits = 64
     steps = args.steps
     block_size = args.block
@@ -487,6 +495,21 @@ def train_single_weight(sub_weight, args):
     total_params = model.num_params()
     print(f"  Parameters: {total_params:,} ({total_params/1e6:.1f}M)")
 
+    # Blackwell optimizations
+    if args.grad_checkpoint:
+        model.gradient_checkpointing_enable()
+        print("  Gradient checkpointing: ON (saves VRAM)")
+    compiled = False
+    if device.type == 'cuda' and not args.no_compile:
+        try:
+            import triton  # noqa: F401
+            print("  torch.compile: compiling model...")
+            model = torch.compile(model)
+            compiled = True
+            print("  torch.compile: ON")
+        except ImportError:
+            print("  torch.compile: SKIPPED (triton not available on Windows)")
+
     # -- Subsumption pairs --
     print()
     print("[4/6] Preparing subsumption pairs...")
@@ -503,7 +526,7 @@ def train_single_weight(sub_weight, args):
     dataset = TextDataset(all_tokens, block_size)
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True,
                             drop_last=True, num_workers=0)
-    scaler = torch.amp.GradScaler('cuda', enabled=(device.type == 'cuda'))
+    scaler = torch.amp.GradScaler('cuda', enabled=use_scaler)
 
     triadic_warmup = int(steps * args.warmup_pct)
 
@@ -522,6 +545,8 @@ def train_single_weight(sub_weight, args):
     # -- Training --
     print()
     print(f"[5/6] Training for {steps} steps (sub_weight={sub_weight})...")
+    print(f"  Device: {device} | Precision: {args.dtype} | Scaler: {'ON' if use_scaler else 'OFF'}"
+          f" | Compile: {'ON' if compiled else 'OFF'}")
     print(f"  Triadic activation at step {triadic_warmup}")
     print(f"  Alpha ramp: {triadic_warmup} -> {triadic_warmup + int(steps * 0.2)} (full weight)")
     print(f"  Subsumption loss every 5 steps")
@@ -556,7 +581,7 @@ def train_single_weight(sub_weight, args):
             pg['lr'] = lr_t
 
         # Forward
-        with torch.amp.autocast('cuda', enabled=(device.type == 'cuda')):
+        with torch.amp.autocast('cuda', dtype=amp_dtype, enabled=(device.type == 'cuda')):
             logits, triadic_proj, lang_loss = model(x, targets=y)
             total_loss = lang_loss
             tri_loss_val = 0.0
@@ -880,6 +905,13 @@ def main():
     parser.add_argument('--alpha', type=float, default=0.05)
     parser.add_argument('--entropy-weight', type=float, default=1.0)
     parser.add_argument('--align-weight', type=float, default=5.0)
+    parser.add_argument('--dtype', choices=['float32', 'float16', 'bfloat16'],
+                        default='bfloat16',
+                        help='Mixed precision dtype (bfloat16 optimal for Blackwell/Ampere+)')
+    parser.add_argument('--grad-checkpoint', action='store_true',
+                        help='Enable gradient checkpointing (trade compute for VRAM)')
+    parser.add_argument('--no-compile', action='store_true',
+                        help='Disable torch.compile (useful for debugging)')
     parser.add_argument('--warmup-pct', type=float, default=0.80,
                         help='Triadic warmup fraction (default: 80%%)')
     args = parser.parse_args()

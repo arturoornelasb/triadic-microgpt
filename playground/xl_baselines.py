@@ -319,7 +319,9 @@ def train_variant(variant_name, args):
     dataset = TextDataset(all_tokens, block_size)
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True,
                             drop_last=True, num_workers=0)
-    scaler = torch.amp.GradScaler('cuda', enabled=(device.type == 'cuda'))
+    amp_dtype = torch.bfloat16
+    use_scaler = False  # bfloat16 doesn't need loss scaling
+    scaler = torch.amp.GradScaler('cuda', enabled=use_scaler)
 
     triadic_warmup = int(steps * args.warmup_pct)
 
@@ -363,7 +365,7 @@ def train_variant(variant_name, args):
             pg['lr'] = lr_t
 
         # Forward
-        with torch.amp.autocast('cuda', enabled=(device.type == 'cuda')):
+        with torch.amp.autocast('cuda', dtype=amp_dtype, enabled=(device.type == 'cuda')):
             logits, triadic_proj, lang_loss = model(x, targets=y)
             total_loss = lang_loss
             tri_loss_val = 0.0

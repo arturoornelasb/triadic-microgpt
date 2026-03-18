@@ -244,7 +244,9 @@ def train_one_seed(seed, device):
     dataset = TextDataset(all_tokens, cfg['block_size'])
     dataloader = DataLoader(dataset, batch_size=cfg['batch_size'], shuffle=True, drop_last=True,
                             num_workers=0, generator=torch.Generator().manual_seed(seed))
-    scaler = torch.amp.GradScaler('cuda', enabled=(device.type == 'cuda'))
+    amp_dtype = torch.bfloat16
+    use_scaler = False  # bfloat16 doesn't need loss scaling
+    scaler = torch.amp.GradScaler('cuda', enabled=use_scaler)
 
     triadic_warmup = int(cfg['steps'] * cfg['triadic_warmup_pct'])
 
@@ -282,7 +284,7 @@ def train_one_seed(seed, device):
         for pg in optimizer.param_groups:
             pg['lr'] = lr_t
 
-        with torch.amp.autocast('cuda', enabled=(device.type == 'cuda')):
+        with torch.amp.autocast('cuda', dtype=amp_dtype, enabled=(device.type == 'cuda')):
             logits, triadic_proj, lang_loss = model(x, targets=y)
             total_loss = lang_loss
             tri_loss_val = 0.0

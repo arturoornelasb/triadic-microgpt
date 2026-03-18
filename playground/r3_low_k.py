@@ -174,7 +174,7 @@ def prepare_analogy_tensors(triples, tokenizer, device):
 def get_word_projection(model, word_ids, device):
     """Get the mean triadic projection for a word (token IDs tensor)."""
     x = word_ids.unsqueeze(0)  # (1, seq_len)
-    with torch.amp.autocast('cuda', enabled=(device.type == 'cuda')):
+    with torch.amp.autocast('cuda', dtype=torch.bfloat16, enabled=(device.type == 'cuda')):
         _, triadic_proj, _ = model(x)
     return triadic_proj[0].mean(dim=0)  # (n_bits,)
 
@@ -231,7 +231,9 @@ def train_variant(model, tokenizer, all_tokens, device, label, n_bits,
                             drop_last=True, num_workers=0)
     optimizer = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=0.01,
                                   betas=(0.9, 0.95))
-    scaler = torch.amp.GradScaler('cuda', enabled=(device.type == 'cuda'))
+    amp_dtype = torch.bfloat16
+    use_scaler = False  # bfloat16 doesn't need loss scaling
+    scaler = torch.amp.GradScaler('cuda', enabled=use_scaler)
     triadic_warmup = int(STEPS * TRIADIC_WARMUP_PCT)
 
     model.train()
@@ -258,7 +260,7 @@ def train_variant(model, tokenizer, all_tokens, device, label, n_bits,
         for pg in optimizer.param_groups:
             pg['lr'] = lr_t
 
-        with torch.amp.autocast('cuda', enabled=(device.type == 'cuda')):
+        with torch.amp.autocast('cuda', dtype=amp_dtype, enabled=(device.type == 'cuda')):
             logits, triadic_proj, lang_loss = model(x, targets=y)
             total_loss = lang_loss
             tri_v, r3_v = 0.0, 0.0
