@@ -356,6 +356,11 @@ class TriadicGPT(nn.Module):
 
         anchor_idx = torch.randint(0, T, (B, n_anchors), device=triadic_proj.device)
         pool_idx = torch.randint(0, T, (B, n_anchors), device=triadic_proj.device)
+        # Avoid trivial self-reference where anchor == pool at same position
+        collisions = anchor_idx == pool_idx
+        if collisions.any():
+            pool_idx = pool_idx.clone()
+            pool_idx[collisions] = (pool_idx[collisions] + 1) % T
 
         anchor_e = torch.gather(embeds, 1,
                                 anchor_idx.unsqueeze(-1).expand(-1, -1, embeds.size(-1)))

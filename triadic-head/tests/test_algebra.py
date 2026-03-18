@@ -33,8 +33,8 @@ class TestPrimeMapper:
 
     def test_encode_all_negative(self):
         m = PrimeMapper(4)
-        # All negative -> composite would be 1, but returns 2 (fallback)
-        assert m.encode([-0.5, -0.5, -0.5, -0.5]) == 2
+        # All negative -> composite = 1 (identity element, no active primitives)
+        assert m.encode([-0.5, -0.5, -0.5, -0.5]) == 1
 
     def test_get_bits(self):
         m = PrimeMapper(4)
@@ -80,11 +80,11 @@ class TestTriadicValidator:
         assert TriadicValidator.similarity(30, 30) == 1.0
 
     def test_analogy(self):
-        # king(30) : queen(70) :: man(?) : woman(?)
-        # transform = 70/gcd(30,70) = 70/10 = 7
-        # analogy(30, 70, 6) -> LCM(6, 7) = 42
+        # king(30=2*3*5) : queen(70=2*5*7) :: man(6=2*3) : woman(?)
+        # only_in_a=3 (male factor), only_in_b=7 (female factor)
+        # c_reduced = 6/gcd(6,3) = 2 (remove male), then 2*7 = 14 (add female)
         result = TriadicValidator.analogy(30, 70, 6)
-        assert result == 42
+        assert result == 14  # woman = 2*7
 
 
 if __name__ == '__main__':

@@ -100,7 +100,9 @@ class PrimeMapper:
             val = float(proj)
             if val > 0:
                 composite *= prime
-        return composite if composite > 1 else 2
+        # Return 1 (identity element) when all projections negative,
+        # rather than prime 2 which has specific semantic meaning.
+        return composite
 
     def get_bits(self, projections) -> List[int]:
         """Return binary bit pattern from projections."""
@@ -188,9 +190,19 @@ class TriadicValidator:
         """
         Analogy: A is to B as C is to ?
 
-        Computes the transform T = factors_in_B_not_in_A,
-        then applies T to C: result = LCM(C, T).
+        Computes the transformation from A->B (factors removed/added),
+        then applies it to C to find D.
+
+        D = (C / GCD(C, only_in_a)) * only_in_b
+        where only_in_a = A/GCD(A,B) and only_in_b = B/GCD(A,B)
+
+        Two steps: (1) remove A-specific factors from C, (2) add B-specific.
         """
-        shared = math.gcd(a, b)
-        transform = b // shared  # what B has that A doesn't
-        return (c * transform) // math.gcd(c, transform)
+        shared_ab = math.gcd(a, b)
+        only_in_a = a // shared_ab  # factors to remove
+        only_in_b = b // shared_ab  # factors to add
+
+        # Remove A-specific factors from C (where they overlap)
+        c_reduced = c // math.gcd(c, only_in_a)
+        # Add B-specific factors (avoiding duplicates via GCD)
+        return (c_reduced * only_in_b) // math.gcd(c_reduced, only_in_b)

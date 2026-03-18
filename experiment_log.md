@@ -2268,3 +2268,116 @@ Results are essentially identical:
 **The triadic head's value is NOT semantic gap** (random projections achieve this). **Its value is algebraic operations**: analogy verification (100%), subsumption (92-100%), and correct semantic ordering. These require training the head — they cannot emerge from random projections.
 
 **This changes the paper's narrative**: the gap metric demonstrates that the head is learning structured representations, but the real contribution is the algebraic capabilities that ONLY emerge from end-to-end training.
+
+---
+
+## D-A5: Bootstrap — Algebraic Prediction of Unseen Concepts (2026-03-18)
+
+| Key | Value |
+|-----|-------|
+| **Date** | 2026-03-18 |
+| **Script** | `playground/danza_bootstrap.py` |
+| **Architecture** | 12L / 512D / 8H / 63 bits (DanzaTriadicGPT) |
+| **Params** | ~40M |
+| **Steps** | 50,000 (triadic warmup at 50% = step 25,000) |
+| **Data** | cuentos-infantiles + 63-bit supervised anchors |
+| **Scale** | XL (same as Run 15) |
+
+### Central Question
+
+Can 24 hand-factorized anchor concepts + algebraic constraints (Regla de Tres) **predict the bits** of 23 concepts the model never saw during supervision?
+
+### Design
+
+**Training split (deterministic, pre-registered):**
+- 24 TRAIN concepts: hombre, mujer, rey, caliente, frio, feliz, triste, amor, abrir, cerrar, libre, brillante, ruidoso, rapido, dulce, rico, orgulloso, ensenar, sabio, creativo, bueno, vivo, solido, oscuro
+- 23 HOLDOUT: 14 "R3-reachable" (have algebraic path via quads) + 9 "CTRL" controls (no algebraic path)
+
+**15 analogy quads for prediction:**
+- 5 exact axis: man:woman=king:queen, happy:sad=love:hate, open:close=free:prisoner, man:woman=solid:liquid, hot:cold=creative:logical
+- 2 partial axis: hot:cold=loud:quiet, bright:dark=loud:quiet
+- 4 approx bright:dark template: fast:slow, rich:poor, sweet:bitter, proud:humble
+- 2 approx happy:sad template: good:bad, alive:dead
+- 1 action direction: open:close=teach:learn
+- 1 knowledge: hot:cold=wise:ignorant
+
+**Prediction method:** Neural R3: `predicted_D = C + (B - A)` in continuous tanh projection space.
+
+**Loss:** L_total = L_lang + alpha * (L_triadic + sup_weight * L_sup + sub_weight * L_sub)
+
+### Success Criteria
+
+1. Holdout direct encoding > 75%
+2. Algebraic (R3/ensemble) > 80%
+3. Algebraic > direct + 5% (algebra adds value)
+4. Reachable (R3) > control (CTRL) + 10% (algebraic path matters)
+
+### Critical Discovery: Trivial Baseline = 90.2%
+
+Per-bit gold distribution analysis revealed that the 63-bit signatures of holdout concepts are highly imbalanced:
+
+| Category | Count | Description |
+|----------|-------|-------------|
+| Always OFF | 24 bits | High-level primitives (logic, complex emotions, senses) |
+| Always ON | 6 bits | Foundations (fuerza, posicion_temporal, uno, mover, mas) |
+| Variable | 33 bits | Discriminative — require real learning |
+
+A model that simply predicts the majority class per bit achieves **90.2% accuracy** — indistinguishable from the base-scale (5M params, 100 steps) result of 90.4% with 61/63 dead bits.
+
+**Implication:** The true test is whether the XL model exceeds 90.2% on holdout, with significantly fewer dead bits. The base-scale "90% accuracy" was trivial.
+
+### Base Scale Results (5M params, 100 triadic steps)
+
+| Metric | Value |
+|--------|-------|
+| R3 direct mean | 90.4% |
+| R3 algebraic mean | 90.8% |
+| CTRL direct mean | 88.5% |
+| Algebraic lift | +0.5% |
+| Dead bits | 61/63 |
+| Verdict | **TRIVIAL** — matches 90.2% majority-class baseline |
+
+### XL Training Progress (in progress)
+
+| Step | Loss | Lang | Tri | Sup | BitTr | BitHo | Dead |
+|------|------|------|-----|-----|-------|-------|------|
+| 2,500 | 2.426 | 2.426 | 0 | 0 | 48.2% | 47.7% | 18 |
+| 5,000 | 1.943 | 1.943 | 0 | 0 | 44.7% | 43.2% | 23 |
+| 10,000 | 1.672 | 1.672 | 0 | 0 | 46.4% | 44.3% | 26 |
+| 22,500 | 1.309 | 1.309 | 0 | 0 | 44.6% | 42.3% | 23 |
+| 25,000 | 1.308 | 1.142 | 0.493 | 1.255 | 51.5% | 50.5% | 26 |
+| 27,500 | 1.267 | 1.262 | 0.092 | 0.007 | **100%** | **87.0%** | 30 |
+| 30,000 | 1.187 | 1.182 | 0.087 | 0.007 | 100% | 86.9% | 30 |
+| 32,500 | 1.135 | 1.130 | 0.087 | 0.007 | 100% | 87.1% | 30 |
+| 35,000 | 1.077 | 1.072 | 0.086 | 0.006 | 100% | 87.1% | 30 |
+| 37,500 | 1.060 | 1.055 | 0.078 | 0.006 | 100% | 87.2% | 30 |
+| 40,000 | 1.067 | 1.062 | 0.072 | 0.006 | 100% | 87.4% | 30 |
+| 42,500 | 0.990 | 0.985 | 0.078 | 0.006 | 100% | 87.3% | 30 |
+| 45,000 | 1.010 | 1.005 | 0.078 | 0.006 | 100% | 87.2% | 30 |
+
+**Observations:**
+- Pre-triadic bit accuracy below 50% (random init bias, not meaningful)
+- Triadic loss activated at step 25,000
+- Train anchors memorized in 2,500 triadic steps (100%)
+- Holdout jumped from 50.5% to 87.0% in same window
+- **PLATEAU CONFIRMED (steps 27.5K-45K): holdout = 87.0-87.4%, dead = 30**
+- Holdout 87.2% is 3.0pp BELOW trivial baseline (90.2%)
+- Dead bits stuck at 30/63 (worse than pre-triadic 23-26)
+- sup_loss converged at 0.006, sub_loss near 0 — no more supervision signal
+- lang_loss still decreasing (1.267->1.062) but triadic head barely moves
+- tri_loss slowly decreasing (0.092->0.072) but not translating to holdout gains
+- Model overfitting to 24 train anchors without generalizing to holdout
+- **The real test will be algebraic prediction (R3), not direct encoding**
+
+### Analysis Tools Created
+
+- `playground/analyze_bootstrap.py` — Full post-training analysis: training curves, per-bit accuracy, quad type comparison, scale comparison, success criteria evaluation
+- `playground/monitor_bootstrap.py` — Real-time training monitor (`--watch 30` for auto-refresh)
+
+### Status: IN PROGRESS — awaiting completion (~step 50,000)
+
+Next steps:
+1. Wait for training to complete
+2. Run `python playground/danza_bootstrap.py --phase predict --checkpoint checkpoints/danza_bootstrap_xl/`
+3. Run `python playground/analyze_bootstrap.py` for full analysis
+4. Key question: Does holdout exceed 90.2% trivial baseline?

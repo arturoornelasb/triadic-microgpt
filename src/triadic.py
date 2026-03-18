@@ -103,9 +103,10 @@ class PrimeMapper:
             val = proj.data if hasattr(proj, 'grad') else proj
             if val > 0:
                 composite *= prime
-        # Ensure we never return 1 (degenerate case)
-        if composite == 1:
-            composite = 2
+        # Degenerate case: all projections negative = no active primitives.
+        # Return 1 (identity element for multiplication) rather than
+        # assigning prime 2 ("vacío") which has specific semantic meaning.
+        # Callers should check for composite == 1 to handle this case.
         return composite
 
     def get_bits(self, projections):
