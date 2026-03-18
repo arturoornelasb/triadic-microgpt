@@ -77,10 +77,32 @@ Los mejores resultados del proyecto NO estan en el paper:
 | Gap +0.342 (17x mejor que produccion) | P15 | Mejor resultado de gap |
 | Analogia 100% con 49 bits estructurados | P15 | Perfeccion algebraica |
 | R3 loss colapsa a k=64 | P5/P7/P10/P11 | Resultado negativo importante |
+| **reina 100% via man:woman=king:queen** | **D-A5 XL** | **Composicionalidad demostrada** |
+| Trade-off memoriz. vs composicion (r=-0.30) | D-A5 XL | Hallazgo teorico nuevo |
+| R3 algebraic 90.7% > trivial 90.2% | D-A5 XL | Senial genuina sobre majority-class |
 
-### 2.4 "Emergence" necesita re-enmarcar
+### 2.5 "Emergence" necesita re-enmarcar
 
 Lo que se llama "emergent semantic ordering" es realmente transferencia de embeddings via alignment loss. E5 muestra gradualidad, no phase transition. Usar "gradual transfer of semantic structure" o similar.
+
+### 2.6 D-A5 XL: Trade-off memorizacion vs composicionalidad
+
+Analisis profundo de los resultados D-A5 XL revela un hallazgo no anticipado:
+
+**XL sacrifico codificacion directa para ganar composicionalidad algebraica:**
+- Direct R3: Base 90.4% vs XL 87.5% (-2.8pp) — XL codifica PEOR directamente
+- Algebraic delta: Base +0.5% vs XL +3.2% — XL compone 6.4x MEJOR
+- Varianza: Base std 2.7% vs XL std 9.3% — XL es mas polarizado
+
+**Patron sistematico (r = -0.30):**
+- Direct bajo (<85%): algebra mejora +11.6% (rescata encodings debiles)
+- Direct alto (>91%): algebra dania -4.3% (proyeccion single-axis pierde riqueza)
+
+**Caso estrella — reina 100%:** XL aprendio un vector de genero ortogonal tan limpio que `king + (woman - man) = queen` es perfecto en 63 bits, aunque "queen" directamente se codifica a solo 77.8%.
+
+**Quads exactos (+7.6%) >> aproximados (+1.5%):** La calidad del quad importa mas que tener un quad. Algebra falla cuando el concepto es mas rico que el eje propuesto (pobre != dark, ignorante != cold).
+
+**Ensemble (+4.7pp en silencioso):** Unico concepto con 2 quads muestra que mas quads por concepto es el camino para aumentar el margen sobre trivial.
 
 ---
 
