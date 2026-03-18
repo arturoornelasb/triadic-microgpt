@@ -1,0 +1,209 @@
+{
+  "_descripcion": "50 conceptos ancla factorizados manualmente con razonamiento. Cada bit se justifica.",
+  "_formato": "nombre: {bits: [...], razon: '...'}",
+
+  "frío": {
+    "bits": ["tierra", "fuerza", "tacto", "orden", "control"],
+    "razon": "Tierra: solidez, cristalización. Fuerza: la energía cinética existe pero baja. Tacto: se siente en la piel. Orden: las moléculas se ordenan (cristal). Control: movimiento restringido. Quitamos más/menos — son modificadores, no constitutivos."
+  },
+  "caliente": {
+    "bits": ["fuego", "fuerza", "tacto", "caos", "libertad"],
+    "razon": "Fuego: radiancia, transformación. Fuerza: energía cinética alta. Tacto: se siente. Caos: moléculas en movimiento desordenado. Libertad: movimiento sin restricción. Comparte fuerza+tacto con frío (Hamming=4)."
+  },
+  "estasis_absoluta": {
+    "bits": ["vacío", "tierra", "muerte", "control"],
+    "razon": "Vacío: ausencia de movimiento. Tierra: solidez total. Muerte: cese. Control: nada se mueve. Menos: reducción al mínimo absoluto. Es el cero absoluto."
+  },
+  "amor": {
+    "bits": ["fuego", "agua", "unión", "vida", "placer", "consciente", "querer", "interocepción"],
+    "razon": "Fuego: pasión, intensidad. Agua: fluidez, profundidad emocional. Unión: conectar con el otro. Vida: el amor es fuerza vital. Placer: experiencia positiva. Consciente: requiere awareness. Querer: voluntad dirigida. Interocepción: se siente en el cuerpo."
+  },
+  "odio": {
+    "bits": ["fuego", "separación", "vida", "dolor", "consciente", "querer", "interocepción"],
+    "razon": "Fuego: intensidad, quema. Separación: rechazar al otro. Vida: requiere estar vivo para odiar. Dolor: experiencia negativa. Consciente: requiere awareness. Querer: voluntad dirigida (contra). Interocepción: se siente en el cuerpo. Comparte 5 bits con amor."
+  },
+  "indiferencia": {
+    "bits": ["vacío", "ausente", "separación", "muerte"],
+    "razon": "Vacío: nada dentro. Ausente: sin conciencia del otro. Separación: desconexión. Muerte: cese de la conexión emocional. GCD con amor = 1 (no comparten nada)."
+  },
+  "hombre": {
+    "bits": ["tierra", "vida", "individual", "consciente", "fuerza", "hacer"],
+    "razon": "Tierra: principio masculino (sólido, fundamento). Vida: ser vivo. Individual: persona singular. Consciente: ser consciente. Fuerza: capacidad de acción. Hacer: agente activo."
+  },
+  "mujer": {
+    "bits": ["agua", "vida", "individual", "consciente", "fuerza", "hacer"],
+    "razon": "Agua: principio femenino (fluido, adaptable, profundo). Vida: ser vivo. Individual, Consciente, Fuerza, Hacer: idénticos a hombre. Solo difieren en tierra↔agua (Cap 13)."
+  },
+  "hombre_vaciado": {
+    "bits": ["vacío", "individual", "muerte"],
+    "razon": "Vacío: vaciado de sus rasgos. Individual: sigue siendo uno. Muerte: privación de lo propio. Es el opuesto real de hombre según Cap 13."
+  },
+  "bueno": {
+    "bits": ["bien", "orden", "verdad", "unión", "vida", "consciente"],
+    "razon": "Bien: polo moral positivo. Orden: lo bueno estructura. Verdad: alineado con la realidad. Unión: conecta. Vida: favorece la vida. Consciente: requiere conciencia moral."
+  },
+  "malo": {
+    "bits": ["mal", "caos", "mentira", "separación", "consciente"],
+    "razon": "Mal: polo moral negativo. Caos: lo malo desordena. Mentira: distorsiona la realidad. Separación: divide. Consciente: el malo SABE que actúa mal (requiere conciencia). No tiene vida porque lo malo puede existir sin estar vivo (sistemas, instituciones)."
+  },
+  "amoral": {
+    "bits": ["vacío", "ausente"],
+    "razon": "Vacío: sin contenido moral. Ausente: sin conciencia moral. No tiene ni bien ni mal. GCD con bueno = 1."
+  },
+  "sabio": {
+    "bits": ["información", "saber", "orden", "consciente", "eterno_obs", "verdad", "muchos"],
+    "razon": "Información: maneja patrones. Saber: conocimiento profundo. Orden: organiza el conocimiento. Consciente: alta awareness. Eterno_obs: perspectiva que trasciende lo inmediato. Verdad: busca lo real. Muchos: conoce muchas cosas."
+  },
+  "ignorante": {
+    "bits": ["vacío", "consciente", "temporal_obs"],
+    "razon": "Vacío: ausencia de conocimiento. Consciente: está vivo y despierto, solo no sabe. Temporal_obs: atado al momento, sin perspectiva. NO tiene ausente porque el ignorante está consciente de su entorno, solo carece de saber."
+  },
+  "inercia_mental": {
+    "bits": ["vacío", "ausente", "muerte", "control"],
+    "razon": "Vacío: sin contenido mental. Ausente: sin conciencia. Muerte: cese de actividad. Control: la mente está atrapada, no fluye. Diferenciado de muerto (tiene tierra) y apatía (tiene separación)."
+  },
+  "creativo": {
+    "bits": ["fuego", "caos", "creación", "hacer", "pensar", "libertad", "consciente"],
+    "razon": "Fuego: energía transformadora. Caos: rompe patrones. Creación: genera lo nuevo. Hacer: acción. Pensar: proceso mental. Libertad: sin restricciones. Consciente: requiere awareness. Comparte pensar+consciente+hacer con lógico."
+  },
+  "lógico": {
+    "bits": ["tierra", "orden", "verdad", "pensar", "saber", "control", "consciente", "hacer"],
+    "razon": "Tierra: sólido, riguroso. Orden: estructura. Verdad: busca lo correcto. Pensar: proceso mental. Saber: conocimiento. Control: disciplina. Consciente: requiere awareness. Hacer: aplica el razonamiento. Comparte pensar+consciente+hacer con creativo (Hamming=6)."
+  },
+  "vivo": {
+    "bits": ["vida", "consciente", "interocepción", "flujo_temporal"],
+    "razon": "Vida: estado vital. Consciente: awareness. Interocepción: siente su propio cuerpo. Flujo_temporal: existe en el tiempo, cambia."
+  },
+  "muerto": {
+    "bits": ["muerte", "ausente", "vacío", "tierra"],
+    "razon": "Muerte: cese vital. Ausente: sin conciencia. Vacío: sin contenido. Tierra: el cuerpo queda como materia. Diferenciado de inercia_mental (que no tiene tierra) y apatía (que tiene separación)."
+  },
+  "feliz": {
+    "bits": ["vida", "placer", "consciente", "interocepción", "unión"],
+    "razon": "Vida: estar vivo. Placer: experiencia positiva. Consciente: aware de la felicidad. Interocepción: se siente en el cuerpo. Unión: conexión con la experiencia."
+  },
+  "triste": {
+    "bits": ["vida", "dolor", "consciente", "interocepción", "separación"],
+    "razon": "Vida: estar vivo. Dolor: experiencia negativa. Consciente: aware del dolor. Interocepción: se siente en el cuerpo. Separación: pérdida, desconexión. Comparte vida+consciente+interocepción con feliz."
+  },
+  "apatía": {
+    "bits": ["vacío", "ausente", "muerte", "separación"],
+    "razon": "Vacío: sin contenido emocional. Ausente: sin awareness. Muerte: cese emocional. Separación: desconectado de todo. Diferenciado de muerto (tiene tierra) e inercia (tiene control)."
+  },
+  "rey": {
+    "bits": ["tierra", "vida", "consciente", "fuerza", "hacer", "control", "colectivo"],
+    "razon": "Tierra: principio masculino. Vida: ser vivo. Consciente: aware. Fuerza: poder. Hacer: agente. Control: domina. Colectivo: representa al grupo. NO tiene individual — el rey se define por su relación con el colectivo."
+  },
+  "reina": {
+    "bits": ["agua", "vida", "consciente", "fuerza", "hacer", "control", "colectivo"],
+    "razon": "Agua: principio femenino. Resto idéntico a rey. Difiere solo en tierra↔agua. Regla de tres: Rey XOR Hombre = {control, colectivo, -individual}."
+  },
+  "sol": {
+    "bits": ["fuego", "fuerza", "vista", "vida", "eje_vertical", "uno", "más"],
+    "razon": "Fuego: radiancia. Fuerza: gravedad, energía. Vista: brillo. Vida: sustenta la vida. Eje_vertical: está arriba. Uno: singular en nuestro sistema. Más: exceso de energía."
+  },
+  "luna": {
+    "bits": ["agua", "vista", "flujo_temporal", "receptivo", "uno"],
+    "razon": "Agua: mareas, ciclo menstrual, reflejo. Vista: visible de noche. Flujo_temporal: fases cíclicas. Receptivo: refleja luz, no la genera. Uno: singular."
+  },
+  "oscuridad": {
+    "bits": ["vacío", "ausente", "contención"],
+    "razon": "Vacío: ausencia de luz. Ausente: sin visibilidad. Contención: envuelve, encierra."
+  },
+  "libre": {
+    "bits": ["libertad", "aire", "mover", "consciente", "creador_obs", "querer"],
+    "razon": "Libertad: autodeterminación. Aire: expansión sin límites. Mover: puede desplazarse. Consciente: aware de su libertad. Creador_obs: agente de su destino. Querer: voluntad propia."
+  },
+  "preso": {
+    "bits": ["control", "tierra", "consciente", "individual", "contención"],
+    "razon": "Control: sometido. Tierra: fijado. Consciente: aware de su prisión. Individual: solo. Contención: encerrado dentro de límites."
+  },
+  "orden_concepto": {
+    "bits": ["orden", "información", "tierra", "control", "verdad"],
+    "razon": "Orden: estructura. Información: patrones organizados. Tierra: solidez. Control: regulación. Verdad: lo ordenado revela la realidad."
+  },
+  "caos_concepto": {
+    "bits": ["caos", "fuerza", "fuego", "libertad"],
+    "razon": "Caos: desorden. Fuerza: energía sin dirección. Fuego: transformación. Libertad: sin restricciones."
+  },
+  "rápido": {
+    "bits": ["mover", "fuerza", "flujo_temporal", "más", "fuego"],
+    "razon": "Mover: desplazamiento. Fuerza: energía cinética. Flujo_temporal: el tiempo importa. Más: exceso de velocidad. Fuego: energía."
+  },
+  "lento": {
+    "bits": ["mover", "fuerza", "flujo_temporal", "menos", "tierra"],
+    "razon": "Mover: sigue habiendo movimiento. Fuerza: poca. Flujo_temporal: el tiempo importa. Menos: reducción. Tierra: pesadez. Comparte mover+fuerza+flujo con rápido."
+  },
+  "inmóvil": {
+    "bits": ["vacío", "tierra", "control", "muerte"],
+    "razon": "Vacío: sin movimiento. Tierra: fijado. Control: restringido. Muerte: cese de movimiento. Opuesto real de rápido Y lento."
+  },
+  "rico": {
+    "bits": ["más", "control", "individual", "hacer", "bien"],
+    "razon": "Más: exceso de recursos. Control: poder sobre recursos. Individual: persona particular. Hacer: capacidad de acción. Bien: valorado positivamente. NO colectivo — el rico se define como individuo con más que otros."
+  },
+  "pobre": {
+    "bits": ["menos", "individual", "consciente", "vida"],
+    "razon": "Menos: carencia. Individual: persona. Consciente: aware de su situación. Vida: está vivo. NO tiene control (no controla recursos)."
+  },
+  "orgulloso": {
+    "bits": ["consciente", "individual", "más", "interocepción", "eje_vertical", "bien"],
+    "razon": "Consciente: autoconsciente. Individual: centrado en sí. Más: se percibe en exceso. Interocepción: se siente. Eje_vertical: se eleva. Bien: se valora positivamente."
+  },
+  "humilde": {
+    "bits": ["consciente", "individual", "menos", "interocepción", "tierra"],
+    "razon": "Consciente: autoconsciente. Individual: centrado en sí. Menos: se reduce. Interocepción: se siente. Tierra: pegado al suelo (humilis = del suelo). Comparte consciente+individual+interocepción con orgulloso."
+  },
+  "dulce": {
+    "bits": ["gusto", "placer", "agua", "más"],
+    "razon": "Gusto: percepción gustativa. Placer: agradable. Agua: disolución. Más: intensidad."
+  },
+  "amargo": {
+    "bits": ["gusto", "dolor", "tierra", "menos"],
+    "razon": "Gusto: percepción gustativa. Dolor: desagradable. Tierra: astringencia, pesadez. Menos: restricción. Comparte solo gusto con dulce."
+  },
+  "ruidoso": {
+    "bits": ["oído", "aire", "fuerza", "caos", "más"],
+    "razon": "Oído: percepción auditiva. Aire: medio de transmisión. Fuerza: amplitud alta. Caos: desorden sonoro. Más: exceso."
+  },
+  "silencioso": {
+    "bits": ["oído", "aire", "vacío", "orden", "menos"],
+    "razon": "Oído: la percepción sigue activa (escuchas el silencio). Aire: el medio existe. Vacío: ausencia de sonido. Orden: calma. Menos: reducción."
+  },
+  "brillante": {
+    "bits": ["vista", "fuego", "fuerza", "más"],
+    "razon": "Vista: percepción visual. Fuego: luz. Fuerza: intensidad. Más: exceso luminoso."
+  },
+  "oscuro": {
+    "bits": ["vista", "vacío", "menos"],
+    "razon": "Vista: la percepción existe pero no hay qué ver. Vacío: ausencia de fotones. Menos: reducción."
+  },
+  "sólido": {
+    "bits": ["tierra", "orden", "contención", "tacto", "fuerza"],
+    "razon": "Tierra: materialidad sólida. Orden: moléculas fijas. Contención: mantiene forma. Tacto: se puede tocar. Fuerza: resiste."
+  },
+  "líquido": {
+    "bits": ["agua", "mover", "contención", "tacto", "flujo_temporal"],
+    "razon": "Agua: fluidez. Mover: fluye. Contención: toma la forma del contenedor. Tacto: se puede tocar. Flujo_temporal: cambia constantemente."
+  },
+  "gaseoso": {
+    "bits": ["aire", "libertad", "mover", "caos"],
+    "razon": "Aire: sustrato gaseoso. Libertad: se expande sin límite. Mover: partículas en movimiento rápido. Caos: desorden molecular máximo."
+  },
+  "enseñar": {
+    "bits": ["información", "decir", "saber", "consciente", "hacer", "unión", "creador_obs"],
+    "razon": "Información: transmite patrones. Decir: comunicación verbal. Saber: tiene conocimiento. Consciente: intencional. Hacer: acción. Unión: conecta con el estudiante. Creador_obs: genera conocimiento en el otro."
+  },
+  "aprender": {
+    "bits": ["información", "saber", "consciente", "receptivo", "pensar", "unión"],
+    "razon": "Información: recibe patrones. Saber: adquiere conocimiento. Consciente: intencional. Receptivo: absorbe. Pensar: procesa. Unión: se conecta con la fuente. Comparte información+saber+consciente+unión con enseñar."
+  },
+  "abrir": {
+    "bits": ["hacer", "libertad", "separación", "mover"],
+    "razon": "Hacer: acción. Libertad: da acceso. Separación: separa lo que estaba unido. Mover: desplazamiento."
+  },
+  "cerrar": {
+    "bits": ["hacer", "control", "unión", "mover"],
+    "razon": "Hacer: acción. Control: restringe acceso. Unión: une lo separado. Mover: desplazamiento. Comparte hacer+mover con abrir, difieren en libertad↔control y separación↔unión."
+  }
+}

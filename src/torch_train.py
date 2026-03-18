@@ -191,7 +191,20 @@ def train(args):
     dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, drop_last=True, num_workers=0)
 
     # --- Mixed precision ---
-    scaler = torch.amp.GradScaler('cuda', enabled=(device.type == 'cuda'))
+    amp_dtype = {'float32': torch.float32, 'float16': torch.float16,
+                 'bfloat16': torch.bfloat16}[args.dtype]
+    use_amp = device.type == 'cuda' and amp_dtype != torch.float32
+    use_scaler = use_amp and amp_dtype == torch.float16  # bf16 doesn't need scaling
+    scaler = torch.amp.GradScaler('cuda', enabled=use_scaler)
+    if use_amp:
+        print(f"  Mixed precision: {args.dtype}")
+    # Gradient checkpointing
+    if args.grad_checkpoint:
+        from torch.utils.checkpoint import checkpoint
+        for block in model.blocks:
+            block._orig_forward = block.forward
+            block.forward = lambda x, b=block: checkpoint(b._orig_forward, x, use_reentrant=False)
+        print(f"  Gradient checkpointing: ON")
 
     # --- Triadic components ---
     mapper = PrimeMapper(args.bits)
@@ -270,7 +283,7 @@ def train(args):
             pg['lr'] = lr_t
 
         # Forward pass with mixed precision
-        with torch.amp.autocast('cuda', enabled=(device.type == 'cuda')):
+        with torch.amp.autocast('cuda', dtype=amp_dtype, enabled=use_amp):
             logits, triadic_proj, lang_loss = model(x, targets=y)
 
             # Triadic loss
@@ -467,8 +480,12 @@ if __name__ == '__main__':
     parser.add_argument('--tokenizer', type=str, default=None, help='Pre-trained tokenizer path (skip BPE training)')
     parser.add_argument('--tokens', type=str, default=None, help='Pre-tokenized .npy cache (skip encoding)')
     parser.add_argument('--no-distill', action='store_true', help='Skip gold primes distillation (faster training)')
-    parser.add_argument('--scale', type=str, choices=['small', 'base', 'large', 'xl'], default='base', help='Model scale preset')
+    parser.add_argument('--scale', type=str, choices=['small', 'base', 'large', 'xl', 'xxl', 'huge'], default='base', help='Model scale preset')
     parser.add_argument('--override-bits', type=int, default=None, help='Override triadic bits from scale preset (for bits sweep)')
+    parser.add_argument('--dtype', choices=['float32', 'float16', 'bfloat16'], default='bfloat16',
+                        help='Mixed precision dtype (default: bfloat16 for Blackwell Tensor Cores)')
+    parser.add_argument('--grad-checkpoint', action='store_true',
+                        help='Gradient checkpointing (saves VRAM, +33%% time)')
     args = parser.parse_args()
 
     SCALE_PRESETS = {
@@ -476,6 +493,8 @@ if __name__ == '__main__':
         'base':   {'layers': 6,  'dim': 256, 'heads': 8, 'bits': 32},
         'large':  {'layers': 8,  'dim': 384, 'heads': 8, 'bits': 48},
         'xl':     {'layers': 12, 'dim': 512, 'heads': 8, 'bits': 64},
+        'xxl':    {'layers': 24, 'dim': 1024, 'heads': 16, 'bits': 64},  # ~307M
+        'huge':   {'layers': 26, 'dim': 1280, 'heads': 20, 'bits': 64},  # ~517M
     }
 
     preset = SCALE_PRESETS[args.scale]
