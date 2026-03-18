@@ -870,7 +870,8 @@ def main():
 
     if args.phase == 'train' or args.phase == 'all':
         train_anchors, holdout_anchors = get_split(all_anchors)
-        ckpt_dir = os.path.join(_PROJECT, 'checkpoints', f'danza_ternary_{args.scale}')
+        qmode = getattr(args, 'quantize_mode', 'fsq')
+        ckpt_dir = os.path.join(_PROJECT, 'checkpoints', f'danza_ternary_{qmode}_{args.scale}')
         model, tokenizer, device = run_training(
             args, train_anchors, holdout_anchors, prim_data, ckpt_dir)
 
@@ -890,8 +891,9 @@ def main():
         return
 
     if args.phase == 'predict':
+        qmode = getattr(args, 'quantize_mode', 'fsq')
         ckpt_dir = args.checkpoint or os.path.join(
-            _PROJECT, 'checkpoints', f'danza_ternary_{args.scale}')
+            _PROJECT, 'checkpoints', f'danza_ternary_{qmode}_{args.scale}')
 
         # Find latest step checkpoint
         import glob as glob_mod

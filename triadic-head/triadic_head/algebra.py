@@ -104,6 +104,9 @@ class PrimeMapper:
         # rather than prime 2 which has specific semantic meaning.
         return composite
 
+    # Alias for compatibility with src/triadic.py which uses map()
+    map = encode
+
     def get_bits(self, projections) -> List[int]:
         """Return binary bit pattern from projections."""
         return [1 if float(p) > 0 else 0 for p in projections]

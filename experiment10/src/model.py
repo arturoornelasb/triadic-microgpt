@@ -239,7 +239,7 @@ class GPT2TriadicModel(nn.Module):
 
         return rank_loss
 
-    def _align_infonce(self, triadic_proj, embeds, B, T, n_bits, temperature=0.1):
+    def _align_infonce(self, triadic_proj, embeds, B, T, n_bits, temperature=0.5):
         """InfoNCE contrastive alignment with embedding-mined positives.
 
         For each anchor token, find the most similar token in embedding space
@@ -250,6 +250,9 @@ class GPT2TriadicModel(nn.Module):
         - Structured positive/negative mining from embedding space
         - Temperature-controlled softmax creates sharper gradients
         - Natural information-theoretic objective
+
+        Bug #7 fix: temperature 0.1->0.5 to prevent logit overflow in bfloat16,
+        added eps to F.normalize, clamped logits before cross_entropy.
         """
         n_anchors = 32
 
@@ -262,8 +265,8 @@ class GPT2TriadicModel(nn.Module):
                                 anchor_idx.unsqueeze(-1).expand(-1, -1, embeds.size(-1)))
         pool_e = torch.gather(embeds, 1,
                               pool_idx.unsqueeze(-1).expand(-1, -1, embeds.size(-1)))
-        anchor_e_norm = F.normalize(anchor_e, dim=-1)
-        pool_e_norm = F.normalize(pool_e, dim=-1)
+        anchor_e_norm = F.normalize(anchor_e, dim=-1, eps=1e-6)
+        pool_e_norm = F.normalize(pool_e, dim=-1, eps=1e-6)
 
         # (B, n_anchors, n_anchors) — cross-similarity matrix in embedding space
         embed_sim_matrix = torch.bmm(anchor_e_norm, pool_e_norm.transpose(1, 2))
@@ -276,14 +279,15 @@ class GPT2TriadicModel(nn.Module):
                                 anchor_idx.unsqueeze(-1).expand(-1, -1, n_bits))
         pool_p = torch.gather(triadic_proj, 1,
                               pool_idx.unsqueeze(-1).expand(-1, -1, n_bits))
-        anchor_p_norm = F.normalize(anchor_p, dim=-1)
-        pool_p_norm = F.normalize(pool_p, dim=-1)
+        anchor_p_norm = F.normalize(anchor_p, dim=-1, eps=1e-6)
+        pool_p_norm = F.normalize(pool_p, dim=-1, eps=1e-6)
 
         # (B, n_anchors, n_anchors) — cross-similarity in triadic space
         triadic_sim_matrix = torch.bmm(anchor_p_norm, pool_p_norm.transpose(1, 2))
 
         # InfoNCE: maximize triadic sim to embedding-selected positive
-        logits = triadic_sim_matrix / temperature  # (B, n_anchors, n_anchors)
+        # Clamp logits to prevent overflow in bfloat16 softmax
+        logits = torch.clamp(triadic_sim_matrix / temperature, -30, 30)
         loss = F.cross_entropy(logits.reshape(-1, n_anchors), pos_labels.reshape(-1))
 
         return loss

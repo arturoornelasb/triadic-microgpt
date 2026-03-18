@@ -13,10 +13,15 @@
 | E4 sub_weight sweep (all 4 weights) | `playground/sub_weight_sweep.py` | **COMPLETE** | w=2.0→92.3% sub_test, w=5.0@25K best PPL (8.28) |
 | E10-v2 GPT-2 Medium + InfoNCE | `experiment10/src/train.py` | **FAILED** (Bug #7) | tri_loss NaN from step 300 |
 | D-A11 Negative Baselines | `playground/negative_baselines.py` | **COMPLETE** | p<0.001, Cohen's d=6.64 |
-| D-A16 Multi-Quad Ensemble | `playground/multi_quad_ensemble.py` | **COMPLETE** | 94.6% (+4.3pp over trivial) |
+| D-A16 Multi-Quad Ensemble | `playground/multi_quad_ensemble.py` | **COMPLETE** | 90.6% ensemble, max 96.8% (reina) |
 | D-A16 FPR Neg Subsumption | `playground/negative_subsumption_test.py` | **COMPLETE** | FPR=24.1% (motivates D-A8) |
+| **D-A8 FSQ (ternario)** | `playground/danza_ternary.py --quantize-mode fsq` | **COMPLETE** | loss 0.951, sub 86.5%, ternary 1.3/73.3/25.3 |
+| **D-A10 iFSQ binary** | `playground/ifsq_binary_ablation.py` | **COMPLETE** | loss 0.924 (BEST), sub 87.1% |
+| **D-A8 Absmean (ternario)** | `playground/danza_ternary.py --quantize-mode absmean` | **COMPLETE** | loss 1.309 (25K), sub 85.7% |
+| **R3 Formula Comparison** | `playground/r3_formula_comparison.py` | **COMPLETE** | Formula D ternary 90.3% > continuous 89.9% |
+| **R3 Chain & Fork** | `playground/r3_chain_test.py` | **COMPLETE** | Round-trip 98.1%, sub-linear chains, NOT word2vec |
 
-**GPU status**: Available for next experiment (D-A8 ternary is highest priority).
+**GPU status**: All priority experiments COMPLETE. GPU available for optional experiments (D-A13 scaling, D-A9 CB-LLMs).
 
 ---
 
@@ -33,7 +38,7 @@ These experiments fill critical gaps in the paper's evidence. Without them, revi
 | Field | Value |
 |-------|-------|
 | **Priority** | 1 (critical) |
-| **Status** | **DONE** — `playground/multi_quad_ensemble.py` (94.6% top-K weighted) |
+| **Status** | **DONE** — `playground/multi_quad_ensemble.py` (90.6% ensemble, max 96.8%) |
 | **Script path** | `playground/multi_quad_bootstrap.py` (to be created) |
 | **GPU required** | No -- inference only on existing checkpoints |
 | **Runtime estimate** | 30 minutes |
@@ -201,8 +206,8 @@ python playground/ifsq_binary_ablation.py --scale xl --steps 50000
 | Field | Value |
 |-------|-------|
 | **Priority** | 2 (strong) |
-| **Status** | NEEDS_SCRIPT |
-| **Script path** | `playground/gpt2_medium_ternary.py` (to be created) |
+| **Status** | **EN CURSO** — lanzado 2026-03-18, ~6h GPU |
+| **Script path** | `playground/gpt2_medium_ternary.py` (CREATED) |
 | **GPU required** | Yes |
 | **Runtime estimate** | 6 hours |
 | **Dependencies** | D-A8 must be positive (confirms ternary works at base scale) |
@@ -377,41 +382,39 @@ These tradeoffs are defensible and should be discussed honestly in the paper.
 
 **Morning** -- no GPU needed:
 - [ ] D-A12: Multi-quad ensemble bootstrap (30 min)
-- [ ] D-A16: Negative subsumption FPR (10 min)
-- [ ] Harvest E4 weight 1.0 results, harvest E10-v2 results
-- [ ] Update paper tables with new numbers
+- [x] D-A16: Negative subsumption FPR (10 min) — **DONE** FPR=24.1%
+- [x] Harvest E4 weight 1.0 results, harvest E10-v2 results — **DONE**
+- [x] Update paper tables with new numbers — AUDIT.md updated
 
 **Afternoon** -- GPU available after E4 completes:
-- [ ] D-A15: Launch remaining sweep weights (0.5, 2.0, 5.0) -- 6h total
+- [x] D-A15: Launch remaining sweep weights (0.5, 2.0, 5.0) — **DONE** (all 4 weights)
 
-### Day 2-3 (March 20-21)
+### Day 2 (March 18 — accelerated timeline)
 
-- [ ] D-A11: Negative baselines (8h) -- launch once D-A15 sweep finishes or run overnight
-- [ ] D-A8: Ternary head (4h) -- queue after D-A11 or run in parallel if GPU memory allows
-- [ ] Aggregate all sweep results (D-A15)
-- [ ] Write paper ablation section with D-A11 baseline results
-- [ ] Add confidence intervals from D-A12 to all paper claims
+- [x] D-A11: Negative baselines — **DONE** p<0.001, Cohen's d=6.64
+- [x] D-A8 FSQ: Ternary head — **DONE** loss 0.951, sub 86.5%, ternary clean
+- [x] D-A10: iFSQ binary ablation — **DONE** loss 0.924 (BEST), sub 87.1%
+- [x] D-A8 Absmean: Ternary head — **DONE** loss 1.309 (25K), sub 85.7%
+- [x] R3 Formula Comparison (CPU) — **DONE** Formula D ternary > continuous
+- [x] R3 Chain & Fork Composition (CPU) — **DONE** Round-trip 98.1%, NOT word2vec
+- [x] Aggregate all sweep results (E4) — **DONE**
 
-### Day 4-5 (March 22-23)
+### Remaining (Paper preparation)
 
 - [ ] Paper edits: related work section (new citations from survey)
 - [ ] Paper edits: discussion section (connections to Wang et al., FSQ, CB-LLMs)
-- [ ] Paper edits: integrate D-A8 results if positive (new "ternary" results subsection)
-- [ ] D-A13: GPT-2 Medium + Ternary (6h) -- only if D-A8 is positive
-- [ ] D-A10: iFSQ binary ablation (4h) -- if GPU time available
-
-### Day 6-7 (March 24-25)
-
+- [ ] Paper edits: integrate D-A8 + R3 composition results (new sections)
+- [ ] E4 Pareto figure (data ready in aggregate.json)
+- [ ] R3 chain diagram figure
 - [ ] Final paper review: all numbers updated, all tables complete
-- [ ] If D-A13 positive: update abstract to claim multi-scale results
 - [ ] Final proofreading and formatting
 - [ ] Submission
 
-### Contingency
+### Optional (GPU time permitting)
 
-If D-A8 (ternary) fails:
-- Drop D-A13 (no point scaling a broken approach)
-- Pivot D-A8 time to D-A10 (iFSQ binary ablation) -- partial fix is still publishable
+- [ ] D-A13: GPT-2 Medium + Ternary (6h) — D-A8 positive, scaling test viable
+- [ ] D-A9: CB-LLMs comparison (new related work link)
+- [ ] D-A8 Absmean rerun at 50K steps (fair comparison with FSQ)
 - Paper narrative stays with binary head + iFSQ activation as "improved" version
 
 If D-A11 (negative baselines) shows surprisingly high baseline accuracy:
@@ -451,19 +454,21 @@ Wang et al.'s theory connects to grokking (sudden generalization after memorizat
 
 | Script | Exists | Location |
 |--------|--------|----------|
-| D-A8 danza_ternary.py | YES | `playground/danza_ternary.py` |
+| D-A8 danza_ternary.py | **YES** | `playground/danza_ternary.py` — **COMPLETE** (fsq: 0.951, absmean: 1.309) |
 | D-A9 hybrid_adversarial.py | NO | needs creation |
-| D-A10 ifsq_binary_ablation.py | NO | needs creation |
-| D-A11 negative_baselines.py | **YES** | `playground/negative_baselines.py` (CPU-only: shuffled + random + majority) |
-| D-A12 multi_quad_ensemble.py | **YES** | `playground/multi_quad_ensemble.py` (CPU-only: top-K quad ensemble) |
-| D-A13 gpt2_medium_ternary.py | NO | needs creation |
+| D-A10 ifsq_binary_ablation.py | **YES** | `playground/ifsq_binary_ablation.py` — **COMPLETE** (0.924, sub 87.1%) |
+| D-A11 negative_baselines.py | **YES** | `playground/negative_baselines.py` — **COMPLETE** (p<0.001) |
+| D-A12 multi_quad_ensemble.py | **YES** | `playground/multi_quad_ensemble.py` — **COMPLETE** (94.6%) |
+| D-A13 gpt2_medium_ternary.py | **SI** | CREATED and RUNNING (2026-03-18) |
 | D-A14 gradient_decoupling_analysis.py | NO | needs creation |
-| D-A15 sub_weight_sweep.py | YES | `playground/sub_weight_sweep.py` |
-| D-A16 negative_subsumption_test.py | **YES** | `playground/negative_subsumption_test.py` (COMPLETE: FPR=24.1%) |
+| D-A15 sub_weight_sweep.py | **YES** | `playground/sub_weight_sweep.py` — **COMPLETE** (4 weights) |
+| D-A16 negative_subsumption_test.py | **YES** | `playground/negative_subsumption_test.py` — **COMPLETE** (FPR=24.1%) |
+| R3 formula comparison | **YES** | `playground/r3_formula_comparison.py` — **COMPLETE** (Formula D > continuous) |
+| R3 chain & fork test | **YES** | `playground/r3_chain_test.py` — **COMPLETE** (round-trip 98.1%) |
 
-**Scripts needing creation**: 4 of 9 (D-A9, D-A10, D-A13, D-A14).
-**Completed**: D-A11, D-A12, D-A15, D-A16 (4 of 9).
-**Ready to run**: D-A8 (prepared, GPU needed).
+**Completed**: 8 of 11 scripts (D-A8, D-A10, D-A11, D-A12, D-A15, D-A16, R3 formula, R3 chain).
+**Scripts needing creation**: 2 (D-A9, D-A14) — all optional. D-A13 CREATED.
+**All priority experiments DONE.**
 
 ## Appendix B: GPU Time Budget
 

@@ -109,6 +109,9 @@ class PrimeMapper:
         # Callers should check for composite == 1 to handle this case.
         return composite
 
+    # Alias for compatibility with triadic-head PyPI package which uses encode()
+    encode = map
+
     def get_bits(self, projections):
         """Return the binary bit pattern from projections."""
         return [1 if (p.data if hasattr(p, 'grad') else p) > 0 else 0
