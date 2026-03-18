@@ -1,0 +1,143 @@
+{
+  "experiment": "E2: Alignment Loss Ablation",
+  "n_variants": 3,
+  "variants": [
+    "full",
+    "no_align",
+    "no_entropy"
+  ],
+  "seed": 42,
+  "base_config": {
+    "n_layer": 12,
+    "n_embd": 512,
+    "n_head": 8,
+    "n_triadic_bits": 64,
+    "block_size": 256,
+    "dropout": 0.1,
+    "lr": 0.0003,
+    "alpha": 0.05,
+    "align_mode": "mse",
+    "triadic_warmup_pct": 0.8,
+    "batch_size": 64,
+    "steps": 50000,
+    "stories": 50000,
+    "vocab": 4096
+  },
+  "variant_configs": {
+    "full": {
+      "description": "Run 15 exact (control)",
+      "align_weight": 5.0,
+      "entropy_weight": 1.0
+    },
+    "no_align": {
+      "description": "No embedding alignment (align=0)",
+      "align_weight": 0.0,
+      "entropy_weight": 1.0
+    },
+    "no_entropy": {
+      "description": "No entropy regularization (entropy=0)",
+      "align_weight": 5.0,
+      "entropy_weight": 0.0
+    }
+  },
+  "results": {
+    "full": {
+      "variant": "full",
+      "description": "Run 15 exact (control)",
+      "align_weight": 5.0,
+      "entropy_weight": 1.0,
+      "alpha": 0.05,
+      "seed": 42,
+      "ppl": 10.858522021894412,
+      "avg_loss": 2.3849502114959824,
+      "final_train_loss": 0.7239134311676025,
+      "training_time_min": 145.6871452331543,
+      "total_params": 40035328,
+      "config": "12L/512D/8H/64bits",
+      "samples": [
+        "Once upon a time, there was a little girl named Lily. She loved to play outside in the sun and pick flowers. One day, sh",
+        "Once upon a time, a little boy named Timmy went to the park with his mommy. Timmy loved to play on the swings and slide.",
+        "Once upon a time, there was a little girl named Lily. She loved to play with her toys and her favorite toy was a teddy b"
+      ],
+      "semantic_gap": 0.024794308475988958,
+      "mean_related_sim": 0.6445333370920918,
+      "mean_random_sim": 0.6197390286161029,
+      "analogy_verification": 1.0,
+      "analogy_correct": 13,
+      "analogy_total": 13,
+      "dead_bits": 11,
+      "mean_entropy": 0.6238205147015125,
+      "ordering_correct": true,
+      "king_queen_sim": 0.4000464498210378,
+      "king_dog_sim": 0.34408391022929913
+    },
+    "no_align": {
+      "variant": "no_align",
+      "description": "No embedding alignment (align=0)",
+      "align_weight": 0.0,
+      "entropy_weight": 1.0,
+      "alpha": 0.05,
+      "seed": 42,
+      "ppl": 10.87256158905592,
+      "avg_loss": 2.3862423301372977,
+      "final_train_loss": 0.719915509223938,
+      "training_time_min": 145.32612094481786,
+      "total_params": 40035328,
+      "config": "12L/512D/8H/64bits",
+      "samples": [
+        "Once upon a time, there was a little girl named Lily. She loved to play with her toys and her favorite toy was a teddy b",
+        "Once upon a time, there was a little girl named Lily. She loved to play with her toys all day long. One day, she found a",
+        "Once upon a time, there was a little girl named Lily. She loved to play with her toys and her favorite was a big, red ba"
+      ],
+      "semantic_gap": 0.018331394093208053,
+      "mean_related_sim": 0.7397889115798759,
+      "mean_random_sim": 0.7214575174866679,
+      "analogy_verification": 1.0,
+      "analogy_correct": 13,
+      "analogy_total": 13,
+      "dead_bits": 23,
+      "mean_entropy": 0.5186817969933408,
+      "ordering_correct": true,
+      "king_queen_sim": 0.693564338475448,
+      "king_dog_sim": 0.5884513390488003
+    },
+    "no_entropy": {
+      "variant": "no_entropy",
+      "description": "No entropy regularization (entropy=0)",
+      "align_weight": 5.0,
+      "entropy_weight": 0.0,
+      "alpha": 0.05,
+      "seed": 42,
+      "ppl": 10.874145953521563,
+      "avg_loss": 2.386388040881358,
+      "final_train_loss": 0.7241177558898926,
+      "training_time_min": 145.4352413535118,
+      "total_params": 40035328,
+      "config": "12L/512D/8H/64bits",
+      "samples": [
+        "Once upon a time, there was a little girl named Lily. She loved to play outside in the sun and pick flowers. One day, sh",
+        "Once upon a time, a little boy named Timmy went to the park with his mommy. Timmy loved to play on the swings and slide.",
+        "Once upon a time, there was a little girl named Lily. She loved to play with her toys and her favorite toy was a teddy b"
+      ],
+      "semantic_gap": 0.023279583783356816,
+      "mean_related_sim": 0.6427655783475816,
+      "mean_random_sim": 0.6194859945642248,
+      "analogy_verification": 1.0,
+      "analogy_correct": 13,
+      "analogy_total": 13,
+      "dead_bits": 12,
+      "mean_entropy": 0.6234379829145817,
+      "ordering_correct": true,
+      "king_queen_sim": 0.39862049627391266,
+      "king_dog_sim": 0.3436566004255921
+    }
+  },
+  "reference": {
+    "name": "Run 15 (v1.4-strongalign)",
+    "ppl": 7.69,
+    "semantic_gap": 0.02,
+    "analogy_verification": 0.692,
+    "dead_bits": 15,
+    "mean_entropy": 0.749
+  }
+}

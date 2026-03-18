@@ -1,0 +1,52 @@
+{
+  "run15": {
+    "ppl": 7.69,
+    "semantic_gap": 0.02,
+    "dead_bits": 15,
+    "mean_bit_entropy": 0.749,
+    "analogy_verification": 1.0,
+    "training_time_min": 76
+  },
+  "baselines": {
+    "pure_lang": {
+      "experiment": "xl_baseline_pure_lang",
+      "variant": "pure_lang",
+      "label": "B2: Pure Language (alpha=0)",
+      "description": "No triadic loss \u2014 head exists but is never trained",
+      "config": "12L/512D/8H/64bits (XL, 40M params)",
+      "alpha": 0.0,
+      "freeze_head": false,
+      "steps": 50000,
+      "training_time_min": 142.8410443544388,
+      "ppl": 10.645957110496074,
+      "avg_loss": 2.3651802060458578,
+      "semantic_gap": 0.05560434202735243,
+      "mean_bit_entropy": 0.6265742142125398,
+      "dead_bits": 16,
+      "analogy_verification": 0.16666666666666666,
+      "king_queen_sim": 0.5527735352516174,
+      "king_dog_sim": 0.44649216532707214,
+      "ordering_correct": true
+    },
+    "frozen_random": {
+      "experiment": "xl_baseline_frozen_random",
+      "variant": "frozen_random",
+      "label": "B3: Frozen Random Head",
+      "description": "Triadic loss (entropy+diversity only, no alignment) with frozen random head",
+      "config": "12L/512D/8H/64bits (XL, 40M params)",
+      "alpha": 0.05,
+      "freeze_head": true,
+      "steps": 50000,
+      "training_time_min": 143.6086199680964,
+      "ppl": 10.683092010525256,
+      "avg_loss": 2.3686623057250555,
+      "semantic_gap": 0.022217628305348014,
+      "mean_bit_entropy": 0.615794344211097,
+      "dead_bits": 13,
+      "analogy_verification": 0.3333333333333333,
+      "king_queen_sim": 0.34119510650634766,
+      "king_dog_sim": 0.6354180574417114,
+      "ordering_correct": false
+    }
+  }
+}

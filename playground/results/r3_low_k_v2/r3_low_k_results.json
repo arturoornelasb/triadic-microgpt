@@ -1,0 +1,209 @@
+{
+  "experiment": "E7_r3_low_k",
+  "description": "R3 loss at k=6,8,12 \u2014 does it avoid the dead-bit collapse seen at k=64?",
+  "config": {
+    "scale": "base",
+    "arch": "6L/256D/8H",
+    "steps": 10000,
+    "batch_size": 32,
+    "alpha": 0.05,
+    "entropy_weight": 1.0,
+    "align_weight": 3.0,
+    "align_mode": "mse",
+    "triadic_warmup_pct": 0.25
+  },
+  "train_triples": [
+    "king:queen::man:woman",
+    "father:mother::brother:sister",
+    "father:mother::son:daughter",
+    "dog:puppy::cat:kitten",
+    "big:small::tall:short",
+    "hot:cold::day:night",
+    "happy:sad::love:hate",
+    "princess:prince::queen:king",
+    "bird:fly::fish:swim",
+    "old:young::big:small",
+    "doctor:hospital::teacher:school",
+    "sun:day::moon:night",
+    "red:blue::green:yellow",
+    "husband:wife::boy:girl",
+    "teacher:student::doctor:patient",
+    "morning:night::summer:winter"
+  ],
+  "test_triples": [
+    "uncle:aunt::grandpa:grandma",
+    "black:white::dark:light",
+    "up:down::left:right",
+    "cake:sweet::lemon:sour"
+  ],
+  "results": {
+    "k=6": {
+      "Baseline": {
+        "dead_bits": 3,
+        "total_bits": 6,
+        "entropy": 0.30472173135048947,
+        "r3_train_acc": 0.0,
+        "r3_train_cos_mean": 0.13238797552185133,
+        "r3_test_acc": 0.0,
+        "r3_test_cos_mean": 0.26792701333761215,
+        "r3_test_cos_detail": [
+          -0.29824551939964294,
+          0.6715848445892334,
+          0.3365185558795929,
+          0.36185017228126526
+        ],
+        "semantic_gap": 0.010499036759138103,
+        "lang_loss": 1.7184410095214844,
+        "params": 5840896
+      },
+      "R3 w=1.0": {
+        "dead_bits": 2,
+        "total_bits": 6,
+        "entropy": 0.5937057594933036,
+        "r3_train_acc": 1.0,
+        "r3_train_cos_mean": 0.9985997900366783,
+        "r3_test_acc": 0.25,
+        "r3_test_cos_mean": -0.11777098849415779,
+        "r3_test_cos_detail": [
+          -0.7110697627067566,
+          0.984846830368042,
+          0.14379696547985077,
+          -0.8886579871177673
+        ],
+        "semantic_gap": -0.07260349439515268,
+        "lang_loss": 1.7535133361816406,
+        "params": 5840896
+      },
+      "R3 w=5.0": {
+        "dead_bits": 2,
+        "total_bits": 6,
+        "entropy": 0.6648317708025399,
+        "r3_train_acc": 1.0,
+        "r3_train_cos_mean": 0.9997490271925926,
+        "r3_test_acc": 0.25,
+        "r3_test_cos_mean": -0.2098231390118599,
+        "r3_test_cos_detail": [
+          -0.4508143365383148,
+          0.9376078844070435,
+          -0.9175833463668823,
+          -0.4085027575492859
+        ],
+        "semantic_gap": -0.34717241988517344,
+        "lang_loss": 1.7326678037643433,
+        "params": 5840896
+      }
+    },
+    "k=8": {
+      "Baseline": {
+        "dead_bits": 3,
+        "total_bits": 8,
+        "entropy": 0.5275807024155542,
+        "r3_train_acc": 0.0,
+        "r3_train_cos_mean": 0.024236190365627408,
+        "r3_test_acc": 0.0,
+        "r3_test_cos_mean": 0.34103555232286453,
+        "r3_test_cos_detail": [
+          0.4904198944568634,
+          0.28389042615890503,
+          -0.16390085220336914,
+          0.7537327408790588
+        ],
+        "semantic_gap": -0.03855302117764947,
+        "lang_loss": 1.7399940490722656,
+        "params": 5841408
+      },
+      "R3 w=1.0": {
+        "dead_bits": 3,
+        "total_bits": 8,
+        "entropy": 0.6549918987854718,
+        "r3_train_acc": 1.0,
+        "r3_train_cos_mean": 0.9983421564102173,
+        "r3_test_acc": 0.0,
+        "r3_test_cos_mean": -0.5475133582949638,
+        "r3_test_cos_detail": [
+          -0.7060185670852661,
+          -0.9562007188796997,
+          -0.9240896701812744,
+          0.3962555229663849
+        ],
+        "semantic_gap": -0.2603525677228754,
+        "lang_loss": 1.7711379528045654,
+        "params": 5841408
+      },
+      "R3 w=5.0": {
+        "dead_bits": 2,
+        "total_bits": 8,
+        "entropy": 0.720773389050546,
+        "r3_train_acc": 1.0,
+        "r3_train_cos_mean": 0.999312374740839,
+        "r3_test_acc": 0.25,
+        "r3_test_cos_mean": 0.24700505239889026,
+        "r3_test_cos_detail": [
+          0.02976497821509838,
+          0.9739092588424683,
+          -0.8027767539024353,
+          0.7871227264404297
+        ],
+        "semantic_gap": -0.289604670398403,
+        "lang_loss": 1.7420339584350586,
+        "params": 5841408
+      }
+    },
+    "k=12": {
+      "Baseline": {
+        "dead_bits": 4,
+        "total_bits": 12,
+        "entropy": 0.5988660025235791,
+        "r3_train_acc": 0.0,
+        "r3_train_cos_mean": 0.018038513211649843,
+        "r3_test_acc": 0.0,
+        "r3_test_cos_mean": 0.22563003096729517,
+        "r3_test_cos_detail": [
+          0.3113018870353699,
+          0.6808403134346008,
+          0.05655315890908241,
+          -0.14617523550987244
+        ],
+        "semantic_gap": -0.0377570414613001,
+        "lang_loss": 1.6898574829101562,
+        "params": 5842432
+      },
+      "R3 w=1.0": {
+        "dead_bits": 5,
+        "total_bits": 12,
+        "entropy": 0.5719775855332988,
+        "r3_train_acc": 1.0,
+        "r3_train_cos_mean": 0.998856671154499,
+        "r3_test_acc": 0.0,
+        "r3_test_cos_mean": -0.49041442573070526,
+        "r3_test_cos_detail": [
+          -0.5931289792060852,
+          -0.9803167581558228,
+          -0.9101905226707458,
+          0.5219785571098328
+        ],
+        "semantic_gap": -0.23308666118653487,
+        "lang_loss": 1.6383585929870605,
+        "params": 5842432
+      },
+      "R3 w=5.0": {
+        "dead_bits": 2,
+        "total_bits": 12,
+        "entropy": 0.8319945506155048,
+        "r3_train_acc": 1.0,
+        "r3_train_cos_mean": 0.9995353035628796,
+        "r3_test_acc": 0.25,
+        "r3_test_cos_mean": 0.2165776528418064,
+        "r3_test_cos_detail": [
+          -0.8757151961326599,
+          0.6582962274551392,
+          0.13984031975269318,
+          0.9438892602920532
+        ],
+        "semantic_gap": -0.4763043282087892,
+        "lang_loss": 1.7374236583709717,
+        "params": 5842432
+      }
+    }
+  }
+}

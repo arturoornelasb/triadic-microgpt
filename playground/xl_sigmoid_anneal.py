@@ -320,7 +320,8 @@ def main():
     # Paths
     data_path = os.path.join(PROJECT_ROOT, 'data', 'TinyStories-train.txt')
     tokenizer_path = os.path.join(PROJECT_ROOT, 'checkpoints', 'torch_run15_strongalign', 'tokenizer.json')
-    checkpoint_dir = os.path.join(PROJECT_ROOT, 'playground', 'checkpoints_xl_sigmoid_anneal')
+    temp_suffix = f"_temp{int(args.final_temp)}" if args.final_temp != 10.0 else ""
+    checkpoint_dir = os.path.join(PROJECT_ROOT, 'playground', f'checkpoints_xl_sigmoid_anneal{temp_suffix}')
     results_dir = os.path.join(PROJECT_ROOT, 'playground', 'results')
     os.makedirs(checkpoint_dir, exist_ok=True)
     os.makedirs(results_dir, exist_ok=True)
@@ -592,7 +593,8 @@ def main():
         'run15_baseline': RUN15_BASELINE,
     }
 
-    results_path = os.path.join(results_dir, 'xl_sigmoid_anneal.json')
+    temp_tag = f"_temp{int(args.final_temp)}" if args.final_temp != 10.0 else ""
+    results_path = os.path.join(results_dir, f'xl_sigmoid_anneal{temp_tag}.json')
     with open(results_path, 'w') as f:
         json.dump(results, f, indent=2)
     print(f"\n  Results: {results_path}")

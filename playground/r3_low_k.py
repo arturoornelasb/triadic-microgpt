@@ -43,7 +43,7 @@ import matplotlib.pyplot as plt
 
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-RESULTS_DIR = os.path.join(PROJECT_ROOT, 'playground', 'results', 'r3_low_k')
+RESULTS_DIR = os.path.join(PROJECT_ROOT, 'playground', 'results', 'r3_low_k_v2')
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
 # ============================================================
@@ -86,12 +86,12 @@ TRAIN_TRIPLES = [
     ("morning", "night", "summer", "winter"),
 ]
 
-# 4 held-out test triples
+# 4 held-out test triples (no word overlap with TRAIN_TRIPLES)
 TEST_TRIPLES = [
-    ("brother", "sister", "uncle", "aunt"),
-    ("run", "walk", "fly", "swim"),
+    ("uncle", "aunt", "grandpa", "grandma"),
     ("black", "white", "dark", "light"),
-    ("mother", "father", "daughter", "son"),
+    ("up", "down", "left", "right"),
+    ("cake", "sweet", "lemon", "sour"),
 ]
 
 

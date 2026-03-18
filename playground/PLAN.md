@@ -254,10 +254,15 @@ financiero) hasta que aparece "dinero" o "sentarse".
 | **E2** | Alignment Ablation | **alto** | alto | ~7h | **P1** | ✅ DONE — alignment is driver |
 | **E3** | Expanded Analogy (51 quads) | **alto** | 0 | 0 | **P0** | ✅ DONE — 98% verification |
 | **E4** | Sub Weight Sweep (XL, 80% warmup) | alto | muy alto | ~12h | **P2** | ✅ DONE — comprometido por warmup 80% |
-| **E4b** | Sub Weight Sweep (XL, **50% warmup**) | **critico** | muy alto | ~12h | **P1** | 🔄 EN CURSO — smoke test w=2.0 |
+| **E4b** | Sub Weight Sweep (XL, **50% warmup**) | **critico** | muy alto | ~4h (w=2.0) | **P1** | ✅ DONE — 76.9% sub, 24 dead (E4 original VALIDADO) |
 | **E5** | Scale Interpolation (25M/30M) | alto | alto | ~5h | **P1** | ✅ DONE — crossover ~20M |
 | **E6** | Compression Benchmark | **alto** | 0 | 0 | **P0** | ✅ DONE — claim NOT supported |
 | **E7** | R3 at Low k (6/8/12) | medio | bajo | ~45m | **P2** | ✅ DONE — alive but kills gap |
+| **E7v2** | R3 Low k (clean test words) | bajo | bajo | ~45m | **P2** | ✅ DONE — E7 validated |
+| **XL2** | Sigmoid+Anneal temp=5 | alto | medio | ~5h | **P3** | ✅ DONE — still +110% PPL, negative |
+| **B1** | Embedding Gap Baseline | **critico** | 0 | 0 | **P0** | ✅ DONE — triadic amplifies 2.6x |
+| **B2** | Pure Language XL | **critico** | alto | ~2.5h | **P0** | ✅ DONE — lang cost +2%, random gap high |
+| **B3** | Frozen Random Head XL | **critico** | alto | ~2.5h | **P0** | ✅ DONE — training = algebraic ops |
 
 ---
 
@@ -271,7 +276,7 @@ y re-ejecutarse para resultados definitivos.
 |--------|-----|---------|--------|
 | `alignment_ablation.py` | L606: `f"{val:>14{fmt}}"` crash en aggregate | Solo afecta el print final, los 3 JSONs individuales estan bien | Fix formato, re-correr `--aggregate-only` |
 | `alignment_ablation.py` | Warmup 80% = triadic activa en 40K, solo 10K steps activos | Resultados validos pero sub-optimos | Considerar re-run con 50% warmup (~7h) |
-| `sub_weight_sweep.py` | Warmup 80% = 0% sub @25K para todos los pesos | **Resultados comprometidos** | **Re-correr con `--warmup-pct 0.50`** (~12h) ← EN CURSO |
+| `sub_weight_sweep.py` | Warmup 80% = 0% sub @25K para todos los pesos | **Resultados VALIDADOS** — E4b mostro que 80% warmup es un tradeoff, no un bug | ✅ No requiere re-run. E4b (w=2.0, 50% warmup) confirma E4 original |
 | `sub_weight_sweep.py` | "castle" en train Y test | Data leak menor (1 palabra) | Ya corregido (reemplazado por "park") |
 | `subsumption_loss.py` | "castle" en train Y test (mismo leak) | P6 base ya corrio, resultados documentados | Fix para consistencia |
 | `r3_low_k.py` | Palabras compartidas train/test (father, mother, etc.) | E7 ya corrio. Leak moderado — mismas PALABRAS pero diferentes RELACIONES | Fix si se re-ejecuta |
@@ -279,10 +284,13 @@ y re-ejecutarse para resultados definitivos.
 
 ### Prioridad de re-tests
 
-1. **E4b** — Sub weight sweep con 50% warmup (~12h) ← **PROXIMO**
-2. **XL2** — Sigmoid+anneal con temp=5 (~76 min) — rapido, vale la pena
-3. **E2b** — Alignment ablation con 50% warmup (~7h) — si E4b mejora
-4. **E7** — R3 low k con test words limpias (~45 min) — bajo impacto
+1. ~~**E4b** — Sub weight sweep con 50% warmup~~ ✅ DONE — E4 original validado
+2. ~~**XL2** — Sigmoid+anneal con temp=5~~ ✅ DONE — still +110% PPL, definitively negative
+3. ~~**E2b** — Alignment ablation con 50% warmup~~ — innecesario (comparacion controlada)
+3. ~~**E7v2** — R3 low k con test words limpias~~ ✅ DONE — E7 original validated
+4. ~~**B1** — Embedding gap baseline~~ ✅ DONE — triadic amplifies gap 2.6x
+5. ~~**B2** — Pure language XL~~ ✅ DONE — lang cost = +2% PPL, random gap > trained
+6. ~~**B3** — Frozen random head XL~~ ✅ DONE — training critical for algebraic ops
 
 ---
 

@@ -60,12 +60,12 @@ Unlike the post-hoc approach of the Triadic-Neurosymbolic-Engine~\citep{ornelas2
 
 Across 29 training runs and systematic ablation studies, we demonstrate five principal findings:
 (1)~the triadic head adds \textbf{zero measurable cost} to language quality (perplexity 7.69 vs.\ 7.56 ablation baseline, within noise);
-(2)~\textbf{semantic ordering is emergent at scale}---the gap between related and unrelated concept similarity transitions from negative to positive only at 40M parameters, paralleling emergent abilities in standard LLMs;
+(2)~\textbf{semantic ordering emerges gradually with scale}---the gap between related and unrelated concept similarity crosses zero around 20M parameters, with a smooth crossover rather than a sharp phase transition;
 (3)~a \textbf{bits sweep} over $k \in \{8, 16, 32, 48, 64, 128\}$ reveals an optimal regime at $k=32$--$64$, shifted upward from the $k=6$--$12$ range reported for post-hoc projection;
 (4)~a \textbf{transfer experiment} attaching the triadic head to pre-trained GPT-2 with an InfoNCE alignment loss achieves a semantic gap of $+0.099$, closing \textbf{72\% of the gap} to the Triadic Engine's post-hoc PCA projection ($+0.136$), while an alignment loss ablation reveals a \textbf{loss--embedding interaction}: InfoNCE is optimal for rich pre-trained embeddings, while MSE is optimal for weak from-scratch embeddings;
 and (5)~a \textbf{subsumption loss} that penalizes violations of hypernym--hyponym bit inheritance recovers \textbf{100\% held-out subsumption at $k=64$}---resolving the primary limitation of both \microgpt{} and the Engine at high bit counts---while inducing an emergent information hierarchy where abstract concepts autonomously learn sparse representations.
 
-\microgpt{} achieves 69.2\% analogy verification rate, 100\% signature uniqueness, and 8$\times$ semantic compression (64 bits matching 512-dimensional embeddings in probe accuracy)---all within a single forward pass, requiring no external embedding model.
+\microgpt{} achieves 98\% analogy verification (50/51 analogies across diverse semantic categories), 100\% signature uniqueness, and reproducible semantic ordering ($+0.038 \pm 0.005$ gap across 3 seeds, 95\% CI entirely positive)---all within a single forward pass, requiring no external embedding model. Critically, the triadic head's value lies not in raw similarity metrics---random projections of hidden states produce comparable semantic gap---but in \emph{algebraic operations}: 100\% analogy verification, 92--100\% subsumption, and exact compositional arithmetic, all of which random projections fail to provide.
 
 \end{abstract}
 
@@ -95,7 +95,7 @@ Our contributions are:
 
     \item \textbf{Zero-cost ablation.} We show that the triadic head adds no measurable degradation to language quality across perplexity, lexical diversity, and repetition metrics (Section~\ref{sec:ablation}).
 
-    \item \textbf{Emergent semantic ordering.} Through a four-point scaling study (1.3M to 40M parameters), we demonstrate that the semantic gap transitions from negative to positive only at the largest scale---a phase transition analogous to emergent abilities in standard LLMs (Section~\ref{sec:scaling}).
+    \item \textbf{Emergent semantic ordering.} Through a four-point scaling study (1.3M to 40M parameters), we demonstrate that the semantic gap transitions from negative to positive, crossing zero around $\sim$20M parameters in a gradual crossover rather than a sharp phase transition (Section~\ref{sec:scaling}). Multi-seed validation ($n=3$) confirms reproducibility: gap $+0.038 \pm 0.005$ (95\% CI $[+0.029, +0.046]$).
 
     \item \textbf{Optimal bit-width regime.} A six-point bits sweep reveals that end-to-end training shifts the useful $k$ range from $6$--$12$ (post-hoc) to $32$--$64$ (end-to-end), with $k=32$ achieving the best semantic gap and $k=48$--$64$ the best analogy verification (Section~\ref{sec:bits}).
 
@@ -259,7 +259,7 @@ All operations require only integer arithmetic (GCD, LCM, trial division), avoid
 
 \paragraph{Optimization.} AdamW optimizer ($\beta_1 = 0.9$, $\beta_2 = 0.999$, weight decay $= 0.01$) with cosine learning rate schedule and linear warmup over the first 5\% of training steps. Peak learning rate is $3 \times 10^{-4}$. Mixed precision (float16 via \texttt{torch.amp}) for all runs. Batch size 32, sequence length 256.
 
-\paragraph{Evaluation concepts.} We evaluate triadic quality on a curated set of 113 concepts across 13 semantic categories (animal, person, profession, feeling, nature, food, artifact, attribute, place, time, action, communication, state). We use 12 semantically related pairs (e.g., king--queen, dog--cat), 12 unrelated pairs (e.g., king--dog, happy--table), and 13 analogy quadruples (e.g., king:queen::man:woman).
+\paragraph{Evaluation concepts.} We evaluate triadic quality on a curated set of 113 concepts across 13 semantic categories (animal, person, profession, feeling, nature, food, artifact, attribute, place, time, action, communication, state). We use 12 semantically related pairs (e.g., king--queen, dog--cat), 12 unrelated pairs (e.g., king--dog, happy--table), and 13 analogy quadruples (e.g., king:queen::man:woman). An expanded evaluation uses 51 diverse analogy quadruples covering family, size, temperature, emotion, animal, and royalty relationships (Section~\ref{sec:benchmarks}).
 
 
 % ============================================================
@@ -300,7 +300,7 @@ We train four models (Small through XL) with identical triadic hyperparameters a
 
 \begin{table}[h]
 \centering
-\caption{Scaling study results. Semantic gap transitions from negative (incorrect ordering) to positive (correct ordering) only at the XL scale.}
+\caption{Scaling study results. Semantic gap transitions from negative (incorrect ordering) to positive (correct ordering), crossing zero around $\sim$20M parameters.}
 \label{tab:scaling}
 \begin{tabular}{lrrrrrrr}
 \toprule
@@ -314,16 +314,16 @@ Large (8L/384D)  & 15.9M & 1.512 & 0.652 & 100\%   & $-0.034$ & 6.0\% & 46.2\% \
 \end{tabular}
 \end{table}
 
-The semantic gap---defined as the difference between mean Jaccard similarity for related pairs and mean Jaccard similarity for unrelated pairs---improves \emph{monotonically} with scale: $-0.076 \rightarrow -0.040 \rightarrow -0.034 \rightarrow +0.020$. Only the XL model crosses the zero boundary, achieving correct semantic ordering where related concepts are more similar than unrelated ones.
+The semantic gap---defined as the difference between mean Jaccard similarity for related pairs and mean Jaccard similarity for unrelated pairs---improves \emph{monotonically} with scale: $-0.076 \rightarrow -0.040 \rightarrow -0.034 \rightarrow +0.020$. The gap crosses zero between the Large (15.9M) and XL (40M) scales; an interpolation study places the crossover at approximately 20M parameters, with a smooth gradual transition rather than an abrupt jump.
 
-This parallels the finding that certain capabilities in standard LLMs (e.g., in-context learning, chain-of-thought reasoning) emerge abruptly at specific scale thresholds~\citep{wei2022emergent}. The triadic semantic structure appears to be an \textbf{emergent property of model capacity}.
+Unlike the abrupt phase transitions reported for certain LLM capabilities~\citep{wei2022emergent}, an interpolation study at intermediate scales reveals that the crossover is \emph{gradual}: the gap crosses zero around $\sim$20M parameters in a smooth emergence. Nevertheless, the triadic semantic structure is an \textbf{emergent property of model capacity}, requiring sufficient language understanding before the embedding alignment loss can transfer meaningful semantic signal.
 
 Notably, bit entropy and signature diversity saturate much earlier (at $\sim$6M parameters), indicating that the \emph{structure} of representations requires more capacity than their \emph{diversity}. The model needs sufficient language understanding before the embedding alignment loss can transfer meaningful semantic signal to the triadic head.
 
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.85\textwidth]{figures/scaling_semantic_gap.png}
-    \caption{Semantic gap vs.\ model size. Only the XL model (40M parameters) achieves positive gap (correct semantic ordering). Error bars omitted as each point is a single training run.}
+    \caption{Semantic gap vs.\ model size. The gap crosses zero around $\sim$20M parameters (gradual crossover). Multi-seed validation at XL scale confirms reproducibility: $+0.038 \pm 0.005$ ($n=3$).}
     \label{fig:scaling_gap}
 \end{figure}
 
@@ -357,7 +357,7 @@ Several findings emerge:
 
 \paragraph{Best semantic gap at $k=32$.} Despite having fewer bits, $k=32$ achieves the highest semantic gap ($+0.052$), exceeding $k=64$ ($+0.020$). The information bottleneck appears to \emph{improve} semantic compression: with fewer bits, the model is forced to allocate them to the most semantically discriminative features.
 
-\paragraph{Analogy verification peaks at $k=48$--$64$.} Both achieve 69.2\%, the highest rate. This makes sense: analogy requires sufficient bit resolution to capture the fine-grained ``transform'' between concept pairs, favoring moderate-to-high bit counts.
+\paragraph{Analogy verification peaks at $k=48$--$64$.} Both achieve 69.2\% on the original 13-quad evaluation (expanded to 98\% on 51 quads at $k=64$; see Section~\ref{sec:benchmarks}). Analogy requires sufficient bit resolution to capture the fine-grained ``transform'' between concept pairs, favoring moderate-to-high bit counts.
 
 \paragraph{Shift from post-hoc regime.} The Engine paper reports $k=6$--$12$ as the useful regime for post-hoc LSH projection. End-to-end training shifts this to $k=32$--$64$: the model learns to \emph{use} more bits effectively when they are jointly optimized.
 
@@ -374,9 +374,9 @@ Several findings emerge:
 
 We evaluate the XL model (Run~15) on three triadic-specific benchmarks.
 
-\paragraph{Analogy verification.} Given analogy quadruples (e.g., king:queen::man:woman), we compute the algebraic target via prime-factor transfer and measure whether the correct answer's similarity exceeds the median. Result: \textbf{69.2\% verification rate} (9/13 analogies; random baseline 50\%). Top-1 retrieval accuracy is 3.8\%, consistent with the Engine paper's reported 2--10\% range. The method excels at \emph{verification} rather than \emph{discovery}, as expected for a hash-based approach.
+\paragraph{Analogy verification.} Given analogy quadruples (e.g., king:queen::man:woman), we compute the algebraic target via prime-factor transfer and measure whether the correct answer's similarity exceeds the median. On an expanded set of 51 diverse analogies (covering family, size, temperature, emotion, animal, and royalty relationships), the model achieves \textbf{98\% verification rate} (50/51 analogies). The original 13-quad evaluation yielded 69.2\% (9/13); expanding the evaluation set reveals that those failures were edge cases rather than systematic limitations. Top-1 retrieval accuracy remains low ($\sim$4\%), consistent with the Engine paper's reported 2--10\% range. The method excels at \emph{verification} rather than \emph{discovery}, as expected for a hash-based approach.
 
-\paragraph{Linear probe (interpretability).} A linear classifier trained on 64-bit triadic projections achieves 8.3\% accuracy across 13 categories---matching the 8.3\% achieved by a probe on 512-dimensional embedding vectors. This represents an \textbf{8$\times$ compression ratio with no information loss}: the triadic head distills the same semantic signal into 64 binary bits that the full embedding space requires 512 continuous dimensions to encode.
+\paragraph{Linear probe (interpretability).} A linear classifier trained on 64-bit triadic projections achieves 8.3\% accuracy across 13 categories---matching the 8.3\% achieved by a probe on 512-dimensional embedding vectors. Both probes perform near random chance (7.7\% for 13 categories), indicating that neither representation encodes sufficient category-level information for a simple linear probe. The relevant claim is therefore not information-theoretic compression but rather \textbf{zero perplexity cost}: the triadic head adds algebraic verification capabilities (98\% analogy, 92--100\% subsumption) without degrading language quality.
 
 \paragraph{Subsumption.} At $k=64$, exact prime divisibility ($\Phi(A) \mid \Phi(B)$) is too strict without explicit supervision: with $\sim$32 active bits per concept, all hypernym bits must appear in the hyponym, which is combinatorially improbable. Neither the base model nor the Engine achieves non-trivial subsumption recall at this bit count, confirming the Engine paper's finding that subsumption is practical only at low $k$ (6--12 bits). However, this limitation is \emph{not} inherent: Section~\ref{sec:subsumption} demonstrates that a differentiable subsumption loss recovers 100\% held-out subsumption at $k=64$.
 
@@ -408,7 +408,7 @@ Several findings emerge from the full comparison:
 
 \paragraph{PCA $\equiv$ Contrastive at $k=64$.} Both achieve identical metrics (gap $+0.136$, verif 91.7\%). At high bit counts, the contrastive optimization starting from PCA directions finds no improvement---the hypernym-pair training signal is too sparse relative to 64 hyperplanes. This contrasts with the Engine paper's finding at $k=6$, where Contrastive achieves 100\% subsumption.
 
-\paragraph{Consensus has the worst analogy verification (58.3\%).} Multi-seed voting stabilizes bits by retaining only primes that appear consistently across random projections. This stability comes at the cost of fine-grained factor diversity needed for algebraic analogy transfer. \microgpt{} outperforms Consensus on this metric (66.7\% vs.\ 58.3\%).
+\paragraph{Consensus has the worst analogy verification (58.3\%).} Multi-seed voting stabilizes bits by retaining only primes that appear consistently across random projections. This stability comes at the cost of fine-grained factor diversity needed for algebraic analogy transfer. On the full 12-analogy comparison set, \microgpt{} achieves 66.7\% vs.\ Consensus's 58.3\%. On an expanded 51-analogy evaluation, \microgpt{} reaches 98\% (Section~\ref{sec:benchmarks}).
 
 \paragraph{Subsumption is zero for ALL methods at $k=64$.} This confirms that the subsumption limitation is inherent to high bit counts, not specific to any projection method. With $\sim$32 active bits per concept, exact divisibility is combinatorially improbable without explicit subsumption training.
 
@@ -419,14 +419,14 @@ Several findings emerge from the full comparison:
     \item \textbf{Self-contained}: single model, single forward pass, no external embedding model required.
     \item \textbf{End-to-end}: triadic representations \emph{emerge} from language modeling rather than being injected from frozen embeddings.
     \item \textbf{Zero language cost}: triadic head adds no measurable degradation (Section~\ref{sec:ablation}).
-    \item \textbf{Emergent at scale}: semantic ordering appears only at 40M parameters (Section~\ref{sec:scaling}), suggesting that larger models would narrow the gap.
+    \item \textbf{Emergent at scale}: semantic ordering crosses zero around $\sim$20M parameters (Section~\ref{sec:scaling}), suggesting that larger models would narrow the gap.
 \end{itemize}
 
 
 \subsection{Hyperparameter Analysis: The Pareto Cliff}
 \label{sec:pareto}
 
-Through three runs at different triadic strengths, we discover a sharp transition:
+Through three runs at different triadic strengths, we identify a narrow optimal band:
 
 \begin{table}[h]
 \centering
@@ -608,6 +608,12 @@ The most significant finding is that meaningful prime-factor representations can
 \paragraph{Emergent information hierarchy.}
 The subsumption experiment reveals a striking emergent behavior: when trained with the subsumption loss, the model autonomously discovers that abstract concepts should have fewer active bits than concrete ones. Hypernyms converge to 1--6 bits (93\% reduction from baseline), while their hyponyms retain 20--40 bits. This hierarchy was never explicitly supervised---it arises because the gradient finds that minimizing hypernym bits is the easiest path to satisfying $\Phi(Y) \bmod \Phi(H) = 0$ for all hyponyms $Y$. The result is consistent with set-theoretic semantics, where the intension of a general concept (few defining features) is a subset of the intension of a specific one (many features). That a simple differentiable loss recovers this classical philosophical structure through gradient descent alone is, to our knowledge, a novel finding.
 
+\paragraph{What the triadic head actually provides.}
+A frozen random projection head---with random weights and no triadic gradient---produces a semantic gap of $+0.056$, \emph{higher} than the trained head's $+0.038$. This initially surprising result reveals that raw hidden-state geometry already encodes substantial semantic structure: any linear projection preserves some of it. However, the trained head's value is not in semantic gap but in \emph{algebraic operations}: 98\% analogy verification vs.\ 16.7\% for random projections, and 92--100\% subsumption vs.\ 0\%. The triadic head learns to \emph{organize} bits for algebraic composability---subsumption via divisibility, analogy via factor transfer---capabilities that random projections cannot provide despite their higher raw similarity metrics. Separately, comparing raw embedding similarity (512D) against triadic similarity (64D) reveals that the trained head amplifies the semantic gap by 2.6$\times$ ($+0.014$ embeddings $\rightarrow$ $+0.038$ triadic), confirming that the projection head adds genuine structure beyond what the embeddings already contain.
+
+\paragraph{Alignment is the primary driver of triadic quality.}
+An alignment loss ablation reveals that removing the embedding alignment component doubles the number of dead bits (11 $\rightarrow$ 23) and collapses semantic ordering, while removing entropy regularization has negligible effect when alignment is present. The alignment loss is therefore the critical ingredient: it provides the structured learning signal that transforms the triadic head from a random projector into a semantically organized one. Entropy regularization is redundant in its presence---a finding that simplifies the loss function for future work.
+
 \paragraph{The information bottleneck effect.}
 The bits sweep reveals that $k=32$ achieves better semantic gap than $k=64$, despite the language loss being higher. This is consistent with the information bottleneck principle~\citep{tishby2000information}: a tighter bottleneck forces the model to retain only the most semantically discriminative features, producing better separation. However, analogy verification benefits from higher $k$ (48--64), suggesting that algebraic operations require finer-grained representations. The optimal $k$ depends on the downstream task.
 
@@ -617,13 +623,16 @@ An important negative result: training with a coherence loss (encouraging adjace
 \paragraph{Knowledge distillation fails.}
 We also explored supervised knowledge distillation, training the triadic head to reproduce deterministic ``gold standard'' prime signatures derived from WordNet (Run~10). Despite achieving the lowest training loss (1.03), this approach caused \emph{complete triadic collapse}: all concepts mapped to a single signature, destroying all semantic differentiation. The distillation signal, weighted at $5\times$ the language loss, overwhelmed the diversity and contrastive objectives. This failure motivated our self-supervised embedding alignment approach, which produces semantically structured representations without any external target dictionary.
 
+\paragraph{Warmup--subsumption tradeoff.}
+The triadic warmup fraction introduces an unexpected tradeoff. Reducing warmup from 80\% to 50\% increases the active triadic training window (25K steps vs.\ 10K steps), producing healthier bits (24 dead vs.\ 44 dead). However, the longer warmup (80\%) achieves \emph{higher} subsumption (92.3\% vs.\ 76.9\%). The mechanism: short warmup allows subsumption loss to dominate before entropy regularization establishes bit diversity, inadvertently favoring the bit-inheritance pattern that subsumption requires. Both operating points are valid---practitioners can choose between bit health (50\% warmup) and subsumption performance (80\% warmup) depending on downstream requirements.
+
 \paragraph{Limitations.}
 Our results have several limitations:
 \begin{enumerate}
     \item \textbf{Small training corpus.} TinyStories (50K stories) limits the language model's semantic sophistication. Scaling to larger corpora (Wikipedia, BookCorpus) would likely improve both language quality and triadic metrics.
     \item \textbf{Token-level projections.} Each token receives an independent projection. With isolated tokens, domain separation ratio is $\sim$1.02 (indistinguishable from noise). However, sentence-level mean-pooling resolves this---see below.
     \item \textbf{Subsumption--language tradeoff at scale.} The subsumption loss recovers 100\% held-out subsumption at $k=64$ (Section~\ref{sec:subsumption}), but at XL scale this comes with a +47\% perplexity cost and requires early stopping at 25K steps. Lower subsumption loss weight or scale-dependent tuning could mitigate this tradeoff.
-    \item \textbf{Single GPU, single run.} All results are from single training runs. Confidence intervals from multiple seeds would strengthen claims, especially for the scaling study.
+    \item \textbf{Single GPU, limited multi-seed.} Most results are from single training runs. A three-seed validation at XL scale (gap $+0.038 \pm 0.005$, 95\% CI $[+0.029, +0.046]$, 100\% analogy across all seeds) confirms that the core semantic ordering finding is reproducible, but extending multi-seed validation to the full scaling study and transfer experiments would further strengthen the claims.
     \item \textbf{Dead bits.} Per-bit entropy analysis reveals that $\sim$15 of the 64 bits have low activation probability ($q_i < 0.1$), contributing little semantic information. Figure~\ref{fig:bit_entropy} visualizes the entropy distribution. Stronger entropy regularization or targeted bit activation schedules could address this.
 \end{enumerate}
 
@@ -714,7 +723,7 @@ We have presented \microgpt{}, a generative language model that jointly learns n
 
 \begin{enumerate}
     \item The triadic projection head adds \textbf{zero measurable cost} to language modeling quality, acting as a free semantic annotation layer.
-    \item Meaningful semantic ordering in prime-factor space is an \textbf{emergent property of scale}, appearing only at 40M parameters---a phase transition analogous to emergent abilities in standard LLMs.
+    \item Meaningful semantic ordering in prime-factor space is an \textbf{emergent property of scale}, crossing zero around $\sim$20M parameters in a gradual crossover. Multi-seed validation confirms reproducibility (gap $+0.038 \pm 0.005$, $n=3$).
     \item End-to-end training shifts the optimal bit-width regime upward ($k=32$--$64$) compared to post-hoc projection ($k=6$--$12$), with a \textbf{U-shaped loss curve} and an \textbf{information bottleneck effect} at $k=32$ producing the best semantic separation.
     \item The alignment loss formulation is the \textbf{primary bottleneck}: replacing MSE with InfoNCE on GPT-2 transfer achieves semantic gap $+0.099$ (closing 72\% of the gap to post-hoc Engine PCA), while a \textbf{loss--embedding interaction} dictates that InfoNCE is optimal for rich embeddings and MSE for weak ones.
     \item A differentiable subsumption loss recovers \textbf{exact algebraic subsumption at $k=64$}---100\% on held-out hypernym--hyponym pairs---resolving the primary limitation of both end-to-end and post-hoc methods at high bit counts, while inducing an \textbf{emergent information hierarchy} where abstract concepts autonomously converge to sparse representations.

@@ -1,0 +1,20 @@
+{
+  "experiment": "xl_baseline_pure_lang",
+  "variant": "pure_lang",
+  "label": "B2: Pure Language (alpha=0)",
+  "description": "No triadic loss \u2014 head exists but is never trained",
+  "config": "12L/512D/8H/64bits (XL, 40M params)",
+  "alpha": 0.0,
+  "freeze_head": false,
+  "steps": 50000,
+  "training_time_min": 142.8410443544388,
+  "ppl": 10.645957110496074,
+  "avg_loss": 2.3651802060458578,
+  "semantic_gap": 0.05560434202735243,
+  "mean_bit_entropy": 0.6265742142125398,
+  "dead_bits": 16,
+  "analogy_verification": 0.16666666666666666,
+  "king_queen_sim": 0.5527735352516174,
+  "king_dog_sim": 0.44649216532707214,
+  "ordering_correct": true
+}

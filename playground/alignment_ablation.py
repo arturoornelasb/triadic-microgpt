@@ -603,7 +603,8 @@ def aggregate_results():
             elif fmt == 'd':
                 vals.append(f"{int(val):>14d}")
             else:
-                vals.append(f"{val:>14{fmt}}")
+                formatted = format(val, fmt)
+                vals.append(f"{formatted:>14s}")
         print(f"  {label:<25s}" + "".join(vals))
 
     # Key findings

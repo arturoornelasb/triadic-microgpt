@@ -1,0 +1,41 @@
+{
+  "experiment": "embedding_gap_baseline",
+  "description": "B1: Semantic gap on raw wte embeddings vs triadic projections",
+  "checkpoint": "Run 15 (v1.4-strongalign)",
+  "embedding_dim": 512,
+  "triadic_dim": 64,
+  "n_words": 39,
+  "embedding": {
+    "semantic_gap": {
+      "gap": 0.014455620417228088,
+      "mean_related": 0.4810748604627756,
+      "mean_random": 0.4666192400455475,
+      "n_related": 13,
+      "n_random": 200
+    },
+    "analogy_verification": {
+      "verification_rate": 0.5,
+      "verified": 3,
+      "total": 6
+    }
+  },
+  "triadic": {
+    "semantic_gap": {
+      "gap": 0.037781255514575895,
+      "mean_related": 0.5454709965449113,
+      "mean_random": 0.5076897410303354,
+      "n_related": 13,
+      "n_random": 200
+    },
+    "analogy_verification": {
+      "verification_rate": 0.6666666666666666,
+      "verified": 4,
+      "total": 6
+    },
+    "bit_stats": {
+      "dead_bits": 10,
+      "mean_entropy": 0.6951160723215735
+    }
+  },
+  "verdict": "TRIADIC ADDS VALUE \u2014 gap higher than embeddings"
+}
