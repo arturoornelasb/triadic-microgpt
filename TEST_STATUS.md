@@ -41,16 +41,19 @@
 | Line | Test | Script | Result | Date |
 |------|------|--------|--------|------|
 | L1 | Bridge PFs (Q1,Q4,Q5,Q6) | `playground/audit_tests/test_pf_bridge.py` | 3/4 PASS (Q6 FAIL) | 03-19 |
-| L3 | Blind prime assignment | `playground/audit_tests/test_blind_primes.py` | PASS (vacuous) | 03-19 |
-| L11 | Indifference (Cap. 5) | `playground/audit_tests/test_indifference.py` | GOLD PASS, MODEL FAIL | 03-19 |
+| L3 | Blind prime assignment | `playground/audit_tests/test_blind_prime_assignment.py` | PASS (vacuous) | 03-19 |
+| F0 | Data + model validation | `playground/audit_tests/test_data_validation.py` | PASS (93.7% bit acc) | 03-19 |
+| L11 | Indifference (Cap. 5) | `playground/audit_tests/test_indifference_and_false_opposites.py` | GOLD PASS, MODEL FAIL | 03-19 |
 | L12 | False opposites | (included in L11 script) | GOLD PASS, MODEL FAIL | 03-19 |
+| — | reptimeline hybrid analysis | `playground/audit_tests/analyze_hybrid.py` | 17 triadic, 50 active | 03-19 |
+| — | reptimeline v2 analysis | `playground/audit_tests/analyze_v2.py` | 68 triadic, 48 active | 03-19 |
 
 ### Pending — Critical (before publication)
 
 | Line | Test | Script exists? | What's needed | Blocking |
 |------|------|---------------|---------------|----------|
-| L2 | D-A13 (355M) formal eval | `playground/audit_tests/eval_da13.py` | GPU time | Paper claim |
-| L11 | Re-run with v2 model | Modify test_indifference.py | v2 checkpoint (DONE) | Paper claim |
+| L2 | D-A13 (355M) formal eval | `playground/audit_tests/test_d_a13_eval.py` | GPU time | Paper claim |
+| L11 | Re-run with v2 model | Modify test_indifference_and_false_opposites.py | v2 checkpoint (DONE) | Paper claim |
 | L12 | Re-run with v2 model | Same as L11 | v2 checkpoint (DONE) | Paper claim |
 
 ### Pending — Book Corrections (no experiments needed)
@@ -71,9 +74,10 @@
 |------|------|---------------|--------|-------|
 | L13 | 1000 adversarial concepts | NO | 4h | Stress test |
 | L14 | PCA for real primitive count | NO | 3h | How many real dims? |
-| L15 | Aristotelian types (Cap. 11) | YES (not run) | 1h | Script created |
+| L15 | Aristotelian types (Cap. 11) | `playground/audit_tests/test_aristotelian_types.py` | 1h | Script created, not run |
 | L16 | Polisemia contextual | NO | 1h | Same word, different context |
 | L17 | Categorical Bits Architecture | NO | 6h GPU | Could be its own paper |
+| L19 | Enantiodromia detection | `playground/audit_tests/test_enantiodromia.py` | 1h | Script created, not run |
 
 ### Future Work (after publication)
 
@@ -131,13 +135,61 @@
 
 ---
 
+## Playground Results (46 files in `playground/results/`)
+
+| File | Experiment | Key metric |
+|------|-----------|-----------|
+| `concept_gpt_49bit.json` | P15 structured 49-bit | 88.5% train, 17% test |
+| `compression_benchmark.json` | E6 compression | 8.3% (refutes "8x") |
+| `expanded_analogy_benchmark.json` | E3 51-analogy | 98% verification |
+| `cross_dataset_eval.json` | P13 cross-corpus | WikiText2/LAMBADA |
+| `subsumption_loss.json` | P6 subsumption | 100% train |
+| `r3_subsumption_combo.json` | P7 R3+sub combo | Combined results |
+| `random_baseline.json` | P2 random | 50% (chance) |
+| `sin_head_experiment.json` | P1 sinusoidal | +4 dead bits (failed) |
+| `dead_bit_regularization.json` | Dead bit entropy | Reg analysis |
+| `embedding_gap_baseline.json` | B1 embedding gap | Baseline metric |
+| `sub_weight_sweep/` | E4 4-weight sweep | w=2.0 best (92.3%) |
+| `multi_seed/` | E1 3-seed validation | Reproducibility |
+| `r3_low_k/`, `r3_low_k_v2/` | E7 R3 at k=6,8,12 | R3 collapses at low k |
+| `scale_interpolation/` | E5 25M/30M | Gradual transition |
+| `alignment_ablation/` | E2 ablation | Full/no-align/no-entropy |
+| `xl_baselines/` | B2/B3 baselines | Language-only, frozen random |
+
+## Data Files
+
+| File | Location | Purpose |
+|------|----------|---------|
+| `primitivos.json` | `playground/danza_data/` | 63 primitive definitions |
+| `anclas.json` | `playground/danza_data/` | 54 anchor concepts (v1) |
+| `anclas_v2.json` | `playground/danza_data/` | 158 anchor concepts (v2) |
+| `gold_primes_64.json` | `data/` | 10K concepts, 64-bit signatures |
+| `gold_primes_32.json` | `data/` | 10K concepts, 32-bit signatures |
+| `gold_primes.json` | `data/` | 100 gold signatures (original) |
+| `TinyStories-train.txt` | `data/` | 1.8GB training corpus |
+| `alpaca_data_cleaned.json` | `data/` | 43MB fine-tuning (70K examples) |
+
+## Reports
+
+| File | Content |
+|------|---------|
+| `reports/bias_audit_results.json` | Exp 8: 98.5% acc, 0.96% FPR |
+| `reports/eval_report.json` | Evaluation metrics export |
+| `reports/loss_curve.png` | Training loss visualization |
+
+---
+
 ## Coverage Summary
 
 ```
 Unit tests:          ~80 (ALL PASS)
 Benchmarks:          12/12 COMPLETE
-Audit tests:         4/4 executed, 3 pending re-runs
+Audit tests:         7 executed, 3 pending (L2 GPU, L11/L12 re-run)
+Audit scripts:       9 total (7 executed, 2 not run: aristotelian, enantiodromia)
 Book corrections:    0/7 done
 Experiments:         8 successful, 5 failed (documented), 3 not evaluated
-Research lines:      4 executed, 3 critical pending, 5 valuable pending, 14 future
+Playground results:  46 files across 16 experiments
+Research lines:      4 executed, 3 critical pending, 6 valuable pending, 14 future
+Data files:          10 in data/, 3 in danza_data/
+Reports:             3 files
 ```

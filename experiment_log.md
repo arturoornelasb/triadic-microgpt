@@ -3486,3 +3486,115 @@ Three independent paths converge on the same ternary representation {+1, 0, -1}:
 Documentation: `research/convergence_trits_bitnet_bitwise.md`
 
 **Significance:** The triadic framework predicts the optimal discrete representation independently of the engineering path. BitNet arrived at the same structure from pure optimization, not philosophy.
+
+---
+
+## Repository Structure Reference (2026-03-19)
+
+### Root Files
+
+| File | Purpose |
+|------|---------|
+| `README.md` | Project overview, key results, architecture |
+| `AUDIT.md` | Comprehensive audit report (v4+, 577 lines) |
+| `CLAUDE.md` | Agent config, coding conventions, GPU optimization |
+| `EVOLUTION_PLAN.md` | Research roadmap, phase tracking |
+| `TEST_STATUS.md` | Complete test/benchmark/research line inventory |
+| `PRIMITIVE_RECONCILIATION.md` | Mapping 51/63/64 primitive systems |
+| `experiment_log.md` | This file — complete run history |
+| `masterplan.md` | Ecosystem plan (4 repos, publication, monetization) |
+| `newplan.md` | Evolution plan v5.0 (non-technical explanation) |
+| `requirements.txt` | Python dependencies |
+| `environment.yml` | Conda environment |
+| `bits_sweep_log.txt` | Bits sweep execution log |
+| `model_fast.npz` | Historical numpy model (legacy) |
+| `model_fast.vocab` | Historical vocab (legacy) |
+| `tokenizer.json` | Root BPE tokenizer |
+| `test_cuda.py` | CUDA availability check |
+| `verify_training.py` | Training loop validation |
+
+### Directories
+
+| Directory | Contents | Files |
+|-----------|----------|-------|
+| `src/` | Core implementation (model, train, triadic, tokenizer) | 27 .py |
+| `benchmarks/` | 12 benchmark scripts + 40+ result JSONs + 12+ figures | ~65 files |
+| `checkpoints/` | 40+ model checkpoints (production + experimental) | ~43 dirs |
+| `data/` | Training data (TinyStories 1.8GB), gold primes, eval caches | 10 files |
+| `tests/` | Unit test suite (37 tests) | 1 file |
+| `triadic-head/` | Standalone PyPI package v0.1.0 (33 tests) | ~15 files |
+| `ui/` | Desktop GUI (7 tabs, 3 backends, dark theme) | ~20 files |
+| `paper/` | LaTeX paper (23pp, 15 figures) | ~30 files |
+| `reptimeline/` | Interpretability toolkit (discovery, autolabel, viz) | ~20 files |
+| `playground/` | 50+ experimental scripts + results + audit_tests | ~100 files |
+| `research/` | 10 theoretical analysis documents | 10 .md |
+| `scripts/` | Utility scripts (vocab, gold primes, sweep) | 7 .py |
+| `experiment10/` | GPT-2 transfer learning (InfoNCE/Rank/MSE) | ~10 files |
+| `experiments/` | Quaternion probe (single exploratory script) | 1 .py |
+| `conceptual_tokenizer/` | Structured 49-bit system (Phase 4) | ~7 files |
+| `reports/` | Evaluation outputs (bias audit, eval JSON, loss curve) | 3 files |
+
+### Playground Data Files
+
+| File | Purpose |
+|------|---------|
+| `playground/danza_data/primitivos.json` | 63 primitive definitions with Spanish names |
+| `playground/danza_data/anclas.json` | 54 anchor concepts (v1) |
+| `playground/danza_data/anclas_v2.json` | 158 anchor concepts (v2, expanded) |
+
+### Playground Results (46 files)
+
+All experiment results stored in `playground/results/`:
+- `concept_gpt_49bit.json` — P15 structured system results
+- `compression_benchmark.json` — E6 compression analysis
+- `expanded_analogy_benchmark.json` — E3 51-analogy results
+- `cross_dataset_eval.json` — P13 cross-corpus
+- `subsumption_loss.json` — P6 subsumption results
+- `r3_subsumption_combo.json` — P7 combo results
+- `random_baseline.json` — P2 random baseline
+- `sin_head_experiment.json` — P1 sinusoidal head
+- `soft_signatures.json` — P3 soft signatures
+- `dead_bit_regularization.json` — Dead bit entropy reg
+- `embedding_gap_baseline.json` — B1 baseline
+- `xl_baselines/` — B2, B3 baseline results
+- `multi_seed/` — E1 multi-seed validation (3 seeds)
+- `r3_low_k/`, `r3_low_k_v2/` — E7 R3 at low k
+- `scale_interpolation/` — E5 25M/30M interpolation
+- `sub_weight_sweep/` — E4 sweep results
+- `alignment_ablation/` — E2 ablation results
+- Various `.png` figures for each experiment
+
+### Playground Audit Tests (8 scripts)
+
+| Script | Line | Status |
+|--------|------|--------|
+| `test_pf_bridge.py` | L1 | EXECUTED |
+| `test_blind_prime_assignment.py` | L3 | EXECUTED |
+| `test_indifference_and_false_opposites.py` | L11/L12 | EXECUTED |
+| `test_data_validation.py` | F0 | EXECUTED |
+| `test_d_a13_eval.py` | L2 | NOT EXECUTED (needs GPU) |
+| `test_aristotelian_types.py` | L15 | NOT EXECUTED |
+| `test_enantiodromia.py` | L19 | NOT EXECUTED |
+| `analyze_hybrid.py` | D-A9 analysis | EXECUTED |
+| `analyze_v2.py` | D-A14 analysis | EXECUTED |
+
+### Playground Checkpoints (inside playground/)
+
+Three checkpoint directories inside playground/ (separate from main checkpoints/):
+- `playground/checkpoints_xl_sigmoid_anneal/` — XL2 experiment
+- `playground/checkpoints_xl_sigmoid_anneal_temp5/` — XL2 with temp=5
+- `playground/checkpoints_xl_subsumption/` — XL subsumption experiment
+
+### Experiments Directory
+
+| File | Purpose |
+|------|---------|
+| `experiments/quaternion_probe.py` | Exploratory: Can quaternion rotations capture semantic transforms? Tests rotation consistency, magnitude semantics, analogy accuracy. Not executed in main pipeline. |
+
+### Reports Directory
+
+| File | Purpose |
+|------|---------|
+| `reports/bias_audit_results.json` | Experiment 8: Relational bias audit (98.5% acc, 0.96% FPR) |
+| `reports/eval_report.json` | Evaluation metrics export |
+| `reports/loss_curve.png` | Training loss visualization |
