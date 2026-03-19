@@ -72,7 +72,7 @@ class TriadicExtractor(RepresentationExtractor):
 
             x = torch.tensor([ids], dtype=torch.long, device=device)
             with torch.no_grad():
-                _, triadic_proj, _ = model(x)
+                triadic_proj = model(x)[1]
 
             proj = triadic_proj[0].mean(dim=0).cpu().numpy()
             bits = mapper.get_bits(proj)

@@ -1,0 +1,24 @@
+{
+  "model": "HybridTriadicGPT (D-A9)",
+  "checkpoint": "C:\\Github\\triadic-microgpt\\checkpoints\\danza_hybrid_adv_xl\\model_best.pt",
+  "n_concepts": 182,
+  "n_active_bits": 50,
+  "n_dead_bits": 13,
+  "supervised": {
+    "active": 25,
+    "dead": 5
+  },
+  "free": {
+    "active": 25,
+    "dead": 8
+  },
+  "n_duals": 18,
+  "n_deps": 1326,
+  "n_triadic_deps": 17,
+  "n_free_triadic": 3,
+  "n_cross_triadic": 0,
+  "reconciliation": {
+    "agreement": null,
+    "n_mismatches": null
+  }
+}
