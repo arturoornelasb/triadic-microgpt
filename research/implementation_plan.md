@@ -1,213 +1,288 @@
 # Implementation Plan — Final Model for Paper
 
-> Date: 2026-03-19 | Status: PROPOSAL
+> Date: 2026-03-19 | Status: ACTIVE
 > Goal: ONE paper, ONE model, ONE framework
+> Based on: ALL experiment results in repo (29 runs + 15 experiments + 12 benchmarks)
 
 ---
 
-## Phase 0: Consolidate What Exists (1-2 days) — NOW
+## EVIDENCE BASE — What We Know
 
-No new code. Validate and document.
+### What Works (ranked by evidence strength)
 
-| Task | Files | Test | Done? |
-|------|-------|------|-------|
-| v2 training complete | `checkpoints/danza_63bit_xl_v2/` | 93% test, 98.3% sub | YES |
-| reptimeline on v2 | `playground/audit_tests/analyze_v2.py` | 68 triadic, 48 active | YES |
-| BitwiseValidator | `src/triadic.py`, `benchmarks/scripts/prime_vs_bitwise.py` | 1000/1000 equiv | YES |
-| L1 bridge test | `playground/audit_tests/test_pf_bridge.py` | 3/4 PASS | YES |
-| L3 blind primes | `playground/audit_tests/test_blind_primes.py` | PASS | YES |
-| L2 D-A13 eval | `playground/audit_tests/eval_da13.py` | **PENDING — needs GPU** | NO |
-| L11/L12 re-run with v2 | modify `test_indifference.py` | **PENDING** | NO |
-| 7 book corrections | L4-L10 in book .tex | **PENDING** | NO |
+| Discovery | Evidence | Numbers | Source |
+|-----------|----------|---------|--------|
+| Zero LM cost | PPL 7.69 vs 7.56 ablation | delta = 0.13 (noise) | Run 15 vs Run 18 |
+| Subsumption algebra | v2 98.3% test, D-A13 100% holdout | 1258/1280 correct | D-A14, D-A13 |
+| Analogy verification | 98% on 51 quads (50/51) | Top-1 verification | E3 expanded |
+| Bitwise isomorphism | 1000/1000 random tests pass | 5-78x faster | prime_vs_bitwise.py |
+| R3 composition | 98.1% round-trip, sub-linear chains | p<0.001, d=6.64 | D-A5, D-A11 |
+| iFSQ activation | Loss 0.924 (best LM) + 87.1% sub | Better than tanh on both | D-A10 |
+| Free bits learn | 6/63 dead vs 26/63 supervised-only | 17 triadic interactions | D-A9 hybrid |
+| ~42% sparsity convergence | 42.9% (D-A5), 41.3% (D-A14), 42.3% (BitNet) | Three independent sources | Multiple |
+| 158 anchors >> 54 anchors | 93% vs 79.4% test accuracy | +13.6pp, 4x triadic | D-A14 vs D-A5 |
+| Scaling to 355M | 100% subsumption holdout | From D-A13 training log | D-A13 |
+| Exact king:queen analogy | Bitwise analogy = 0 bit difference | sim=0.913 | D-A14 bitwise |
 
-**Exit criteria:** All Ls executed or documented why not. Book corrections listed.
+### What Failed (and why)
+
+| Attempt | Result | Root Cause | Lesson for Final Model |
+|---------|--------|-----------|----------------------|
+| Gradient decoupling | 49.6% = random | Per-bit gradient manipulation breaks joint optimization | Don't decouple — bits learn holistically |
+| Absmean quantization | Loss 1.309 | Worse than FSQ for this architecture | Use iFSQ, not absmean |
+| 49-bit structured (P15) | 17% test (memorization) | Structured system can't generalize | End-to-end > manual structure |
+| Bootstrap self-play (D-A6) | Cycle 0 stuck | Confidence gate too strict with 54 anchors | More anchors (v2=158) > self-play |
+| 8x compression claim | 13.3% accuracy (below random) | Bits don't compress like embeddings | Remove from claims |
+| Sinusoidal head (P1) | +4 dead bits | Literal wave is wrong level | tanh/iFSQ valid structural |
+| E10-v2 GPT-2 InfoNCE | tri_loss=NaN | Numerical overflow | Need temperature fix |
+
+### What's Ambiguous
+
+| Question | Evidence | Resolution needed |
+|----------|----------|------------------|
+| Ternary vs binary at scale | D-A13 (355M): zeros -> 0% | Is ternary only for small models? Test at scale |
+| iFSQ + v2 anchors together | Not tested — iFSQ used 54 anchors, v2 used tanh | **KEY EXPERIMENT: combine both** |
+| Discovery loop closed | Manual proof-of-concept works | Automate and test convergence |
+| L11/L12 with v2 | Gold PASS but model FAIL with old anchors | **Re-run with v2 checkpoint** |
 
 ---
 
-## Phase 1: Bitwise as Default Backend (1 day)
+## TESTS THAT ARE MISSING
 
-Change validation layer only. Model and training unchanged.
+### Tier 1: Must run before paper (can do NOW)
 
-| Task | File to modify | Change | Test |
-|------|---------------|--------|------|
-| 1.1 | `src/torch_train.py` | Use BitwiseValidator for eval subsumption/analogy | Results identical to prime |
-| 1.2 | `src/evaluate.py` | Use BitwiseValidator for all algebraic checks | Results identical |
-| 1.3 | `benchmarks/scripts/*.py` | Add `--backend bitwise` flag (default) | Benchmarks still pass |
-| 1.4 | `ui/model_interface.py` | Use BitwiseValidator in desktop UI | UI functional |
-| 1.5 | `tests/test_all.py` | Add tests: both backends produce same results | 37+ tests pass |
+| Test | Why critical | Script | Effort | Blocking |
+|------|-------------|--------|--------|----------|
+| **L11/L12 re-run with v2** | Model failed with old anchors, v2 has 3x more anchors — may now pass | Modify `test_indifference_and_false_opposites.py` to load v2 | 30 min CPU | YES — paper claim about indifference |
+| **L15 Aristotelian types** | Script exists, never run, tests Cap. 11 claim | `test_aristotelian_types.py` | 30 min CPU | Semi — validates book |
+| **L19 Enantiodromia** | Script exists, never run | `test_enantiodromia.py` | 30 min CPU | No — but free test |
 
-**What does NOT change:**
-- `triadic_loss()` — differentiable, doesn't use primes or bits
-- Model architecture — same TriadicGPT
-- Training loop — same dual loss
-- PrimeMapper stays in codebase for paper formalization
+### Tier 2: Must run before paper (needs GPU)
 
-**Exit criteria:** `python benchmarks/scripts/prime_vs_bitwise.py` passes, all benchmarks produce identical results with bitwise backend.
+| Test | Why critical | Script | Effort | Blocking |
+|------|-------------|--------|--------|----------|
+| **L2 D-A13 formal eval** | 100% sub from training log but no formal benchmark | `test_d_a13_eval.py` | 1h GPU | YES — 355M scaling claim |
+| **iFSQ + v2 anchors** | Best activation + best anchors never combined | New script needed | 2h GPU | YES — final model decision |
+
+### Tier 3: Valuable, not blocking
+
+| Test | What it proves | Effort |
+|------|---------------|--------|
+| L13: 1000 adversarial concepts | Stress test beyond 158 anchors | 4h GPU |
+| L14: PCA real primitive count | How many independent dims exist? | 3h CPU |
+| L16: Polisemia contextual | Same word different meaning | 1h CPU |
+| Cross-corpus (WikiText2, LAMBADA) | Generalization beyond TinyStories | 2h GPU |
 
 ---
 
-## Phase 2: Discovery Loop Integration (3-5 days)
+## THE FINAL MODEL — Based on Evidence
 
-Close the loop: train -> discover -> re-anchor -> train.
+### Architecture Decision Table
 
-| Task | Description | Priority |
-|------|-------------|----------|
-| 2.1 | Hook reptimeline discover at end of each bootstrap cycle | HIGH |
-| 2.2 | Auto-generate new anchors from bit semantics | HIGH |
-| 2.3 | Dead bit detection -> adaptive entropy regularization | MEDIUM |
-| 2.4 | Use 3-way deps as composition loss signal | MEDIUM |
-| 2.5 | AutoLabel -> LLM-generated names -> validate | LOW |
+| Component | Options tested | Winner | Evidence |
+|-----------|---------------|--------|----------|
+| **Activation** | tanh, iFSQ, FSQ, absmean, sigmoid | **iFSQ** | 0.924 loss (best), 87.1% sub |
+| **Algebra backend** | PrimeMapper, BitwiseValidator | **BitwiseValidator** | O(1), 1000/1000 equiv, 5-78x |
+| **Anchor strategy** | 54 (v1), 158 (v2), 0 (unsupervised) | **158+ (v2)** | 93% vs 79.4% test |
+| **Bit allocation** | 63 supervised, 30+33 hybrid | **Hybrid recommended** | 6 dead vs 26 dead |
+| **Discovery** | None, post-hoc, integrated | **Post-hoc (proven), integrated (proposed)** | 68 triadic in v2 |
+| **Scale** | 1.3M, 5.8M, 15.9M, 40M, 355M | **40M (paper), 355M (bonus)** | Phase transition at ~20M |
 
-### 2.1 Discovery Hook
+### Final Architecture
+
+```
+Text -> BPE (4096) -> TriadicGPT (12L/512D/8H, 40M params)
+                            |
+                      +-----+-----+
+                      |           |
+                 LM Head    Triadic Head
+                 (softmax)  (Linear -> iFSQ -> 63 bits)
+                      |           |
+                 next token  BitwiseValidator
+                             - subsumes:  (A & B) == B       O(1)
+                             - compose:   A | B              O(1)
+                             - analogy:   (C & ~oA) | oB     O(1)
+                             - gap:       A & ~B, B & ~A     O(1)
+                             - similarity: popcount ratio    O(1)
+                                  |
+                             reptimeline (post-hoc)
+                             - bit semantics
+                             - dual pairs (7 found)
+                             - 3-way interactions (68 found)
+                             - 635 dependency edges
+```
+
+### What Changes vs Current
+
+| Component | Current (v2) | Final Model | Why change |
+|-----------|-------------|-------------|-----------|
+| Activation | tanh | **iFSQ** | 0.924 < 0.946 loss, preserves gradients |
+| Algebra | PrimeMapper | **BitwiseValidator** | 5-78x faster, scales to 1024+ bits |
+| Bits | 63 all supervised | **30 sup + 33 free** (hybrid) | 6 dead vs 26, free bits learn composites |
+| Discovery | manual reptimeline | **auto-hook post-training** | Same tool, just automated |
+| Anchors | 158 (v2) | **158 + auto-generated** | Discovery can propose new ones |
+
+### What Does NOT Change
+
+- Transformer architecture (12L/512D/8H) — validated at this scale
+- BPE tokenizer (4096 vocab) — works
+- Dual-head design (LM + triadic) — zero cost proven
+- 63 bits total — k=64 optimal (bits sweep)
+- Training loop — warmup 80% LM, then add triadic loss
+- `triadic_loss()` — differentiable, works as-is
+
+---
+
+## IMPLEMENTATION PHASES
+
+### Phase 0: Run Missing Tests (TODAY, CPU)
+
+```bash
+# 1. L11/L12 with v2 checkpoint
+python playground/audit_tests/test_indifference_and_false_opposites.py \
+  --checkpoint checkpoints/danza_63bit_xl_v2/model_best.pt
+
+# 2. L15 Aristotelian types
+python playground/audit_tests/test_aristotelian_types.py
+
+# 3. L19 Enantiodromia
+python playground/audit_tests/test_enantiodromia.py
+```
+
+**Exit criteria:** Results documented. L11/L12 either pass with v2 or we document why not.
+
+### Phase 1: iFSQ + v2 Anchors (KEY EXPERIMENT, 2h GPU)
+
+The two best components have never been combined:
+- iFSQ (best LM: 0.924) was trained with 54 anchors
+- v2 (best accuracy: 93%) was trained with tanh
+
+```bash
+# New script or flag in danza_63bit.py
+python playground/danza_63bit.py \
+  --scale xl --steps 50000 --v2 \
+  --activation ifsq --dtype bfloat16
+```
+
+| Expected outcome | Metric to beat |
+|-----------------|---------------|
+| LM loss < 0.95 | v2 tanh = 0.946, iFSQ = 0.924 |
+| Test accuracy >= 93% | v2 tanh = 93.0% |
+| Subsumption >= 98% | v2 tanh = 98.3% |
+| Dead bits < 26 | v2 tanh = 26/63 |
+
+**If this succeeds** -> this IS the final model.
+**If accuracy drops** -> use v2 tanh (already validated, already good).
+
+Files to modify:
+- `playground/danza_63bit.py`: Add `--activation` flag with iFSQ option
+- `src/torch_transformer.py`: Add iFSQ activation to TriadicGPT
+
+### Phase 2: BitwiseValidator as Default (1 day, no GPU)
+
+Replace PrimeMapper in ALL runtime paths:
+
+| File | Change |
+|------|--------|
+| `src/torch_train.py` | Eval uses BitwiseValidator |
+| `src/evaluate.py` | All algebraic checks use bitwise |
+| `benchmarks/scripts/*.py` | Default to bitwise backend |
+| `ui/model_interface.py` | UI uses BitwiseValidator |
+| `tests/test_all.py` | Add dual-backend equivalence tests |
+
+Validation: Run all 12 benchmarks, verify identical results.
+
+### Phase 3: Hybrid Bits (2-3 days GPU)
+
+Combine v2 anchors + iFSQ + hybrid bit allocation:
+
+```
+Bits 0-29:  Supervised (158 anchor concepts)
+Bits 30-62: Free (learned via LM + adversarial disentanglement)
+```
+
+| From D-A9 (hybrid) | From D-A14 (v2) | Combined expectation |
+|--------------------|-----------------|---------------------|
+| 6 dead bits | 26 dead bits | <10 dead bits |
+| 50 active bits | 48 active bits | ~55 active bits |
+| 17 triadic 3-way | 68 triadic 3-way | 80+ triadic |
+| 80% subsumption | 98.3% subsumption | >95% subsumption |
+
+Files to create/modify:
+- `playground/unified_training.py`: New script combining iFSQ + hybrid + v2 anchors
+- Use `hybrid_adversarial.py` as base, swap tanh for iFSQ, use v2 anchors
+
+### Phase 4: Discovery Loop (3-5 days)
+
+Close the loop: after training, run discovery, generate new anchors, retrain.
 
 ```python
-# At end of each cycle in danza_bootstrap.py:
-from reptimeline.discovery import BitDiscovery
-from reptimeline.core import ConceptSnapshot
+for cycle in range(N_CYCLES):
+    # 1. Train
+    train(model, anchors, steps=50000)
 
-# After training, before next cycle:
-codes = extract_all_projections(model, tokenizer, all_words)
-snapshot = ConceptSnapshot(step=current_step, codes=codes)
-discovery = BitDiscovery()
-report = discovery.discover(snapshot)
+    # 2. Discover
+    codes = extract_projections(model, all_words)
+    report = BitDiscovery().discover(ConceptSnapshot(codes=codes))
 
-# Use report to inform next cycle:
-new_anchors = generate_anchors_from_discovery(report)
+    # 3. Generate new anchors from discovery
+    new_anchors = generate_from_triadic_deps(report)
+    anchors = merge(anchors, new_anchors)
+
+    # 4. Log metrics
+    log(cycle, report.n_triadic_deps, test_accuracy)
 ```
 
-### 2.2 Anchor Generation from Discovery
+**Already works manually** — bootstrap does train->eval->re-anchor.
+Need to: hook reptimeline discover, auto-generate anchors from 3-way deps.
 
-When discovery finds:
-- **Dual pair (bit_i <-> bit_j):** Create anchor pairs that activate one but not the other
-- **3-way interaction (bit_i + bit_j -> bit_r):** Create composite anchors
-- **Dead bit:** Increase entropy reg for that bit
+### Phase 5: Scale to 355M (1-2 weeks, GPU-dependent)
 
-### 2.4 Composition Loss from 3-Way Deps
+Apply final model architecture to GPT-2 Medium:
+- iFSQ activation
+- BitwiseValidator backend
+- v2+ anchors
+- Run L2 formal eval
 
-```python
-# If discovery found: bit_4 + bit_25 -> bit_33
-# Then for concepts where bits 4 and 25 are ON, bit 33 should also be ON
-# This becomes an additional loss term:
-comp_loss = F.binary_cross_entropy(proj[:, 33], target_from_deps)
-```
-
-**Already works manually:**
-- Bootstrap cycle: train -> eval -> re-anchor (manual)
-- reptimeline: bit semantics + 3-way deps
-- hybrid_adversarial: free bits learn unsupervised
-
-**What's missing:** Closing the loop automatically.
-
-**Exit criteria:** Script `train_unified.py` runs N cycles of train+discover automatically. Metrics improve or stay stable across cycles.
+**Open question:** At 355M, zeros collapse to 0%. Document as finding.
 
 ---
 
-## Phase 3: iFSQ Activation (2-3 days)
+## PAPER SECTION <-> EVIDENCE MAPPING
 
-Replace tanh with iFSQ as default activation.
+| Section | Claim | Evidence | Status |
+|---------|-------|----------|--------|
+| Abstract | Zero-cost triadic head | PPL 7.69 vs 7.56 | READY |
+| 3.1 | Prime algebra | Formal proof in `src/triadic.py` | READY |
+| 3.2 | Bitwise isomorphism | 1000/1000 tests, `prime_vs_bitwise.py` | READY |
+| 3.3 | Scaling advantage | Primes IMPOSSIBLE >128 bits | READY |
+| 4 | Architecture | 12L/512D/8H + triadic head | READY |
+| 5.1 | Scaling study | 4-point (1.3M-40M), phase transition | READY |
+| 5.2 | Bits sweep | k=8-128, optimal k=32-64 | READY |
+| 5.3 | Ablation | Run 18 (no head), D-A15 (grad decoupling FAIL) | READY |
+| 5.4 | Subsumption | 98.3% test (v2), 100% holdout (355M) | READY (L2 pending) |
+| 5.5 | Analogy | 98% verification (51 quads), exact king:queen bitwise | READY |
+| 5.6 | Composition | R3 98.1% round-trip, p<0.001 | READY |
+| 5.7 | Domain separation | 1.21 sentence-level (+19%) | READY |
+| 5.8 | Discovery | 68 triadic 3-way, 7 duals, 635 deps | READY |
+| 5.9 | iFSQ activation | 0.924 loss, 87.1% sub (pending: +v2) | **PENDING Phase 1** |
+| 5.10 | Convergence | ~42% sparsity, three paths | READY |
+| 6 | Discussion | Ternary vs binary at scale | **PENDING L2** |
+| 7 | Future work | Discovery loop, scaling, cross-linguistic | READY |
 
-| Task | Description | Test |
-|------|-------------|------|
-| 3.1 | Add iFSQ option to `torch_transformer.py` | Model builds |
-| 3.2 | Train v2 equivalent with iFSQ | Compare: loss, accuracy, subsumption |
-| 3.3 | Run reptimeline on iFSQ model | Compare triadic interactions |
-| 3.4 | Measure sparsity distribution | Compare with ~42% prediction |
-
-**Evidence:** D-A10 (iFSQ binary) achieved best LM loss (0.924) AND 87.1% subsumption. But it was trained with different anchors (54 vs 158). Need apples-to-apples comparison.
-
-**Exit criteria:** iFSQ model with v2 anchors achieves >= 93% test AND <= 0.95 LM loss.
-
----
-
-## Phase 4: Scale to 355M (1-2 weeks, GPU-dependent)
-
-| Task | Description | Dependency |
-|------|-------------|------------|
-| 4.1 | Train 355M with bitwise backend | Phase 1 |
-| 4.2 | Train 355M with discovery loop | Phase 2 |
-| 4.3 | Run L2 (D-A13 formal eval) | GPU |
-| 4.4 | Cross-corpus: WikiText2, LAMBADA | Phase 4.1 |
-| 4.5 | Probe for categorical structure | Phase 4.2 |
-
-**Open question:** At 355M, D-A13 showed zeros collapse to 0% (binary, not ternary). Does the ternary structure only hold at smaller scales? If so, document as scale-dependent finding.
-
-**Exit criteria:** 355M model with subsumption >= 100% (matching D-A13) + discovery loop results.
+**Status: 11/13 sections READY. 2 pending experiments (iFSQ+v2, L2).**
 
 ---
 
-## Tests Required Per Phase
+## IMMEDIATE NEXT ACTIONS (Priority Order)
 
-### Phase 0 Tests
-- [ ] L2: D-A13 eval (GPU)
-- [ ] L11/L12: re-run with v2 checkpoint
-- [ ] Verify all 80 unit tests pass
+1. **Run L11/L12 with v2 checkpoint** — 30 min, CPU, can do now
+2. **Run L15 + L19** — 30 min each, CPU, scripts exist
+3. **Create iFSQ+v2 training script** — combine best activation + best anchors
+4. **Run iFSQ+v2 training** — 2h GPU, the decisive experiment
+5. **Switch to BitwiseValidator default** — 1 day, no GPU
+6. **Run L2 D-A13 eval** — 1h GPU
+7. **Update paper with final results** — 1 day
 
-### Phase 1 Tests
-- [ ] prime_vs_bitwise.py: 1000/1000 equivalence
-- [ ] All 12 benchmarks produce identical results with bitwise backend
-- [ ] UI functional with BitwiseValidator
-
-### Phase 2 Tests
-- [ ] Discovery loop runs N cycles without crash
-- [ ] Metrics don't degrade across cycles
-- [ ] Auto-generated anchors are semantically valid (manual inspection)
-- [ ] Composition loss from 3-way deps improves subsumption
-
-### Phase 3 Tests
-- [ ] iFSQ model achieves >= 93% test accuracy
-- [ ] iFSQ model has LM loss <= 0.95
-- [ ] Sparsity distribution measured and compared to ~42% prediction
-- [ ] reptimeline discovery on iFSQ model
-
-### Phase 4 Tests
-- [ ] L2 formal eval passes
-- [ ] Cross-corpus generalization (WikiText2, LAMBADA)
-- [ ] Categorical structure probing results
-- [ ] Scale-dependent ternary analysis
-
----
-
-## Paper Structure Mapping
-
-| Paper Section | Phase | Evidence Source |
-|--------------|-------|---------------|
-| 3. Triadic Algebra | 0 | `src/triadic.py` (PrimeMapper + BitwiseValidator) |
-| 3.3 Isomorphism proof | 1 | `benchmarks/scripts/prime_vs_bitwise.py` |
-| 4. TriadicGPT Architecture | 0 | `src/torch_transformer.py` |
-| 5. Discovery Loop | 2 | `reptimeline/`, `playground/audit_tests/analyze_v2.py` |
-| 6.1 Scaling study | 0 | Runs 19-21, D-A13 |
-| 6.2 Bits sweep | 0 | Runs 22-26 |
-| 6.3 Ablation | 0 | Run 18, D-A15 (fail) |
-| 6.4 Ternary convergence | 3 | D-A8/D-A10, convergence doc |
-| 6.5 BitwiseValidator | 1 | prime_vs_bitwise benchmark |
-| 6.6 Subsumption/analogy | 0 | D-A14 v2 results |
-| 6.7 Domain separation | 0 | Experiment 11 |
-| 6.8 NSM overlap | 0 | NSM mapping doc |
-| 7. Discussion | all | Convergence analysis |
-
----
-
-## What NOT to Do
-
-- Do NOT move files (breaks imports)
-- Do NOT create second paper (one topic)
-- Do NOT publish triadic-head to PyPI yet
-- Do NOT implement bitwise tokenizer (separate research)
-- Do NOT over-engineer discovery loop (manual works, auto is bonus)
-- Do NOT attempt ternary weights at 355M (evidence says they collapse)
-
----
-
-## Timeline
-
-```
-Phase 0: NOW (1-2 days)     <- current
-Phase 1: +2 days
-Phase 2: +5 days
-Phase 3: +7 days
-Phase 4: +2-3 weeks (GPU)
-
-Minimum for paper: Phase 0 + Phase 1 = 3 days
-Full implementation: Phase 0-3 = ~10 days
-With scaling: Phase 0-4 = ~3 weeks
-```
+**Minimum for submission: Steps 1-4 (test what's missing + one decisive experiment)**
+**Complete: Steps 1-7**
