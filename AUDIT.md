@@ -8,19 +8,24 @@
 
 | Componente | Estado | Bloqueo |
 |---|---|---|
-| TriadicGPT (Run 15) | Produccion, 40M params, loss 0.946 | Paper no integra P12/P15 |
-| **D-A8 FSQ (ternario)** | **COMPLETADO** 50K, loss 0.951, sub 86.5% | **Nuevo modelo de referencia** |
-| **D-A10 iFSQ (binario)** | **COMPLETADO** 50K, loss 0.924, sub 87.1% | Mejor LM de todos |
+| TriadicGPT (Run 15) | Produccion, 40M params, loss 0.946 | Modelo base de referencia |
+| **D-A14 Danza v2 (158 anc)** | **COMPLETADO** 50K, 93% test, 98.3% sub | **Mejor modelo — 68 triadic 3-way** |
+| D-A9 Hybrid Adversarial | COMPLETADO 50K, 69.3% test, 6 dead | Free bits aprenden sin supervision |
+| D-A15 Gradient Decoupling | **FAILED** 25K, 49.6% = random | Abandonado |
+| D-A8 FSQ (ternario) | COMPLETADO 50K, loss 0.951, sub 86.5% | Referencia ternaria |
+| D-A10 iFSQ (binario) | COMPLETADO 50K, loss 0.924, sub 87.1% | Mejor LM de todos |
 | D-A8 Absmean (ternario) | COMPLETADO 25K, loss 1.309, sub 85.7% | Inferior a FSQ |
-| Bootstrap D-A5 | XL **COMPLETADO** 50K steps | R3 algebraic 90.7% > trivial 90.2% |
-| R3 Composicion | **VALIDADO**: round-trip 98.1%, chains sub-linear | Substrato computacional |
-| Paper LaTeX | 23pp, ~990 lineas, 20+ citas | Actualizado con D-A8, R3 chains, stat sig |
-| triadic-head (PyPI) | v0.1.0, bugs #2-#4 **FIXED** | API divergence map/encode (BAJO) |
-| Reconciliacion | 51/63/64 **RESUELTO** | `PRIMITIVE_RECONCILIATION.md` |
+| Bootstrap D-A5 | XL COMPLETADO 50K steps | R3 algebraic 90.7% > trivial 90.2% |
+| **BitwiseValidator** | **NUEVO** — O(1) isomorfo a primos, 5-78x speedup | Escala a 1024+ bits |
+| **reptimeline discovery** | **NUEVO** — bit semantics, duals, 3-way deps | 68 interacciones en v2 |
+| R3 Composicion | VALIDADO: round-trip 98.1%, chains sub-linear | Substrato computacional |
+| Paper LaTeX | 23pp, ~990 lineas, 20+ citas | Pendiente integrar v2 + bitwise |
+| triadic-head (PyPI) | v0.1.0, bugs #2-#4 FIXED | API divergence map/encode (BAJO) |
+| Reconciliacion | 51/63/64 RESUELTO | `PRIMITIVE_RECONCILIATION.md` |
 
-**Paper readiness: 9/10** | **Computational evidence: 10/10**
-> Core validation COMPLETE. D-A8 FSQ: ternary head preserves LM (0.951 vs 0.946), achieves 100% subsumption train / 86.5% holdout, clean 3-state distribution {1.3%, 73.3%, 25.3%}. R3 composition: round-trip 98.1% (predicted 81.9%), sub-linear chains (+4.5%). Fork cosines ~0 = NOT word2vec, ontological mechanism. Formula D ternary > continuous (90.3% vs 89.9%). Statistical: p < 0.001, Cohen's d = 6.64.
-> **Remaining for publication:** Optional P2 items (NSM convergence, D-A13 scaling). All P1 tasks COMPLETE. Paper ready for final review.
+**Paper readiness: 8/10** | **Computational evidence: 10/10**
+> **Update 2026-03-19:** Danza v2 (158 anchors) achieves 93% test accuracy, 98.3% subsumption, 68 triadic 3-way interactions. BitwiseValidator proven isomorphic to primes (1000/1000 tests), 5-78x faster. Convergence: trits (philosophy), BitNet (engineering), bitwise (math) -> same ternary {+1,0,-1} with ~42% sparsity.
+> **Remaining for publication:** Integrate v2 + BitwiseValidator results into paper. Run L2 (D-A13 eval), re-run L11/L12 with v2. 7 book corrections (L4-L10).
 
 ---
 
@@ -564,14 +569,20 @@ python playground/danza_bootstrap.py --phase predict --checkpoint checkpoints/da
 ### Resumen ejecutivo
 
 ```
-COMPLETADOS:    10 experimentos + 29 runs previos
-GPU COMPLETADO: D-A13 (GPT-2 Medium + Ternary, 100% sub holdout)
-GPU PENDIENTE:  2 opcionales (D-A9, D-A14)
-CPU PENDIENTE:  0
-PAPER EDITS:    10/10 LISTAS (+ D-A13 resultados pendientes)
-BUGS FIXED:     #1 (API alias), #7 (InfoNCE NaN)
+COMPLETADOS:    15+ experimentos + 29 runs previos
+GPU COMPLETADO: D-A14 (v2 93% test), D-A9 (hybrid), D-A13 (355M), D-A8/D-A10
+GPU FAILED:     D-A15 (gradient decoupling, 49.6% = random)
+NEW TOOLS:      BitwiseValidator (O(1), 1000/1000 equiv), reptimeline (68 triadic)
+AUDIT TESTS:    L1 (3/4 PASS), L3 (PASS), L11/L12 (GOLD PASS, MODEL FAIL)
+BUGS FIXED:     #1, #7, bfloat16 numpy, model unpacking (6 instances)
 BUGS ABIERTOS:  1 (#7a KV cache, bajo impacto)
 
-ESTADO: ALL VALIDATION COMPLETE. D-A13 scaling confirmed (100% sub holdout).
-Paper listo para submission (24pp, 0 errores, 23 citas).
+PENDIENTE:
+  - L2: D-A13 eval formal (GPU)
+  - L11/L12: re-run con v2
+  - 7 correcciones libro (L4-L10)
+  - Integrar v2 + BitwiseValidator en paper
+
+ESTADO: Best model achieved (v2: 93%, 98.3% sub, 68 triadic, exact king:queen).
+BitwiseValidator enables O(1) scaling. Three-path convergence documented.
 ```
