@@ -206,7 +206,7 @@ python playground/ifsq_binary_ablation.py --scale xl --steps 50000
 | Field | Value |
 |-------|-------|
 | **Priority** | 2 (strong) |
-| **Status** | **EN CURSO** — lanzado 2026-03-18, ~6h GPU |
+| **Status** | **COMPLETE** — 100% sub holdout, 89.4% bit acc, 4.5h GPU |
 | **Script path** | `playground/gpt2_medium_ternary.py` (CREATED) |
 | **GPU required** | Yes |
 | **Runtime estimate** | 6 hours |

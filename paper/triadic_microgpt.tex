@@ -672,7 +672,7 @@ This result provides the strongest single-concept evidence that the triadic head
 
 The original $\tanh$-based triadic head suffers from two related problems: (1)~$\sim$42\% of bits become ``dead'' (entropy $< 0.3$), and (2)~adding a subsumption loss to encourage algebraic structure destroys language quality (+47\% perplexity; see Section~\ref{sec:subsumption}). Both problems trace to $\tanh$ saturation, which freezes gradients and prevents the model from adjusting bit assignments without damaging shared representations.
 
-We test two fixes: replacing the activation function (iFSQ: $2\sigma(1.6x)-1$), and switching from binary to ternary quantization ($\{-1, 0, +1\}$ via rounding + STE). Three models are trained at XL scale (40M params, 50K steps):
+We test two fixes: replacing the activation function (iFSQ: $2\sigma(1.6x)-1$), and switching from binary to ternary quantization ($\{-1, 0, +1\}$ via rounding + STE). Three models are trained at XL scale (40M params, 50K steps), plus a scaling test on GPT-2 Medium (355M):
 
 \begin{table}[h]
 \centering
@@ -686,7 +686,10 @@ Model & Activation & States & Lang loss & Sub train & Sub test & Ternary ($-$/$0
 D-A5 (baseline) & $\tanh$ & binary & 0.946 & 0\% & 0\% & --- \\
 D-A10 iFSQ binary & iFSQ & binary & \textbf{0.924} & 100\% & \textbf{87.1\%} & --- \\
 D-A8 FSQ ternary & iFSQ & ternary & 0.951 & 100\% & 86.5\% & 1.3/73.3/25.3 \\
+\midrule
+D-A13 GPT-2 Med. & iFSQ & ternary & 2.73$^\dagger$ & 100\% & \textbf{100\%} & 74.1/0.0/25.9 \\
 \bottomrule
+\multicolumn{7}{l}{\footnotesize $^\dagger$Not comparable: GPT-2 tokenizer (50K vocab) vs.\ custom BPE (4K vocab).}
 \end{tabular}
 \end{table}
 
@@ -695,6 +698,8 @@ Three key results emerge. First, \textbf{the iFSQ activation resolves the subsum
 Second, \textbf{the activation function is the critical variable, not ternary quantization}. The iFSQ binary model (D-A10) achieves near-identical subsumption to the ternary model (87.1\% vs.\ 86.5\%), confirming that the fix resides in gradient flow through the activation, not in the number of output states.
 
 Third, \textbf{the ternary model produces a clean three-state distribution}: 1.3\% negative (present), 73.3\% zero (irrelevant), 25.3\% positive (absent). The 73\% zero rate is consistent with BitNet b1.58's independently discovered $\sim$42\% weight zeros~\citep{ma2024bitnet}, adjusted for the difference between network weights (distributed symmetrically) and concept activations (where ``irrelevant'' is the dominant state). This three-state structure maps directly to the ontological framework from which the triadic system originates: \emph{presence} ($+1$), \emph{absence} ($-1$), and \emph{void/irrelevance} ($0$).
+
+Fourth, \textbf{scaling to a pre-trained backbone dramatically improves generalization}. D-A13 attaches the same iFSQ ternary head to GPT-2 Medium (355M params, two-phase training: frozen backbone for 5K steps, then unfreeze last 4 layers for 45K steps). Held-out subsumption jumps from 86.5\% to \textbf{100\%}---all 13 unseen hypernym--hyponym pairs pass exact prime divisibility. Holdout bit accuracy reaches 89.4\%, exceeding the from-scratch model. However, the ternary distribution collapses to binary: 74.1\% negative, 0\% zero, 25.9\% positive. The richer GPT-2 embeddings provide enough signal that the model does not need the third ``irrelevant'' state---every bit becomes either active or negated. This degeneracy suggests that the three-state structure in D-A8 is a byproduct of limited model capacity rather than a fundamental property of the semantic space.
 
 
 % ============================================================
@@ -850,7 +855,7 @@ The loss--embedding interaction suggests a \emph{staged training} strategy: begi
 
 \paragraph{Future work.}
 Several directions emerge naturally:
-(1)~Scaling the iFSQ ternary head to 100M+ parameters (GPT-2 Medium/Large), where the D-A8 results predict further improvements in subsumption generalization.
+(1)~Scaling beyond GPT-2 Medium (355M) to Large/XL backbones, where D-A13's 100\% held-out subsumption suggests the approach may achieve perfect generalization at sufficient scale.
 (2)~Combining the iFSQ activation with richer embeddings (GPT-2 transfer + InfoNCE), potentially achieving both high subsumption and high semantic gap in a single model.
 (3)~Exploiting the compositional substrate for multi-step reasoning chains, building on the sub-linear error accumulation demonstrated in Section~\ref{sec:composition}.
 (4)~Category-aware discrete Rule of Three formulas, which achieve 90.3\% accuracy in ternary space (outperforming continuous arithmetic at 89.9\%), suggesting that fully discrete analogical reasoning is feasible.

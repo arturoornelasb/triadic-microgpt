@@ -520,7 +520,7 @@ python playground/danza_bootstrap.py --phase predict --checkpoint checkpoints/da
 |----|------|---------|-----------|--------|-------------|-------|
 | **D-A8** | **Ternary Head (BitNet)** | **4** | **P1 CRITICO** | `danza_ternary.py` | GPU libre | Valida 3 estados, fija FPR, convergencia BitNet |
 | D-A10 | iFSQ Binary Ablation | 4 | P2 | **NECESITA SCRIPT** | Idealmente post D-A8 | Aisla contribucion activacion vs ternary |
-| D-A13 | GPT-2 Medium + Ternary | 6 | P2 | `gpt2_medium_ternary.py` | **EN CURSO** | Lanzado 2026-03-18, ~6h GPU |
+| D-A13 | GPT-2 Medium + Ternary | 4.5 | P2 | `gpt2_medium_ternary.py` | **COMPLETADO** | Sub holdout 100%, bit acc 89.4% |
 | D-A9 | Hybrid + Adversarial | 4.5 | P3 | **NECESITA SCRIPT** | D-A8 completo | 30 supervised + 33 free bits |
 | D-A14 | Gradient Decoupling | 5 | P4 | **NECESITA SCRIPT** | Ninguna | Evidencia empirica para Wang et al. theory |
 | E10-v3 | GPT-2 + InfoNCE (fix) | 2 | P2 | Fix Bug #7 primero | Bug #7 resuelto | Re-run con InfoNCE estable |
@@ -550,7 +550,7 @@ python playground/danza_bootstrap.py --phase predict --checkpoint checkpoints/da
 | Integrar D-A8 resultados (si positivo) | P1 | **LISTO** | Section 7.7 Ternary + iFSQ |
 | BitNet convergence paragraph | P1 | **LISTO** | Section 6 Discussion |
 | NSM convergence argument | P2 | **LISTO** | Section 6 Discussion + Wierzbicka citation |
-| D-A13 scaling claim (si positivo) | P2 | **EN CURSO** | Abstract + Results (pendiente resultados) |
+| D-A13 scaling claim (si positivo) | P2 | **LISTO** | Section 7.7 + Future Work updated |
 | Validacion crosslingüistica (future work) | P3 | Ninguna | Section 7 Future Work |
 
 ### Bugs abiertos
@@ -565,13 +565,13 @@ python playground/danza_bootstrap.py --phase predict --checkpoint checkpoints/da
 
 ```
 COMPLETADOS:    10 experimentos + 29 runs previos
-GPU EN CURSO:   D-A13 (GPT-2 Medium + Ternary, ~6h)
+GPU COMPLETADO: D-A13 (GPT-2 Medium + Ternary, 100% sub holdout)
 GPU PENDIENTE:  2 opcionales (D-A9, D-A14)
 CPU PENDIENTE:  0
 PAPER EDITS:    10/10 LISTAS (+ D-A13 resultados pendientes)
 BUGS FIXED:     #1 (API alias), #7 (InfoNCE NaN)
 BUGS ABIERTOS:  1 (#7a KV cache, bajo impacto)
 
-ESTADO: Core validation COMPLETE. NSM convergence integrado.
-D-A13 corriendo en GPU. Paper listo para submission (24pp, 0 errores).
+ESTADO: ALL VALIDATION COMPLETE. D-A13 scaling confirmed (100% sub holdout).
+Paper listo para submission (24pp, 0 errores, 23 citas).
 ```
