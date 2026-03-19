@@ -313,6 +313,169 @@ class TriadicValidator:
 
 
 # ============================================================
+# Bitwise Mapper — O(1) alternative to PrimeMapper
+# ============================================================
+
+class BitwiseMapper:
+    """Maps projections to bitmask integers instead of prime composites.
+
+    Isomorphic to PrimeMapper but uses O(1) bitwise operations instead
+    of BigInt arithmetic. Scales to any number of bits.
+
+    Example:
+        projections = [0.5, -0.2, 0.8, 0.1]  (4 bits)
+        bitmask     = 0b1101 = 13  (bits 0, 2, 3 are positive)
+    """
+
+    def __init__(self, n_bits):
+        self.n_bits = n_bits
+
+    def map(self, projections):
+        """Convert projections to a bitmask integer."""
+        bitmask = 0
+        for i, proj in enumerate(projections[:self.n_bits]):
+            val = proj.data if hasattr(proj, 'grad') else proj
+            if val > 0:
+                bitmask |= (1 << i)
+        return bitmask
+
+    encode = map
+
+    def get_bits(self, projections):
+        """Return the binary bit pattern from projections."""
+        return [1 if (p.data if hasattr(p, 'grad') else p) > 0 else 0
+                for p in projections[:self.n_bits]]
+
+    def to_prime(self, bitmask, prime_mapper):
+        """Convert bitmask to equivalent prime composite."""
+        composite = 1
+        for i in range(self.n_bits):
+            if bitmask & (1 << i):
+                composite *= prime_mapper.primes[i]
+        return composite
+
+    def from_prime(self, composite, prime_mapper):
+        """Convert prime composite to equivalent bitmask."""
+        bitmask = 0
+        for i, p in enumerate(prime_mapper.primes):
+            if composite % p == 0:
+                bitmask |= (1 << i)
+        return bitmask
+
+    def explain(self, bitmask):
+        """Decompose a bitmask into active bit indices."""
+        active = []
+        for i in range(self.n_bits):
+            if bitmask & (1 << i):
+                active.append(i)
+        return {
+            'bitmask': bitmask,
+            'active_bits': active,
+            'n_active': len(active),
+            'n_total': self.n_bits,
+        }
+
+
+class BitwiseValidator:
+    """Algebraic semantic operations using O(1) bitwise ops.
+
+    Mathematically equivalent to TriadicValidator but operates on
+    bitmask integers instead of prime composites. Every operation
+    that TriadicValidator does with GCD/LCM/division, this class
+    does with AND/OR/XOR.
+
+    Equivalences:
+        GCD(A, B)         <->  A & B          (shared features)
+        LCM(A, B)         <->  A | B          (union of features)
+        A / GCD(A, B)     <->  A & ~B         (features only in A)
+        A % B == 0        <->  (A & B) == B   (subsumption)
+    """
+
+    @staticmethod
+    def subsumes(a, b):
+        """Does concept A contain ALL features of B?  O(1)."""
+        return (a & b) == b
+
+    @staticmethod
+    def compose(*concepts):
+        """Combine features from multiple concepts.  O(n)."""
+        result = 0
+        for c in concepts:
+            result |= c
+        return result
+
+    @staticmethod
+    def explain_gap(a, b):
+        """Exactly WHICH features differ between A and B.  O(1)."""
+        shared = a & b
+        only_in_a = a & ~b
+        only_in_b = b & ~a
+        return {
+            'shared': shared,
+            'only_in_a': only_in_a,
+            'only_in_b': only_in_b,
+            'a_contains_b': (a & b) == b,
+            'b_contains_a': (a & b) == a,
+        }
+
+    @staticmethod
+    def analogy(a, b, c):
+        """A is to B as C is to ?  O(1).
+
+        Same transformation as TriadicValidator.analogy but in bit space:
+        1. Find what A has that B doesn't (only_a)
+        2. Find what B has that A doesn't (only_b)
+        3. Remove only_a from C, add only_b
+        """
+        only_a = a & ~b  # bits to remove
+        only_b = b & ~a  # bits to add
+        return (c & ~only_a) | only_b
+
+    @staticmethod
+    def similarity(a, b):
+        """Jaccard similarity on active bits.  O(1)."""
+        shared = bin(a & b).count('1')
+        total = bin(a | b).count('1')
+        if total == 0:
+            return 1.0
+        return shared / total
+
+    @staticmethod
+    def intersect(a, b):
+        """Shared features.  O(1)."""
+        return a & b
+
+    @staticmethod
+    def difference(a, b):
+        """Features in A but NOT in B.  O(1)."""
+        return a & ~b
+
+    @staticmethod
+    def symmetric_difference(a, b):
+        """Features in EXACTLY ONE of A or B.  O(1)."""
+        return a ^ b
+
+    @staticmethod
+    def negate(a, n_bits=64):
+        """Complement within universe of n_bits.  O(1)."""
+        mask = (1 << n_bits) - 1
+        return a ^ mask
+
+    @staticmethod
+    def project(a, category_bits):
+        """Extract only features from specific bit positions.  O(1).
+
+        Args:
+            a: bitmask integer
+            category_bits: list of bit indices defining the category
+        """
+        mask = 0
+        for b in category_bits:
+            mask |= (1 << b)
+        return a & mask
+
+
+# ============================================================
 # Triadic Loss — Differentiable loss for prime alignment
 # ============================================================
 
