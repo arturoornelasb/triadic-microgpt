@@ -247,9 +247,10 @@ class TestTriadic(unittest.TestCase):
 
     def test_prime_mapper_all_negative(self):
         mapper = PrimeMapper(4)
-        # All negative → default to 2
+        # All negative → identity element 1 (no active primitives)
+        # Bug #3 fix: returns 1 instead of 2 to avoid conflating with vacío
         prime = mapper.map([-0.1, -0.2, -0.3, -0.4])
-        self.assertEqual(prime, 2)
+        self.assertEqual(prime, 1)
 
     def test_prime_mapper_all_positive(self):
         mapper = PrimeMapper(4)
