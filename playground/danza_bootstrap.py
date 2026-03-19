@@ -697,34 +697,57 @@ def phase_predict(model, tokenizer, train_anchors, holdout_anchors, all_anchors,
 # Phase: bootstrap — D-A6 iterative self-improvement
 # ============================================================
 
-def confidence_gate(direct, ensemble, holdout_anchors, threshold=0.7):
+def confidence_gate(direct, ensemble, holdout_anchors, threshold=0.7,
+                    min_quads=1, certainty_threshold=0.70,
+                    direct_fallback=True):
     """Accept holdout predictions as pseudo-anchors if confidence is high enough.
 
     Returns dict of accepted pseudo-anchors: {eng_word: target_tensor}.
+
+    v2 fixes (D-A6b):
+    - Gate 2: min_quads lowered from 2 to 1 (most concepts only have 1 quad)
+    - Gate 4: certainty computed on ALIVE bits only (dead bits have |proj|≈0,
+      inflating the denominator and making certainty artificially low)
+    - Direct fallback: concepts without R3 quads can be accepted if their
+      direct encoding has high accuracy and certainty
     """
     accepted = {}
 
+    # Detect alive bits from direct projections (entropy > 0.3)
+    all_projs = torch.stack([d['proj'] for d in direct.values()])  # (N, 63)
+    bit_means = (all_projs > 0).float().mean(dim=0)  # fraction positive per bit
+    bit_entropy = -bit_means * torch.log2(bit_means.clamp(min=1e-8)) \
+                  - (1 - bit_means) * torch.log2((1 - bit_means).clamp(min=1e-8))
+    alive_mask = bit_entropy > 0.3  # same threshold used in eval
+    n_alive = alive_mask.sum().item()
+
+    print(f"\n  Confidence gate v2: alive bits={n_alive}/{all_projs.shape[1]}, "
+          f"min_quads={min_quads}, certainty_thr={certainty_threshold:.0%}, "
+          f"acc_thr={threshold:.0%}, direct_fallback={direct_fallback}")
+
+    # --- Path A: R3 ensemble predictions ---
     for word in ensemble:
+        if word in accepted:
+            continue
         proj = ensemble[word]['proj']
         ens_acc = ensemble[word]['bit_accuracy']
         n_quads = ensemble[word]['n_quads']
 
-        # Gate 1: bit certainty — fraction of bits with |proj| > 0.5
-        certainty = (proj.abs() > 0.5).float().mean().item()
-
-        # Gate 2: minimum quads for cross-validation
-        if n_quads < 2:
+        # Gate 2: minimum quads (v2: default 1)
+        if n_quads < min_quads:
             continue
 
         # Gate 3: ensemble accuracy must exceed threshold
         if ens_acc < threshold:
             continue
 
-        # Gate 4: high certainty
-        if certainty < 0.85:
+        # Gate 4: certainty on ALIVE bits only (v2 fix)
+        alive_proj = proj[alive_mask] if n_alive > 0 else proj
+        certainty = (alive_proj.abs() > 0.5).float().mean().item()
+        if certainty < certainty_threshold:
             continue
 
-        # Accept: create pseudo-target from ensemble prediction
+        # Accept from ensemble
         pseudo_target = torch.where(proj > 0,
                                      torch.ones_like(proj),
                                      torch.full_like(proj, -1.0))
@@ -734,9 +757,39 @@ def confidence_gate(direct, ensemble, holdout_anchors, threshold=0.7):
             'frontier': holdout_anchors[word]['frontier'],
             'expanded': holdout_anchors[word]['expanded'],
             'n_active': holdout_anchors[word]['n_active'],
-            'razon': f'PSEUDO (cycle bootstrap, ens_acc={ens_acc:.1%}, certainty={certainty:.1%})',
+            'razon': f'PSEUDO-R3 (ens_acc={ens_acc:.1%}, cert={certainty:.1%}, quads={n_quads})',
             'is_pseudo': True,
         }
+
+    # --- Path B: Direct encoding fallback (no R3 needed) ---
+    if direct_fallback:
+        for word in direct:
+            if word in accepted or word not in holdout_anchors:
+                continue
+            d_acc = direct[word]['bit_accuracy']
+            proj = direct[word]['proj']
+
+            # Stricter threshold for direct (no algebraic cross-validation)
+            if d_acc < threshold + 0.10:
+                continue
+
+            alive_proj = proj[alive_mask] if n_alive > 0 else proj
+            certainty = (alive_proj.abs() > 0.5).float().mean().item()
+            if certainty < certainty_threshold:
+                continue
+
+            pseudo_target = torch.where(proj > 0,
+                                         torch.ones_like(proj),
+                                         torch.full_like(proj, -1.0))
+            accepted[word] = {
+                'target': pseudo_target.cpu(),
+                'spanish': holdout_anchors[word]['spanish'],
+                'frontier': holdout_anchors[word]['frontier'],
+                'expanded': holdout_anchors[word]['expanded'],
+                'n_active': holdout_anchors[word]['n_active'],
+                'razon': f'PSEUDO-DIRECT (d_acc={d_acc:.1%}, cert={certainty:.1%})',
+                'is_pseudo': True,
+            }
 
     return accepted
 
@@ -746,7 +799,9 @@ def phase_bootstrap(args, all_anchors, prim_data):
     train_anchors, holdout_anchors = get_split(all_anchors)
 
     print(f"\n{'=' * 70}")
-    print(f"  D-A6 BOOTSTRAP LOOP — {args.cycles} cycles")
+    print(f"  D-A6b BOOTSTRAP LOOP v2 — {args.cycles} cycles")
+    print(f"  Gate: min_quads={args.min_quads}, acc≥{args.confidence_threshold:.0%}, "
+          f"cert≥{args.certainty_threshold:.0%}, direct_fb={args.direct_fallback}")
     print(f"{'=' * 70}")
 
     cycle_results = []
@@ -757,7 +812,7 @@ def phase_bootstrap(args, all_anchors, prim_data):
 
         # Train
         ckpt_dir = os.path.join(_PROJECT, 'checkpoints',
-                                 f'danza_bootstrap_{args.scale}', f'cycle{cycle}')
+                                 f'danza_bootstrap_v2_{args.scale}', f'cycle{cycle}')
         model, tokenizer, device = run_training(
             args, train_anchors, holdout_anchors, prim_data, ckpt_dir, cycle=cycle)
 
@@ -765,9 +820,12 @@ def phase_bootstrap(args, all_anchors, prim_data):
         results, direct, r3_preds, ensemble = phase_predict(
             model, tokenizer, train_anchors, holdout_anchors, all_anchors, device)
 
-        # Confidence gate
+        # Confidence gate (v2)
         accepted = confidence_gate(direct, ensemble, holdout_anchors,
-                                    threshold=args.confidence_threshold)
+                                    threshold=args.confidence_threshold,
+                                    min_quads=args.min_quads,
+                                    certainty_threshold=args.certainty_threshold,
+                                    direct_fallback=args.direct_fallback)
 
         n_accepted = len(accepted)
         print(f"\n  Cycle {cycle}: accepted {n_accepted} pseudo-anchors")
@@ -775,8 +833,8 @@ def phase_bootstrap(args, all_anchors, prim_data):
         if accepted:
             for word in sorted(accepted.keys()):
                 sp = accepted[word]['spanish']
-                ens_acc = ensemble[word]['bit_accuracy']
-                print(f"    + {word} ({sp}): ensemble acc = {ens_acc:.1%}")
+                razon = accepted[word].get('razon', '?')
+                print(f"    + {word} ({sp}): {razon}")
 
         cycle_results.append({
             'cycle': cycle,
@@ -808,7 +866,7 @@ def phase_bootstrap(args, all_anchors, prim_data):
 
     # Save bootstrap results
     results_path = os.path.join(_PROJECT, 'checkpoints',
-                                 f'danza_bootstrap_{args.scale}', 'bootstrap_results.json')
+                                 f'danza_bootstrap_v2_{args.scale}', 'bootstrap_results.json')
     os.makedirs(os.path.dirname(results_path), exist_ok=True)
 
     # Convert non-serializable data
@@ -861,8 +919,15 @@ def main():
                         help='Checkpoint dir for --phase predict')
     parser.add_argument('--cycles', type=int, default=3,
                         help='Number of bootstrap cycles (D-A6)')
-    parser.add_argument('--confidence-threshold', type=float, default=0.7,
+    parser.add_argument('--confidence-threshold', type=float, default=0.70,
                         help='Minimum ensemble accuracy to accept pseudo-anchor')
+    parser.add_argument('--min-quads', type=int, default=1,
+                        help='Minimum R3 quads for ensemble acceptance (v2: 1, was 2)')
+    parser.add_argument('--certainty-threshold', type=float, default=0.70,
+                        help='Minimum alive-bit certainty (v2: 0.70, was 0.85 on all bits)')
+    parser.add_argument('--direct-fallback', action='store_true', default=True,
+                        help='Accept high-accuracy direct encodings as pseudo-anchors')
+    parser.add_argument('--no-direct-fallback', dest='direct_fallback', action='store_false')
     args = parser.parse_args()
 
     # Load data

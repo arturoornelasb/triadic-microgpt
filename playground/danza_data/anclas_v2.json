@@ -1,0 +1,527 @@
+{
+  "_descripcion": "v2: ~100 conceptos adicionales. NO reemplaza anclas.json — se carga junto con él. Mismos 63 primitivos, más conceptos para mejorar generalización. Incluye conceptos abstractos, filosóficos y los usados en los audit tests.",
+  "_formato": "nombre_español: {en: 'english', bits: [...], razon: '...'}",
+  "_total_v1": 50,
+  "_total_v2": 104,
+
+  "socialismo": {
+    "en": "socialism",
+    "bits": ["colectivo", "control", "unión", "orden", "hacer", "bien", "algunos"],
+    "razon": "Colectivo: sistema orientado al grupo. Control: regulación estatal. Unión: solidaridad. Orden: planificación. Hacer: acción social. Bien: intención moral declarada. Algunos: redistribución parcial."
+  },
+  "capitalismo": {
+    "en": "capitalism",
+    "bits": ["individual", "libertad", "hacer", "más", "control", "fuerza", "creación"],
+    "razon": "Individual: agente autónomo. Libertad: mercado libre. Hacer: empresa. Más: acumulación. Control: propiedad. Fuerza: competencia. Creación: innovación. Comparte hacer+control con socialismo pero difiere en individual↔colectivo y libertad↔orden."
+  },
+  "tiranía": {
+    "en": "tyranny",
+    "bits": ["control", "fuerza", "individual", "mal", "dolor", "destrucción", "más"],
+    "razon": "Control: dominio absoluto. Fuerza: coerción. Individual: un solo poder. Mal: daño moral. Dolor: sufrimiento infligido. Destrucción: elimina lo que se opone. Más: exceso de poder."
+  },
+  "democracia": {
+    "en": "democracy",
+    "bits": ["colectivo", "libertad", "orden", "verdad", "hacer", "algunos", "consciente"],
+    "razon": "Colectivo: decisión grupal. Libertad: derechos. Orden: instituciones. Verdad: transparencia. Hacer: participación. Algunos: representación. Consciente: ciudadanía informada."
+  },
+  "fanatismo": {
+    "en": "fanaticism",
+    "bits": ["fuego", "más", "control", "mentira", "querer", "consciente", "individual"],
+    "razon": "Fuego: pasión extrema. Más: exceso. Control: rigidez dogmática. Mentira: distorsión de realidad. Querer: voluntad obsesiva. Consciente: convicción firme. Individual: centrado en su verdad."
+  },
+  "tolerancia": {
+    "en": "tolerance",
+    "bits": ["unión", "libertad", "consciente", "orden", "bien", "receptivo", "algunos"],
+    "razon": "Unión: aceptación del otro. Libertad: permite diferencia. Consciente: awareness. Orden: coexistencia. Bien: intención moral. Receptivo: abierto. Algunos: acepta la pluralidad."
+  },
+  "perfeccionismo": {
+    "en": "perfectionism",
+    "bits": ["control", "orden", "más", "verdad", "consciente", "querer", "individual"],
+    "razon": "Control: autoexigencia. Orden: todo en su lugar. Más: nunca es suficiente. Verdad: busca lo correcto. Consciente: autoconsciente. Querer: voluntad dirigida. Individual: centrado en sí."
+  },
+  "aceptación": {
+    "en": "acceptance",
+    "bits": ["receptivo", "consciente", "orden", "unión", "vida"],
+    "razon": "Receptivo: permite lo que es. Consciente: awareness. Orden: paz interior. Unión: integración. Vida: seguir adelante."
+  },
+  "temeridad": {
+    "en": "recklessness",
+    "bits": ["caos", "libertad", "más", "hacer", "mover", "fuego"],
+    "razon": "Caos: sin plan. Libertad: sin restricciones. Más: exceso. Hacer: acción impulsiva. Mover: movimiento sin dirección. Fuego: energía sin control."
+  },
+  "cautela": {
+    "en": "caution",
+    "bits": ["control", "orden", "menos", "consciente", "pensar", "tierra"],
+    "razon": "Control: autoregulación. Orden: planificación. Menos: reducir riesgo. Consciente: alerta. Pensar: deliberación. Tierra: pisada firme."
+  },
+  "audacia": {
+    "en": "boldness",
+    "bits": ["fuerza", "hacer", "libertad", "consciente", "mover", "fuego"],
+    "razon": "Fuerza: coraje. Hacer: acción decidida. Libertad: rompe límites. Consciente: decisión deliberada. Mover: avanza. Fuego: energía. Diferente de temeridad: tiene consciente (no es impulsivo)."
+  },
+  "avaricia": {
+    "en": "greed",
+    "bits": ["más", "individual", "control", "querer", "contención", "mal"],
+    "razon": "Más: nunca suficiente. Individual: solo para sí. Control: acumula. Querer: deseo insaciable. Contención: retiene. Mal: daña a otros."
+  },
+  "generosidad": {
+    "en": "generosity",
+    "bits": ["más", "colectivo", "libertad", "hacer", "unión", "bien"],
+    "razon": "Más: tiene para dar. Colectivo: orientado a otros. Libertad: da voluntariamente. Hacer: acción. Unión: conecta. Bien: virtud moral."
+  },
+  "ira": {
+    "en": "rage",
+    "bits": ["fuego", "fuerza", "más", "destrucción", "dolor", "consciente", "interocepción"],
+    "razon": "Fuego: quema. Fuerza: energía intensa. Más: exceso. Destrucción: impulso destructivo. Dolor: experiencia negativa. Consciente: aware. Interocepción: se siente en el cuerpo. Similar a odio pero con más+destrucción."
+  },
+  "calma": {
+    "en": "calm",
+    "bits": ["agua", "orden", "menos", "consciente", "interocepción", "vida"],
+    "razon": "Agua: fluidez serena. Orden: equilibrio. Menos: reducción de activación. Consciente: presence. Interocepción: bienestar corporal. Vida: estado vital tranquilo."
+  },
+  "irritación": {
+    "en": "irritation",
+    "bits": ["fuego", "fuerza", "dolor", "consciente", "interocepción"],
+    "razon": "Fuego: calienta. Fuerza: energía molesta. Dolor: incómodo. Consciente: aware. Interocepción: se siente. Versión moderada de ira: sin más, sin destrucción."
+  },
+  "pasión": {
+    "en": "passion",
+    "bits": ["fuego", "más", "vida", "querer", "fuerza", "consciente", "interocepción"],
+    "razon": "Fuego: ardor. Más: intensidad. Vida: vitalidad. Querer: deseo. Fuerza: energía. Consciente: aware. Interocepción: se siente. Comparte mucho con amor pero sin unión."
+  },
+  "miedo": {
+    "en": "fear",
+    "bits": ["dolor", "vida", "consciente", "interocepción", "mover", "contención"],
+    "razon": "Dolor: anticipación de daño. Vida: instinto de supervivencia. Consciente: aware del peligro. Interocepción: corazón acelerado. Mover: impulso de huir. Contención: paraliza también."
+  },
+  "sorpresa": {
+    "en": "surprise",
+    "bits": ["información", "caos", "consciente", "interocepción", "flujo_temporal"],
+    "razon": "Información: dato inesperado. Caos: rompe la expectativa. Consciente: awareness. Interocepción: reacción corporal. Flujo_temporal: momento súbito."
+  },
+  "asco": {
+    "en": "disgust",
+    "bits": ["dolor", "separación", "consciente", "interocepción", "gusto", "olfato"],
+    "razon": "Dolor: aversión. Separación: rechazo. Consciente: aware. Interocepción: náusea. Gusto: relacionado con ingesta. Olfato: olores repulsivos."
+  },
+  "vergüenza": {
+    "en": "shame",
+    "bits": ["dolor", "consciente", "individual", "interocepción", "mal", "menos"],
+    "razon": "Dolor: sufrimiento. Consciente: autoconsciente. Individual: centrado en sí. Interocepción: rubor, tensión. Mal: autojuicio negativo. Menos: disminución del yo."
+  },
+  "culpa": {
+    "en": "guilt",
+    "bits": ["dolor", "consciente", "hacer", "mal", "verdad", "individual"],
+    "razon": "Dolor: sufrimiento. Consciente: sabe lo que hizo. Hacer: por una acción. Mal: reconoce el daño. Verdad: confrontación con la realidad. Individual: responsabilidad personal."
+  },
+  "ansiedad": {
+    "en": "anxiety",
+    "bits": ["dolor", "vida", "consciente", "interocepción", "flujo_temporal", "caos"],
+    "razon": "Dolor: malestar. Vida: amenaza percibida. Consciente: hiperaware. Interocepción: síntomas físicos. Flujo_temporal: anticipación del futuro. Caos: desorden mental."
+  },
+  "placer_concepto": {
+    "en": "pleasure",
+    "bits": ["placer", "vida", "consciente", "interocepción", "más"],
+    "razon": "Placer: experiencia hedónica directa. Vida: requiere estar vivo. Consciente: aware. Interocepción: se siente en el cuerpo. Más: deseo de incrementar."
+  },
+  "felicidad": {
+    "en": "happiness",
+    "bits": ["vida", "placer", "consciente", "interocepción", "unión", "orden"],
+    "razon": "Similar a feliz (v1) pero con orden: estado sostenido, no momentáneo."
+  },
+  "piedra": {
+    "en": "stone",
+    "bits": ["tierra", "fuerza", "contención", "orden"],
+    "razon": "Tierra: materia sólida. Fuerza: dureza. Contención: forma definida. Orden: estructura cristalina. Sin vida, sin consciencia."
+  },
+  "agua_concepto": {
+    "en": "water",
+    "bits": ["agua", "mover", "contención", "flujo_temporal", "vida"],
+    "razon": "Agua: el elemento. Mover: fluye. Contención: toma forma. Flujo_temporal: cambia. Vida: sustenta la vida."
+  },
+  "número": {
+    "en": "number",
+    "bits": ["información", "orden", "uno", "verdad"],
+    "razon": "Información: patrón abstracto. Orden: estructura. Uno: unidad base. Verdad: exactitud. Sin materia, sin vida."
+  },
+  "triángulo": {
+    "en": "triangle",
+    "bits": ["información", "orden", "contención", "verdad", "algunos"],
+    "razon": "Información: forma. Orden: geometría. Contención: encierra área. Verdad: exacto. Algunos: tres lados."
+  },
+  "gravedad": {
+    "en": "gravity",
+    "bits": ["fuerza", "eje_vertical", "tierra", "mover", "todo"],
+    "razon": "Fuerza: atracción. Eje_vertical: arriba/abajo. Tierra: masa. Mover: causa movimiento. Todo: afecta a toda la materia."
+  },
+  "velocidad": {
+    "en": "velocity",
+    "bits": ["mover", "fuerza", "flujo_temporal", "información"],
+    "razon": "Mover: desplazamiento. Fuerza: energía. Flujo_temporal: por unidad de tiempo. Información: medible."
+  },
+  "masa": {
+    "en": "mass",
+    "bits": ["tierra", "fuerza", "contención", "información"],
+    "razon": "Tierra: materia. Fuerza: inercia. Contención: cuerpo definido. Información: cuantificable."
+  },
+  "distancia": {
+    "en": "distance",
+    "bits": ["separación", "eje_profundidad", "información", "mover"],
+    "razon": "Separación: entre dos puntos. Eje_profundidad: dimensión espacial. Información: medible. Mover: se recorre."
+  },
+  "carbono": {
+    "en": "carbon",
+    "bits": ["tierra", "contención", "unión", "vida", "orden"],
+    "razon": "Tierra: material. Contención: forma enlaces. Unión: se une con todo. Vida: base de la vida orgánica. Orden: estructuras regulares (diamante)."
+  },
+  "hierro": {
+    "en": "iron",
+    "bits": ["tierra", "fuerza", "contención", "orden"],
+    "razon": "Tierra: metal. Fuerza: dureza. Contención: estructura. Orden: cristalino. Similar a piedra pero con fuerza más prominente."
+  },
+  "oxígeno": {
+    "en": "oxygen",
+    "bits": ["aire", "vida", "fuerza", "mover"],
+    "razon": "Aire: gas. Vida: necesario para respirar. Fuerza: oxidación. Mover: fluye."
+  },
+  "nitrógeno": {
+    "en": "nitrogen",
+    "bits": ["aire", "orden", "contención"],
+    "razon": "Aire: gas. Orden: estable, inerte. Contención: permanece."
+  },
+  "hidrógeno": {
+    "en": "hydrogen",
+    "bits": ["aire", "fuerza", "uno", "más", "creación"],
+    "razon": "Aire: gas. Fuerza: energía (fusión). Uno: el más simple. Más: abundancia. Creación: formó las primeras estrellas."
+  },
+  "presencia": {
+    "en": "presence",
+    "bits": ["consciente", "vida", "información", "contención", "uno"],
+    "razon": "Consciente: awareness. Vida: estar. Información: señal. Contención: ocupar espacio. Uno: singularidad del ser presente."
+  },
+  "ausencia_concepto": {
+    "en": "absence",
+    "bits": ["vacío", "ausente", "separación", "muerte"],
+    "razon": "Vacío: nada. Ausente: sin consciencia de ello. Separación: distancia. Muerte: cese. Opuesto genuino de presencia."
+  },
+  "luz": {
+    "en": "light",
+    "bits": ["fuego", "vista", "fuerza", "mover", "más", "información"],
+    "razon": "Fuego: radiancia. Vista: percepción. Fuerza: energía electromagnética. Mover: viaja. Más: ilumina. Información: revela."
+  },
+  "ceguera": {
+    "en": "blindness",
+    "bits": ["vacío", "ausente", "vista"],
+    "razon": "Vacío: ausencia de visión. Ausente: sin percepción visual. Vista: la facultad existe conceptualmente aunque ausente. Privativo clásico."
+  },
+  "silencio_concepto": {
+    "en": "silence",
+    "bits": ["vacío", "oído", "orden", "menos"],
+    "razon": "Vacío: ausencia de sonido. Oído: la facultad existe. Orden: calma. Menos: reducción. Similar a silencioso (v1)."
+  },
+  "conocimiento": {
+    "en": "knowledge",
+    "bits": ["información", "saber", "orden", "consciente", "verdad"],
+    "razon": "Información: datos. Saber: comprensión. Orden: organizado. Consciente: requiere mente. Verdad: corresponde con realidad."
+  },
+  "ignorancia_concepto": {
+    "en": "ignorance",
+    "bits": ["vacío", "consciente", "ausente"],
+    "razon": "Vacío: ausencia de conocimiento. Consciente: el ignorante está consciente (vive). Ausente: sin awareness del tema. Similar a ignorante (v1) pero simplificado."
+  },
+  "esperanza": {
+    "en": "hope",
+    "bits": ["vida", "placer", "consciente", "flujo_temporal", "querer", "creación"],
+    "razon": "Vida: querer seguir. Placer: anticipación positiva. Consciente: awareness. Flujo_temporal: dirigida al futuro. Querer: deseo. Creación: imagina algo mejor."
+  },
+  "desesperación": {
+    "en": "despair",
+    "bits": ["muerte", "dolor", "consciente", "flujo_temporal", "vacío", "destrucción"],
+    "razon": "Muerte: deseo de cese. Dolor: sufrimiento. Consciente: aware del sufrimiento. Flujo_temporal: no ve futuro. Vacío: sin contenido. Destrucción: autodestructivo."
+  },
+  "salud": {
+    "en": "health",
+    "bits": ["vida", "orden", "fuerza", "consciente", "interocepción", "bien"],
+    "razon": "Vida: vitalidad. Orden: homeostasis. Fuerza: vigor. Consciente: aware. Interocepción: bienestar corporal. Bien: estado positivo."
+  },
+  "enfermedad": {
+    "en": "disease",
+    "bits": ["vida", "caos", "dolor", "interocepción", "mal", "destrucción"],
+    "razon": "Vida: afecta al vivo. Caos: desorden biológico. Dolor: sufrimiento. Interocepción: síntomas. Mal: estado negativo. Destrucción: deterioro."
+  },
+  "riqueza": {
+    "en": "wealth",
+    "bits": ["más", "control", "individual", "hacer", "bien", "contención"],
+    "razon": "Similar a rico (v1) con contención: acumula dentro de límites."
+  },
+  "pobreza": {
+    "en": "poverty",
+    "bits": ["menos", "vacío", "individual", "dolor", "contención"],
+    "razon": "Menos: carencia. Vacío: sin recursos. Individual: persona. Dolor: sufrimiento. Contención: atrapado."
+  },
+  "libertad_concepto": {
+    "en": "freedom",
+    "bits": ["libertad", "mover", "consciente", "vida", "querer", "aire"],
+    "razon": "Libertad: autodeterminación. Mover: poder ir. Consciente: saber que se es libre. Vida: estado vital. Querer: voluntad. Aire: expansión."
+  },
+  "cautiverio": {
+    "en": "captivity",
+    "bits": ["control", "contención", "individual", "dolor", "tierra"],
+    "razon": "Control: dominio externo. Contención: encierro. Individual: prisionero. Dolor: sufrimiento. Tierra: fijado."
+  },
+  "confianza": {
+    "en": "trust",
+    "bits": ["unión", "consciente", "verdad", "bien", "receptivo"],
+    "razon": "Unión: vínculo. Consciente: decisión deliberada. Verdad: creencia en honestidad. Bien: expectativa positiva. Receptivo: abierto."
+  },
+  "desconfianza": {
+    "en": "distrust",
+    "bits": ["separación", "consciente", "mentira", "mal", "control"],
+    "razon": "Separación: distancia. Consciente: alerta. Mentira: sospecha de falsedad. Mal: espera daño. Control: protección."
+  },
+  "coraje": {
+    "en": "courage",
+    "bits": ["fuerza", "hacer", "vida", "consciente", "libertad", "dolor"],
+    "razon": "Fuerza: fortaleza. Hacer: acción a pesar del miedo. Vida: apuesta vital. Consciente: sabe el riesgo. Libertad: elige actuar. Dolor: acepta el costo."
+  },
+  "cobardía": {
+    "en": "cowardice",
+    "bits": ["control", "contención", "consciente", "dolor", "menos"],
+    "razon": "Control: autorestricción por miedo. Contención: se encierra. Consciente: sabe que debería actuar. Dolor: miedo. Menos: disminuido."
+  },
+  "maestro": {
+    "en": "teacher",
+    "bits": ["información", "decir", "saber", "consciente", "hacer", "unión", "creador_obs"],
+    "razon": "Idéntico a enseñar (v1): transmite conocimiento. El agente y la acción comparten primitivos."
+  },
+  "estudiante": {
+    "en": "student",
+    "bits": ["información", "saber", "consciente", "receptivo", "pensar", "unión"],
+    "razon": "Idéntico a aprender (v1): absorbe conocimiento."
+  },
+  "comprador": {
+    "en": "buyer",
+    "bits": ["querer", "hacer", "individual", "más", "consciente"],
+    "razon": "Querer: desea. Hacer: acción de compra. Individual: persona. Más: adquiere. Consciente: decide."
+  },
+  "vendedor": {
+    "en": "seller",
+    "bits": ["hacer", "individual", "menos", "consciente", "decir", "creador_obs"],
+    "razon": "Hacer: acción de venta. Individual: persona. Menos: cede posesión. Consciente: decide. Decir: comunica valor. Creador_obs: ofrece."
+  },
+  "doctor": {
+    "en": "doctor",
+    "bits": ["saber", "hacer", "vida", "consciente", "individual", "bien", "creador_obs"],
+    "razon": "Saber: conocimiento médico. Hacer: interviene. Vida: preserva la vida. Consciente: deliberado. Individual: persona. Bien: intención. Creador_obs: agente activo."
+  },
+  "paciente": {
+    "en": "patient",
+    "bits": ["vida", "dolor", "individual", "consciente", "receptivo"],
+    "razon": "Vida: ser vivo. Dolor: padece. Individual: persona. Consciente: aware. Receptivo: recibe tratamiento."
+  },
+  "depredador": {
+    "en": "predator",
+    "bits": ["vida", "fuerza", "hacer", "mover", "destrucción", "querer"],
+    "razon": "Vida: ser vivo. Fuerza: poder. Hacer: caza. Mover: persigue. Destrucción: mata. Querer: impulso."
+  },
+  "presa": {
+    "en": "prey",
+    "bits": ["vida", "dolor", "mover", "receptivo", "menos"],
+    "razon": "Vida: ser vivo. Dolor: vulnerable. Mover: huye. Receptivo: reacciona. Menos: posición subordinada en la cadena trófica."
+  },
+  "causa": {
+    "en": "cause",
+    "bits": ["porque", "hacer", "fuerza", "posición_temporal", "creación"],
+    "razon": "Porque: causalidad directa. Hacer: produce efecto. Fuerza: impulso. Posición_temporal: precede al efecto. Creación: genera."
+  },
+  "efecto": {
+    "en": "effect",
+    "bits": ["porque", "receptivo", "posición_temporal", "flujo_temporal", "información"],
+    "razon": "Porque: resultado causal. Receptivo: recibe la causa. Posición_temporal: sucede después. Flujo_temporal: consecuencia temporal. Información: observable."
+  },
+  "pregunta": {
+    "en": "question",
+    "bits": ["información", "vacío", "decir", "consciente", "querer"],
+    "razon": "Información: busca datos. Vacío: hay algo que falta. Decir: se expresa. Consciente: sabe que no sabe. Querer: desea respuesta."
+  },
+  "respuesta": {
+    "en": "answer",
+    "bits": ["información", "verdad", "decir", "saber", "unión"],
+    "razon": "Información: provee datos. Verdad: resuelve. Decir: se comunica. Saber: conocimiento. Unión: cierra la brecha de la pregunta."
+  },
+  "anfitrión": {
+    "en": "host",
+    "bits": ["contención", "unión", "hacer", "consciente", "individual", "bien", "creador_obs"],
+    "razon": "Contención: provee espacio. Unión: acoge. Hacer: sirve. Consciente: deliberado. Individual: persona. Bien: hospitalidad. Creador_obs: produce la experiencia."
+  },
+  "invitado": {
+    "en": "guest",
+    "bits": ["receptivo", "unión", "individual", "consciente", "mover"],
+    "razon": "Receptivo: recibe hospitalidad. Unión: se une al anfitrión. Individual: persona. Consciente: presente. Mover: llega/se va."
+  },
+  "empleador": {
+    "en": "employer",
+    "bits": ["control", "hacer", "individual", "más", "colectivo", "creador_obs"],
+    "razon": "Control: dirige. Hacer: gestiona. Individual: persona/entidad. Más: posee recursos. Colectivo: maneja grupo. Creador_obs: produce estructura."
+  },
+  "empleado": {
+    "en": "employee",
+    "bits": ["hacer", "individual", "receptivo", "control", "menos"],
+    "razon": "Hacer: trabaja. Individual: persona. Receptivo: recibe instrucciones. Control: sometido a reglas. Menos: recibe parte del valor."
+  },
+  "líder": {
+    "en": "leader",
+    "bits": ["fuerza", "hacer", "consciente", "colectivo", "creador_obs", "mover", "eje_vertical"],
+    "razon": "Fuerza: influencia. Hacer: acción. Consciente: visión. Colectivo: guía al grupo. Creador_obs: crea dirección. Mover: lleva adelante. Eje_vertical: posición elevada."
+  },
+  "seguidor": {
+    "en": "follower",
+    "bits": ["receptivo", "colectivo", "mover", "consciente", "unión"],
+    "razon": "Receptivo: sigue. Colectivo: parte del grupo. Mover: va detrás. Consciente: elige seguir. Unión: adhesión."
+  },
+  "alto": {
+    "en": "tall",
+    "bits": ["eje_vertical", "más", "fuerza"],
+    "razon": "Eje_vertical: dimensión arriba. Más: extensión. Fuerza: se eleva."
+  },
+  "bajo": {
+    "en": "short",
+    "bits": ["eje_vertical", "menos", "tierra"],
+    "razon": "Eje_vertical: dimensión arriba. Menos: reducción. Tierra: pegado al suelo."
+  },
+  "pesado": {
+    "en": "heavy",
+    "bits": ["fuerza", "tierra", "más", "eje_vertical"],
+    "razon": "Fuerza: gravedad. Tierra: materia. Más: exceso de masa. Eje_vertical: tira hacia abajo."
+  },
+  "ligero": {
+    "en": "light_weight",
+    "bits": ["aire", "menos", "mover", "libertad"],
+    "razon": "Aire: ligereza. Menos: poca masa. Mover: fácil de desplazar. Libertad: no pesa."
+  },
+  "viejo": {
+    "en": "old",
+    "bits": ["flujo_temporal", "más", "vida", "tierra", "eterno_obs"],
+    "razon": "Flujo_temporal: mucho tiempo. Más: acumulación. Vida: ha vivido. Tierra: solidificado. Eterno_obs: perspectiva amplia."
+  },
+  "joven": {
+    "en": "young",
+    "bits": ["flujo_temporal", "menos", "vida", "fuego", "temporal_obs"],
+    "razon": "Flujo_temporal: poco tiempo. Menos: inicio. Vida: vital. Fuego: energía. Temporal_obs: atado al momento."
+  },
+  "casado": {
+    "en": "married",
+    "bits": ["unión", "individual", "consciente", "hacer", "contención"],
+    "razon": "Unión: vínculo. Individual: persona. Consciente: compromiso. Hacer: acto formal. Contención: dentro de un marco."
+  },
+  "soltero": {
+    "en": "single",
+    "bits": ["individual", "libertad", "uno", "separación"],
+    "razon": "Individual: persona sola. Libertad: sin compromiso. Uno: singular. Separación: no unido."
+  },
+  "inocente": {
+    "en": "innocent",
+    "bits": ["bien", "consciente", "individual", "verdad", "vida"],
+    "razon": "Bien: sin culpa. Consciente: persona. Individual: particular. Verdad: no mintió. Vida: ser vivo."
+  },
+  "culpable": {
+    "en": "guilty_person",
+    "bits": ["mal", "consciente", "individual", "hacer", "verdad"],
+    "razon": "Mal: transgresión. Consciente: sabía. Individual: responsable. Hacer: cometió acto. Verdad: los hechos lo confirman."
+  },
+  "visible": {
+    "en": "visible",
+    "bits": ["vista", "información", "más", "fuego"],
+    "razon": "Vista: perceptible. Información: revela. Más: presencia. Fuego: luz que permite ver."
+  },
+  "invisible": {
+    "en": "invisible",
+    "bits": ["vista", "vacío", "ausente", "menos"],
+    "razon": "Vista: la dimensión visual existe. Vacío: nada que ver. Ausente: no percibido. Menos: reducido a nada."
+  },
+  "hambre": {
+    "en": "hunger",
+    "bits": ["vacío", "dolor", "vida", "interocepción", "querer", "menos"],
+    "razon": "Vacío: estómago vacío. Dolor: malestar. Vida: necesidad vital. Interocepción: se siente. Querer: desea alimento. Menos: carencia."
+  },
+  "abundancia": {
+    "en": "abundance",
+    "bits": ["más", "vida", "bien", "contención", "muchos"],
+    "razon": "Más: exceso positivo. Vida: prosperidad. Bien: estado favorable. Contención: tiene dentro. Muchos: pluralidad."
+  },
+  "hambruna": {
+    "en": "starvation",
+    "bits": ["vacío", "dolor", "muerte", "menos", "destrucción", "colectivo"],
+    "razon": "Vacío: sin alimento. Dolor: sufrimiento extremo. Muerte: amenaza vital. Menos: carencia total. Destrucción: deterioro. Colectivo: afecta a muchos."
+  },
+  "aislamiento": {
+    "en": "isolation",
+    "bits": ["separación", "individual", "contención", "dolor", "menos"],
+    "razon": "Separación: desconexión. Individual: solo. Contención: encerrado. Dolor: sufre. Menos: reducido."
+  },
+  "conexión": {
+    "en": "connection",
+    "bits": ["unión", "consciente", "información", "vida", "mover"],
+    "razon": "Unión: vínculo. Consciente: deliberada. Información: intercambio. Vida: relación viva. Mover: fluye entre dos."
+  },
+  "soledad": {
+    "en": "solitude",
+    "bits": ["individual", "uno", "consciente", "orden", "separación"],
+    "razon": "Individual: solo. Uno: singular. Consciente: elegida. Orden: calma. Separación: aparte. Diferente de aislamiento: tiene orden y consciente (es elegida, no impuesta)."
+  },
+  "adoración": {
+    "en": "worship",
+    "bits": ["más", "eje_vertical", "consciente", "querer", "unión", "bien", "receptivo"],
+    "razon": "Más: elevación. Eje_vertical: mira hacia arriba. Consciente: devoto. Querer: deseo. Unión: conectar con lo divino. Bien: acto virtuoso. Receptivo: abierto a lo sagrado."
+  },
+  "admiración": {
+    "en": "admiration",
+    "bits": ["consciente", "eje_vertical", "placer", "vista", "querer"],
+    "razon": "Consciente: deliberada. Eje_vertical: mira hacia arriba. Placer: agradable. Vista: observa. Querer: desea ser como. Versión moderada de adoración: sin unión ni receptivo."
+  },
+  "interés": {
+    "en": "interest",
+    "bits": ["consciente", "información", "querer", "pensar", "receptivo"],
+    "razon": "Consciente: atento. Información: busca datos. Querer: deseo de saber. Pensar: procesa. Receptivo: abierto. Versión moderada de obsesión."
+  },
+  "obsesión_concepto": {
+    "en": "obsession",
+    "bits": ["más", "querer", "control", "consciente", "individual", "fuego", "contención"],
+    "razon": "Más: exceso. Querer: deseo intenso. Control: no puede parar. Consciente: sabe que está obsesionado. Individual: centrado en sí. Fuego: arde. Contención: atrapado en el ciclo."
+  },
+  "devoción_concepto": {
+    "en": "devotion",
+    "bits": ["unión", "querer", "consciente", "vida", "hacer", "más"],
+    "razon": "Unión: vínculo profundo. Querer: voluntad sostenida. Consciente: deliberada. Vida: compromiso vital. Hacer: acción constante. Más: entrega total."
+  },
+  "desprecio": {
+    "en": "contempt",
+    "bits": ["separación", "mal", "consciente", "eje_vertical", "menos", "individual"],
+    "razon": "Separación: rechazo. Mal: juicio negativo. Consciente: deliberado. Eje_vertical: mira hacia abajo. Menos: empequeñece al otro. Individual: dirigido a alguien."
+  },
+  "resentimiento": {
+    "en": "resentment",
+    "bits": ["dolor", "consciente", "flujo_temporal", "separación", "mal", "querer"],
+    "razon": "Dolor: herida no sanada. Consciente: rumiación. Flujo_temporal: del pasado. Separación: distancia. Mal: juicio negativo. Querer: deseo de justicia/venganza."
+  },
+  "entumecimiento": {
+    "en": "numbness",
+    "bits": ["vacío", "ausente", "tacto", "menos", "contención"],
+    "razon": "Vacío: sin sensación. Ausente: sin awareness sensorial. Tacto: la modalidad afectada. Menos: reducción. Contención: bloqueado."
+  },
+  "aburrimiento": {
+    "en": "boredom",
+    "bits": ["vacío", "consciente", "flujo_temporal", "menos", "dolor"],
+    "razon": "Vacío: sin contenido interesante. Consciente: aware del vacío. Flujo_temporal: el tiempo pesa. Menos: poca estimulación. Dolor: malestar leve."
+  },
+  "emoción": {
+    "en": "excitement",
+    "bits": ["fuego", "más", "vida", "consciente", "interocepción", "mover", "placer"],
+    "razon": "Fuego: energía. Más: activación alta. Vida: vitalidad. Consciente: aware. Interocepción: corazón acelerado. Mover: inquietud. Placer: positivo."
+  },
+  "traición": {
+    "en": "betrayal",
+    "bits": ["separación", "dolor", "mentira", "mal", "destrucción", "consciente"],
+    "razon": "Separación: rompe el vínculo. Dolor: herida profunda. Mentira: engaño. Mal: acto inmoral. Destrucción: destruye confianza. Consciente: deliberado."
+  }
+}

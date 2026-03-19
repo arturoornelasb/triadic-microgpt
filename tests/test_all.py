@@ -318,6 +318,43 @@ class TestTriadic(unittest.TestCase):
         self.assertIn(7, info['factors'])
         self.assertEqual(info['n_active'], 3)
 
+    def test_intersect(self):
+        v = TriadicValidator()
+        # 30 = 2*3*5, 70 = 2*5*7 → gcd = 10 = 2*5
+        self.assertEqual(v.intersect(30, 70), 10)
+        self.assertEqual(v.intersect(6, 6), 6)
+        self.assertEqual(v.intersect(3, 7), 1)  # coprime
+
+    def test_difference(self):
+        v = TriadicValidator()
+        # 30 = 2*3*5, 70 = 2*5*7 → only in 30: 3
+        self.assertEqual(v.difference(30, 70), 3)
+        self.assertEqual(v.difference(70, 30), 7)
+        self.assertEqual(v.difference(30, 30), 1)  # nothing unique
+
+    def test_symmetric_difference(self):
+        v = TriadicValidator()
+        # 30 vs 70: only_in_30=3, only_in_70=7 → 3*7 = 21
+        self.assertEqual(v.symmetric_difference(30, 70), 21)
+        self.assertEqual(v.symmetric_difference(70, 30), 21)  # commutative
+        self.assertEqual(v.symmetric_difference(30, 30), 1)   # identical
+
+    def test_negate(self):
+        v = TriadicValidator()
+        # With 4 bits: universe = 2*3*5*7 = 210, negate(30) = 210/30 = 7
+        self.assertEqual(v.negate(30, n_bits=4), 7)
+        # Double negation = identity
+        self.assertEqual(v.negate(v.negate(30, n_bits=4), n_bits=4), 30)
+
+    def test_project(self):
+        v = TriadicValidator()
+        # 210 = 2*3*5*7, project onto {2, 3, 5} → 30
+        self.assertEqual(v.project(210, [2, 3, 5]), 30)
+        # project onto {7, 11} → 7 (only 7 divides 210)
+        self.assertEqual(v.project(210, [7, 11]), 7)
+        # project onto disjoint set → 1
+        self.assertEqual(v.project(30, [11, 13]), 1)
+
 
 # ============================================================
 # Integration Tests

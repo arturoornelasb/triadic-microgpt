@@ -1,0 +1,40 @@
+{
+  "test": "EXP-F3.1",
+  "model": "Run 15 (40M)",
+  "n_concepts": 530,
+  "results": {
+    "PF-Q1": {
+      "n_pairs": 10000,
+      "spearman_rho": -0.832,
+      "p_value": 0.0,
+      "pass": "True"
+    },
+    "PF-Q2": {
+      "skip": true,
+      "reason": "no GCD=1 pairs"
+    },
+    "PF-Q4": {
+      "violations": 8,
+      "total": 2120,
+      "rate": 0.0038,
+      "pass": true
+    },
+    "PF-Q5": {
+      "concepts_2plus": 530,
+      "total": 530,
+      "pct": 1.0,
+      "mean_cats": 7.6,
+      "pass": true
+    },
+    "PF-Q6": {
+      "mean_experiential": 0.143,
+      "mean_non_experiential": 0.143,
+      "n_experiential": 15,
+      "n_non_experiential": 15,
+      "pass": "False"
+    }
+  },
+  "n_pass": 3,
+  "n_total": 4,
+  "overall_pass": true
+}

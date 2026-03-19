@@ -120,6 +120,10 @@ python src/evaluate.py --model checkpoints/torch/model_best.pt
 
 # Run benchmark suite
 python benchmarks/scripts/scaling_study.py --model checkpoints/torch_run15_strongalign/model_best.pt
+
+# Bit evolution (longitudinal analysis across checkpoints)
+python benchmarks/scripts/bit_evolution.py \
+  --checkpoint-dir checkpoints/torch_run15_strongalign/ --plot
 ```
 
 ### Chat
@@ -161,6 +165,7 @@ benchmarks/
     bits_sweep_plots.py    # Bits sweep figures
     engine_comparison.py   # TriadicGPT vs Engine (5-method Table 7)
     bit_entropy.py         # Per-bit entropy analysis
+    bit_evolution.py       # Longitudinal bit activation tracking across checkpoints
     analogy_benchmark.py   # Analogy verification benchmark
     subsumption_benchmark.py
     interpretability_probe.py

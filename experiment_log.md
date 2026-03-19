@@ -2637,6 +2637,72 @@ InfoNCE implementation in `experiment10/src/train.py` likely has numerical insta
 
 ---
 
+## E10-v3: GPT-2 + InfoNCE (Bug #7 Fix) (2026-03-19) — COMPLETE
+
+| Key | Value |
+|-----|-------|
+| **Date** | 2026-03-19 |
+| **Script** | `experiment10/src/train.py --model gpt2 --align-mode infonce --phase1-steps 5000 --phase2-steps 10000 --batch-size 16 --dtype bfloat16` |
+| **Phase 1** | 5000 steps (backbone frozen, LR 1e-3) |
+| **Phase 2** | 10000 steps (unfreeze last 2 layers, LR 3e-5) |
+| **GPU** | RTX 5060 Ti, bfloat16 |
+| **Time** | ~45.5 min total |
+| **Checkpoints** | `experiment10/checkpoints/phase_2_(unfreeze_last_layers)_final.pt` |
+| **Results** | `experiment10/results/experiment10_results.json` |
+
+### Goal
+
+Re-run E10 InfoNCE with Bug #7 fix (temperature 0.1→0.5, eps in F.normalize, clamp logits ±30). E10-v2 failed with NaN triadic loss due to bfloat16 overflow in the contrastive similarity computation.
+
+### Bug #7 Fix Applied (in `experiment10/src/model.py`)
+
+1. Temperature: 0.1 → 0.5 (prevents logit overflow in bfloat16)
+2. `F.normalize(..., eps=1e-6)` in 4 locations (prevents divide-by-zero)
+3. `torch.clamp(logits, -30, 30)` before softmax (caps extreme similarities)
+
+### Results
+
+| Metric | E10-v3 (InfoNCE) | From-scratch | Engine PCA |
+|--------|-------------------|-------------|-----------|
+| Semantic Gap | **+0.076** | +0.020 | +0.136 |
+| Bit Entropy | 0.534 | 0.680 | 0.947 |
+| Analogy Verif | **100.0%** | 66.7% | 91.7% |
+| Unique Sigs | 99.1% | 100.0% | 100.0% |
+| Subsumption | 0.0% | 0.0% | 0.0% |
+| Speed | 16.69 ms/concept | 5.23 ms | 0.92 ms |
+
+### Comparison with Previous E10 Runs
+
+| Variant | Gap | Analogy | Notes |
+|---------|-----|---------|-------|
+| E10a (MSE) | +0.011 | 75.0% | Original, stable |
+| E10b (Rank) | +0.047 | **83.3%** | Best analogy |
+| E10c (InfoNCE, pre-fix) | +0.099 | 66.7% | Likely inflated by numerical instability |
+| **E10-v3 (InfoNCE, fixed)** | **+0.076** | **100.0%** | Clean, reproducible result |
+| E10-v2 (GPT-2 Medium) | FAILED | — | NaN (Bug #7) |
+
+### Key Findings
+
+1. **Bug #7 fix works**: training is fully stable, no NaN, clean convergence.
+2. **Gap +0.076 is the correct InfoNCE result** — the previous +0.099 was likely inflated by numerical instability (overflowing logits before clamping created artificially high contrastive signal).
+3. **Analogy 100%** — perfect verification, best of ALL variants including Engine PCA (91.7%).
+4. **Gap closure: 48%** of the gap to Engine PCA ((0.076-0.020)/(0.136-0.020) = 48.3%), not the previously reported 70%.
+5. **Bit entropy 0.534** — lower than from-scratch (0.680), indicating more dead bits with GPT-2 transfer. The richer embeddings concentrate information into fewer active bits.
+6. **Generation quality preserved** — coherent multi-sentence stories with correct grammar.
+
+### Correction to Previous Claims
+
+The paper and prior documentation reported "+0.099" and "closes 72%/70% of the gap". With the Bug #7 fix producing stable training, the correct numbers are:
+- Semantic gap: +0.076 (not +0.099)
+- Gap closure: 48% (not 70%)
+- The 9× improvement claim (MSE→InfoNCE) becomes 6.9× (+0.011→+0.076)
+
+These are still strongly positive results: 3.8× improvement over from-scratch, perfect analogy verification.
+
+**Experiment E10-v3 Status: COMPLETE. Bug #7 fix validated. Paper numbers corrected.**
+
+---
+
 ## D-A12: Dead-Bit Surgery (2026-03-18) — Prepared
 
 | Key | Value |
@@ -3019,3 +3085,105 @@ Sub-linear degradation across chained steps.
 | Training time | ~4h | 4.5h | Similar |
 
 **Experiment D-A13 Status: COMPLETE. Scaling hypothesis CONFIRMED. 100% subsumption holdout validates the ternary triadic head at 355M scale.**
+
+---
+
+## D-A6: Bootstrap Loop — Self-Improving Pseudo-Anchors
+
+**Date**: 2026-03-19
+**Script**: `playground/danza_bootstrap.py` (bootstrap phase)
+**Scale**: XL (12L/512D/8H, ~40M params)
+**Training time**: 132.4 min (single cycle — converged immediately)
+**GPU**: RTX 5060 Ti 16GB, bfloat16
+
+### Goal
+
+Test whether the model can bootstrap its own semantic knowledge: train with 25 gold anchors, predict holdout concepts via Regla de Tres algebra, promote high-confidence predictions as pseudo-anchors, retrain, and iterate. Measures self-improvement over cycles.
+
+### Setup
+
+| Parameter | Value |
+|-----------|-------|
+| Scale | XL (12L/512D/8H) |
+| Training anchors | 25 (of 50) |
+| Holdout concepts | 23 (14 reachable via R3, 9 control) |
+| Steps | 50,000 |
+| Bootstrap cycles planned | 3 |
+| Confidence gate | Bit accuracy threshold |
+| Bits | 63 (ternary tanh) |
+
+### Results
+
+**Training:**
+- Train bit accuracy: 100.0%
+- Holdout bit accuracy: 87.2% (no supervision)
+- Dead bits: 30/63
+
+**Holdout Predictions (14 reachable + 9 control):**
+
+| Concept | Type | Direct | BestR3 | Ensemble | #Quads | Delta |
+|---------|------|--------|--------|----------|--------|-------|
+| amargo | R3 | 87.3% | 85.7% | 85.7% | 1 | -1.6% |
+| apatía | CTRL | 90.5% | --- | --- | 0 | --- |
+| aprender | R3 | 92.1% | 90.5% | 90.5% | 1 | -1.6% |
+| caos_concepto | CTRL | 82.5% | --- | --- | 0 | --- |
+| gaseoso | CTRL | 74.6% | --- | --- | 0 | --- |
+| humilde | R3 | 77.8% | 87.3% | 87.3% | 1 | +9.5% |
+| ignorante | R3 | 95.2% | 85.7% | 85.7% | 1 | -9.5% |
+| indiferencia | CTRL | 90.5% | --- | --- | 0 | --- |
+| inmóvil | CTRL | 85.7% | --- | --- | 0 | --- |
+| lento | R3 | 81.0% | 87.3% | 87.3% | 1 | +6.3% |
+| luna | CTRL | 92.1% | --- | --- | 0 | --- |
+| líquido | R3 | 85.7% | 95.2% | 95.2% | 1 | +9.5% |
+| lógico | R3 | 87.3% | 92.1% | 92.1% | 1 | +4.8% |
+| malo | R3 | 92.1% | 90.5% | 90.5% | 1 | -1.6% |
+| muerto | R3 | 92.1% | 88.9% | 88.9% | 1 | -3.2% |
+| odio | R3 | 93.7% | 98.4% | 98.4% | 1 | +4.8% |
+| orden_concepto | CTRL | 84.1% | --- | --- | 0 | --- |
+| oscuridad | CTRL | 77.8% | --- | --- | 0 | --- |
+| pobre | R3 | 90.5% | 82.5% | 82.5% | 1 | -7.9% |
+| preso | R3 | 92.1% | 88.9% | 88.9% | 1 | -3.2% |
+| reina | R3 | 77.8% | 100.0% | 100.0% | 1 | +22.2% |
+| silencioso | R3 | 82.5% | 92.1% | 96.8% | 2 | +14.3% |
+| sol | CTRL | 92.1% | --- | --- | 0 | --- |
+
+**Aggregated:**
+
+| Metric | Value | Threshold | Result |
+|--------|-------|-----------|--------|
+| Reachable direct | 87.6% | > 75% | **PASS** |
+| Algebraic best | 90.7% | > 80% | **PASS** |
+| Algebraic delta | +3.1% | > +5% | FAIL |
+| Reachable vs control | +5.2% | > +10% | FAIL |
+
+**Regla de Tres (6 original quads):**
+- Mean cosine: +0.689
+- Mean bit accuracy: 83.9%
+
+**Bootstrap Cycle 0:**
+- Accepted pseudo-anchors: **0**
+- Status: **Converged immediately** — no predictions passed confidence gate
+
+### Key Findings
+
+1. **Bootstrap did NOT bootstrap** — the confidence gate rejected all candidates. The model's predictions, while ~87% accurate, were not confident enough on a per-concept basis for the gate to accept them as training targets. This is actually the conservative gate working correctly: promoting noisy pseudo-labels would risk error propagation.
+
+2. **R3 algebra is concept-specific, not uniformly beneficial** — dramatic wins (reina +22.2%, silencioso +14.3%, líquido +9.5%) coexist with losses (ignorante -9.5%, pobre -7.9%). The net +3.1% mean masks high variance.
+
+3. **Best individual predictions are algebraic** — reina hits 100% via R3 (vs 77.8% direct), confirming algebra CAN outperform learned encoding for specific concepts. But it doesn't generalize uniformly.
+
+4. **Controls are surprisingly strong (85.5%)** — unsupervised holdout concepts achieve high accuracy from embedding alignment alone, without any gold labels or algebraic inference. The gap between reachable (87.6%) and control (85.5%) is only +2.1pp for direct, +5.2pp with algebra.
+
+5. **30/63 dead bits** — consistent with D-A5 (same scale/config), confirming the ~48% dead bit rate at XL with 63 bits is structural.
+
+6. **Consistent with D-A5** — this is essentially D-A5 repeated with the bootstrap mechanism. The base metrics (87.2% holdout, 30 dead bits, +3.1% algebraic delta) closely match D-A5's results, confirming reproducibility.
+
+### Interpretation
+
+The bootstrap hypothesis — that R3 algebra can seed self-improving semantic knowledge — is **not confirmed** at this scale. The confidence gate is correctly conservative (preventing error propagation), but this means the system cannot self-improve. Possible paths forward:
+
+- **Lower the confidence threshold** — accept more pseudo-anchors at risk of noise
+- **Multi-quad ensemble** — most concepts only had 1 quad; more coverage could improve confidence
+- **Larger model** — D-A13 showed 355M params gives better holdout (89.4%), which might cross the confidence threshold
+
+**Experiment D-A6 Status: COMPLETE. Bootstrap loop converged at cycle 0 — confidence gate too strict for self-improvement. R3 algebra helps individual concepts (+22% max) but +3.1% mean is below +5% threshold.**

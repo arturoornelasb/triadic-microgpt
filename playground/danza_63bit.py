@@ -199,6 +199,70 @@ def load_anchors(prim_data):
     return anchors, skipped
 
 
+def load_anchors_v2(prim_data):
+    """Load ~104 additional anchors from anclas_v2.json.
+
+    v2 format has 'en' field directly (no separate translations dict).
+    Returns anchors in the same format as load_anchors().
+    Does NOT replace v1 — designed to be merged with it.
+    """
+    path = os.path.join(TOOLKIT_DIR, 'anclas_v2.json')
+    if not os.path.exists(path):
+        return {}, []
+
+    with open(path, 'r', encoding='utf-8') as f:
+        raw = json.load(f)
+
+    name_to_bit = prim_data['name_to_bit']
+    deps = prim_data['deps']
+
+    anchors = {}
+    skipped = []
+
+    for spanish_name, info in raw.items():
+        if spanish_name.startswith('_'):
+            continue
+        if not isinstance(info, dict) or 'bits' not in info:
+            continue
+
+        eng_word = info.get('en')
+        if not eng_word:
+            skipped.append(spanish_name)
+            continue
+
+        frontier = info['bits']
+        # Validate all bits exist
+        if not all(b in name_to_bit for b in frontier):
+            bad = [b for b in frontier if b not in name_to_bit]
+            print(f"  WARNING: {spanish_name} has invalid bits: {bad}")
+            skipped.append(spanish_name)
+            continue
+
+        expanded = expand_bits(frontier, deps)
+        target = make_target_vector(expanded, name_to_bit)
+
+        anchors[eng_word] = {
+            'spanish': spanish_name,
+            'frontier': frontier,
+            'expanded': expanded,
+            'n_active': len(expanded),
+            'target': target,
+            'razon': info.get('razon', ''),
+        }
+
+    return anchors, skipped
+
+
+def load_all_anchors(prim_data):
+    """Load v1 + v2 anchors merged. v1 takes priority on conflicts."""
+    v1, skip1 = load_anchors(prim_data)
+    v2, skip2 = load_anchors_v2(prim_data)
+
+    # Merge: v1 wins on conflicts
+    merged = {**v2, **v1}
+    return merged, skip1 + skip2
+
+
 # ============================================================
 # Subsumption pairs from anchors
 # ============================================================
@@ -272,7 +336,8 @@ def evaluate_regla_de_tres(model, tokenizer, anchors, device):
         if not ids:
             return None
         x = torch.tensor([ids], dtype=torch.long, device=device)
-        _, proj, _ = model(x)
+        out = model(x)
+        proj = out[1]
         return proj[0].mean(dim=0)  # (63,)
 
     for a_word, b_word, c_word, d_word in REGLA_DE_TRES_QUADS:
@@ -359,7 +424,7 @@ def supervised_anchor_loss(model, word_tensors, target_vectors, n_sample=32):
         w_batch = word_tensors
         t_batch = target_vectors
 
-    _, proj, _ = model(w_batch)      # (n, T, 63)
+    proj = model(w_batch)[1]         # (n, T, 63)
     pred = proj.mean(dim=1)          # (n, 63) mean-pool tokens
 
     return F.mse_loss(pred, t_batch)
@@ -377,8 +442,8 @@ def subsumption_loss(model, hyper_t, hypo_t, n_sample=32):
     else:
         h_batch, y_batch = hyper_t, hypo_t
 
-    _, h_proj, _ = model(h_batch)
-    _, y_proj, _ = model(y_batch)
+    h_proj = model(h_batch)[1]
+    y_proj = model(y_batch)[1]
 
     h_01 = (h_proj.mean(dim=1) + 1) / 2
     y_01 = (y_proj.mean(dim=1) + 1) / 2
@@ -439,7 +504,7 @@ def evaluate_anchors(model, word_tensors, target_vectors, valid_words):
         model.train()
         return {}
 
-    _, proj, _ = model(word_tensors)
+    proj = model(word_tensors)[1]
     pred = proj.mean(dim=1)  # (N, 63)
 
     # Bit accuracy (per concept)
@@ -489,8 +554,10 @@ def evaluate_subsumption(model, hyper_t, hypo_t, n_total):
         model.train()
         return 0.0, 0.0
 
-    _, h_proj, _ = model(hyper_t)
-    _, y_proj, _ = model(hypo_t)
+    out = model(hyper_t)
+    h_proj = out[1]
+    out = model(hypo_t)
+    y_proj = out[1]
 
     h_bits = (h_proj.mean(dim=1) > 0).float()
     y_bits = (y_proj.mean(dim=1) > 0).float()
@@ -541,11 +608,15 @@ def main():
     parser.add_argument('--dropout', type=float, default=0.1)
     parser.add_argument('--grad-checkpoint', action='store_true',
                         help='Use gradient checkpointing (saves VRAM, +33%% time)')
+    parser.add_argument('--no-compile', action='store_true',
+                        help='Disable torch.compile (for debugging)')
     parser.add_argument('--dtype', choices=['float32', 'float16', 'bfloat16'],
                         default='bfloat16', help='Mixed precision dtype (default: bfloat16)')
     parser.add_argument('--print-every', type=int, default=50)
     parser.add_argument('--save-every', type=int, default=2500)
     parser.add_argument('--eval-every', type=int, default=1000)
+    parser.add_argument('--v2', action='store_true',
+                        help='Use expanded anchors (anclas.json + anclas_v2.json = 158 concepts)')
     args = parser.parse_args()
 
     SCALES = {
@@ -556,7 +627,11 @@ def main():
     }
     preset = SCALES[args.scale]
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    ckpt_dir = os.path.join(PROJECT_ROOT, 'checkpoints', f'danza_63bit_{args.scale}')
+    if device.type == 'cuda':
+        torch.set_float32_matmul_precision('high')   # TF32 for residual float32 ops
+        torch.backends.cudnn.benchmark = True         # kernel autotuning
+    suffix = f'{args.scale}_v2' if args.v2 else args.scale
+    ckpt_dir = os.path.join(PROJECT_ROOT, 'checkpoints', f'danza_63bit_{suffix}')
     os.makedirs(ckpt_dir, exist_ok=True)
 
     # --- 0. Load primitives & anchors ---
@@ -574,8 +649,12 @@ def main():
     print(f"  Dual axes: {len(prim_data['dual_axes'])}")
     print(f"  Dependency chains: {sum(len(v) for v in prim_data['deps'].values())} total deps")
 
-    anchors, skipped = load_anchors(prim_data)
-    print(f"  Anchors loaded: {len(anchors)} English words from {len(ANCHOR_TRANSLATIONS)} Spanish concepts")
+    if args.v2:
+        anchors, skipped = load_all_anchors(prim_data)
+        print(f"  Anchors loaded: {len(anchors)} English words (v1 + v2 merged)")
+    else:
+        anchors, skipped = load_anchors(prim_data)
+        print(f"  Anchors loaded: {len(anchors)} English words from {len(ANCHOR_TRANSLATIONS)} Spanish concepts")
     if skipped:
         print(f"  Skipped (won't appear in TinyStories): {skipped}")
 
@@ -651,6 +730,18 @@ def main():
     if args.grad_checkpoint:
         model.gradient_checkpointing_enable()
         print(f"  Gradient checkpointing: ON")
+
+    # torch.compile — fuse CUDA kernels (10-30% speedup, requires Triton/Linux)
+    if device.type == 'cuda' and not args.no_compile:
+        try:
+            import triton  # noqa: F401
+            model = torch.compile(model)
+            print(f"  torch.compile: ON")
+        except ImportError:
+            print(f"  torch.compile: SKIPPED (triton not available)")
+    else:
+        if hasattr(args, 'no_compile') and args.no_compile:
+            print(f"  torch.compile: DISABLED (--no-compile)")
 
     # Mixed precision setup
     use_amp = device.type == 'cuda'

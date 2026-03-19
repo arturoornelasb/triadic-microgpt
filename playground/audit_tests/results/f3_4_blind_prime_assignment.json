@@ -1,0 +1,33 @@
+{
+  "test": "EXP-F3.4",
+  "model": "Run 15 (40M)",
+  "n_quads": 15,
+  "n_concepts": 54,
+  "original": {
+    "accuracy": 0.0,
+    "correct": 0,
+    "total": 15
+  },
+  "frequency": {
+    "accuracy": 0.0,
+    "correct": 0,
+    "total": 15
+  },
+  "semantic": {
+    "accuracy": 0.0,
+    "correct": 0,
+    "total": 15
+  },
+  "random": {
+    "mean": 0.0,
+    "std": 0.0,
+    "min": 0.0,
+    "max": 0.0,
+    "n_trials": 100
+  },
+  "z_score": 0,
+  "percentile": 100.0,
+  "interpretation": "ORIGINAL_WORSE",
+  "cherry_picked": false,
+  "overall_pass": true
+}

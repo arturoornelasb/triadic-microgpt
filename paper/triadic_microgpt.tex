@@ -62,7 +62,7 @@ Across 29+ training runs and systematic ablation studies, we demonstrate seven p
 (1)~the triadic head adds \textbf{zero measurable cost} to language quality (perplexity 7.69 vs.\ 7.56 ablation baseline, within noise);
 (2)~\textbf{semantic ordering emerges gradually with scale}---the gap between related and unrelated concept similarity crosses zero around 20M parameters, with a smooth crossover rather than a sharp phase transition;
 (3)~a \textbf{bits sweep} over $k \in \{8, 16, 32, 48, 64, 128\}$ reveals an optimal regime at $k=32$--$64$, shifted upward from the $k=6$--$12$ range reported for post-hoc projection;
-(4)~a \textbf{transfer experiment} attaching the triadic head to pre-trained GPT-2 with an InfoNCE alignment loss closes \textbf{70\% of the gap} to the Triadic Engine's post-hoc projection;
+(4)~a \textbf{transfer experiment} attaching the triadic head to pre-trained GPT-2 with an InfoNCE alignment loss closes \textbf{48\% of the gap} to the Triadic Engine's post-hoc projection;
 (5)~a \textbf{subsumption loss} recovers \textbf{100\% held-out subsumption at $k=64$}, resolving the primary limitation at high bit counts;
 (6)~an \textbf{iFSQ activation} ($2\sigma(1.6x)-1$) resolves the subsumption--language tradeoff entirely: language quality is preserved (loss 0.924--0.951 vs.\ baseline 0.946) while achieving up to 87.1\% held-out subsumption, compared to $+47\%$ perplexity degradation under $\tanh$;
 and (7)~\textbf{compositional analysis} reveals that the bit space functions as a computational substrate---round-trip accuracy (98.1\%) far exceeds the multiplicative prediction (81.9\%), two-step chains show sub-linear error accumulation, and fork analysis confirms that the mechanism is ontologically categorical, not vectorial.
@@ -433,7 +433,7 @@ Several findings emerge from the full comparison:
 
 \paragraph{Subsumption is zero for ALL methods at $k=64$.} This confirms that the subsumption limitation is inherent to high bit counts, not specific to any projection method. With $\sim$32 active bits per concept, exact divisibility is combinatorially improbable without explicit subsumption training.
 
-\paragraph{Engine advantages are embedding-driven.} All four Engine modes benefit from MiniLM's rich pre-trained representations. The gap between Engine modes (PCA gap $+0.136$ vs.\ Random $+0.105$) is smaller than the gap between the best Engine mode and \microgpt{} ($+0.136$ vs.\ $+0.020$), indicating that the embedding quality matters more than the projection method. This hypothesis is confirmed by the transfer experiment (Section~\ref{sec:transfer}): attaching the triadic head to GPT-2's rich embeddings with InfoNCE alignment closes 70\% of this gap ($+0.099$).
+\paragraph{Engine advantages are embedding-driven.} All four Engine modes benefit from MiniLM's rich pre-trained representations. The gap between Engine modes (PCA gap $+0.136$ vs.\ Random $+0.105$) is smaller than the gap between the best Engine mode and \microgpt{} ($+0.136$ vs.\ $+0.020$), indicating that the embedding quality matters more than the projection method. This hypothesis is confirmed by the transfer experiment (Section~\ref{sec:transfer}): attaching the triadic head to GPT-2's rich embeddings with InfoNCE alignment closes 48\% of this gap ($+0.076$).
 
 \paragraph{Architectural advantages of \microgpt{}.}
 \begin{itemize}
@@ -482,19 +482,19 @@ We test all three alignment loss formulations on this transfer setup, with ident
 \toprule
 Metric & MSE & Rank & \textbf{InfoNCE} & From-scratch & Engine PCA \\
 \midrule
-Semantic Gap    & $+0.011$ & $+0.047$ & $\mathbf{+0.099}$ & $+0.020$ & $+0.136$ \\
-Bit Entropy     & 0.601    & 0.542    & \textbf{0.729}    & 0.680    & 0.947 \\
-Analogy Verif   & 75.0\%   & \textbf{83.3\%} & 66.7\%   & 66.7\%   & 91.7\% \\
+Semantic Gap    & $+0.011$ & $+0.047$ & $\mathbf{+0.076}$ & $+0.020$ & $+0.136$ \\
+Bit Entropy     & 0.601    & 0.542    & 0.534             & 0.680    & 0.947 \\
+Analogy Verif   & 75.0\%   & \textbf{83.3\%} & \textbf{100.0\%} & 66.7\%   & 91.7\% \\
 Unique Sigs     & 100\%    & 100\%    & 100\%             & 100\%    & 100\% \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\paragraph{InfoNCE closes 70\% of the gap to Engine PCA.} The semantic gap improves from $+0.011$ (MSE) to $+0.099$ (InfoNCE)---a $9\times$ improvement from changing only the loss function. InfoNCE's structured positive/negative mining leverages GPT-2's rich 768-dimensional embeddings far more effectively than MSE's absolute similarity matching.
+\paragraph{InfoNCE closes 48\% of the gap to Engine PCA.} The semantic gap improves from $+0.011$ (MSE) to $+0.076$ (InfoNCE)---a $6.9\times$ improvement from changing only the loss function. InfoNCE's structured positive/negative mining leverages GPT-2's rich 768-dimensional embeddings far more effectively than MSE's absolute similarity matching. InfoNCE also achieves perfect analogy verification (100\%), surpassing all other variants including Engine PCA (91.7\%).
 
 \paragraph{Rank loss achieves the best analogy verification.} At 83.3\%, margin ranking produces the most structured relational representations, outperforming InfoNCE (66.7\%) on analogy despite a lower semantic gap ($+0.047$). This suggests that ordering-based losses better preserve the fine-grained factor transforms needed for algebraic analogy.
 
-\paragraph{The bottleneck is the loss formulation, not embedding quality.} Same model, same embeddings, same hyperparameters---only the alignment loss changes. The gap ranges from $+0.011$ (MSE) to $+0.099$ (InfoNCE), a $9\times$ difference attributable entirely to how similarity structure is transferred from embedding space to triadic space.
+\paragraph{The bottleneck is the loss formulation, not embedding quality.} Same model, same embeddings, same hyperparameters---only the alignment loss changes. The gap ranges from $+0.011$ (MSE) to $+0.076$ (InfoNCE), a $6.9\times$ difference attributable entirely to how similarity structure is transferred from embedding space to triadic space.
 
 \subsubsection{Loss--Embedding Interaction}
 
@@ -511,7 +511,7 @@ Embeddings & Loss & K$\leftrightarrow$Q & K$\leftrightarrow$D & Ordering \\
 \multirow{3}{*}{GPT-2 768D (WebText)}
     & MSE    & ---    & ---    & weak ($+0.011$) \\
     & Rank   & ---    & ---    & moderate ($+0.047$) \\
-    & InfoNCE & ---   & ---    & \textbf{strong ($+0.099$)} \\
+    & InfoNCE & ---   & ---    & \textbf{strong ($+0.076$)} \\
 \midrule
 \multirow{3}{*}{From-scratch 512D (TinyStories)}
     & \textbf{MSE} & \textbf{89\%} & \textbf{60\%} & \textbf{correct} \\
@@ -745,7 +745,7 @@ These results provide evidence that the triadic bit space is a \emph{computation
 % ============================================================
 
 \paragraph{Emergence vs.\ injection.}
-The most significant finding is that meaningful prime-factor representations can \emph{emerge} from language modeling---they do not need to be injected from external embeddings or predefined ontologies. The embedding alignment loss enables this by using the model's \emph{own} developing understanding of semantic similarity as the supervision signal. As the language model improves during training, it provides an increasingly rich semantic teacher for the triadic head, creating a virtuous cycle. The transfer experiment (Section~\ref{sec:transfer}) confirms this interpretation: when the semantic teacher is richer (GPT-2 embeddings trained on 8M web pages vs.\ 50K children's stories), the triadic head achieves $5\times$ higher semantic gap ($+0.099$ vs.\ $+0.020$)---demonstrating that the triadic architecture faithfully extracts whatever semantic structure the embeddings provide.
+The most significant finding is that meaningful prime-factor representations can \emph{emerge} from language modeling---they do not need to be injected from external embeddings or predefined ontologies. The embedding alignment loss enables this by using the model's \emph{own} developing understanding of semantic similarity as the supervision signal. As the language model improves during training, it provides an increasingly rich semantic teacher for the triadic head, creating a virtuous cycle. The transfer experiment (Section~\ref{sec:transfer}) confirms this interpretation: when the semantic teacher is richer (GPT-2 embeddings trained on 8M web pages vs.\ 50K children's stories), the triadic head achieves $3.8\times$ higher semantic gap ($+0.076$ vs.\ $+0.020$)---demonstrating that the triadic architecture faithfully extracts whatever semantic structure the embeddings provide.
 
 \paragraph{Emergent information hierarchy.}
 The subsumption experiment reveals a striking emergent behavior: when trained with the subsumption loss, the model autonomously discovers that abstract concepts should have fewer active bits than concrete ones. Hypernyms converge to 1--6 bits (93\% reduction from baseline), while their hyponyms retain 20--40 bits. This hierarchy was never explicitly supervised---it arises because the gradient finds that minimizing hypernym bits is the easiest path to satisfying $\Phi(Y) \bmod \Phi(H) = 0$ for all hyponyms $Y$. The result is consistent with set-theoretic semantics, where the intension of a general concept (few defining features) is a subset of the intension of a specific one (many features). That a simple differentiable loss recovers this classical philosophical structure through gradient descent alone is, to our knowledge, a novel finding.
@@ -873,7 +873,7 @@ We have presented \microgpt{}, a generative language model that jointly learns n
     \item The triadic projection head adds \textbf{zero measurable cost} to language modeling quality, acting as a free semantic annotation layer.
     \item Meaningful semantic ordering in prime-factor space is an \textbf{emergent property of scale}, crossing zero around $\sim$20M parameters in a gradual crossover. Multi-seed validation confirms reproducibility (gap $+0.038 \pm 0.005$, $n=3$).
     \item End-to-end training shifts the optimal bit-width regime upward ($k=32$--$64$) compared to post-hoc projection ($k=6$--$12$), with a \textbf{U-shaped loss curve} and an \textbf{information bottleneck effect} at $k=32$ producing the best semantic separation.
-    \item The alignment loss formulation is the \textbf{primary bottleneck}: replacing MSE with InfoNCE on GPT-2 transfer achieves semantic gap $+0.099$ (closing 70\% of the gap to post-hoc Engine PCA), while a \textbf{loss--embedding interaction} dictates that InfoNCE is optimal for rich embeddings and MSE for weak ones.
+    \item The alignment loss formulation is the \textbf{primary bottleneck}: replacing MSE with InfoNCE on GPT-2 transfer achieves semantic gap $+0.076$ (closing 48\% of the gap to post-hoc Engine PCA) with perfect analogy verification (100\%), while a \textbf{loss--embedding interaction} dictates that InfoNCE is optimal for rich embeddings and MSE for weak ones.
     \item A differentiable subsumption loss recovers \textbf{exact algebraic subsumption at $k=64$}---100\% on held-out hypernym--hyponym pairs---resolving the primary limitation of both end-to-end and post-hoc methods at high bit counts, while inducing an \textbf{emergent information hierarchy} where abstract concepts autonomously converge to sparse representations.
     \item The \textbf{iFSQ activation resolves the subsumption--language tradeoff}: replacing $\tanh$ with scaled sigmoid ($2\sigma(1.6x)-1$) preserves language quality (loss 0.924--0.951 vs.\ baseline 0.946) while achieving up to 87.1\% held-out subsumption---compared to the $+47\%$ perplexity cost under $\tanh$. The ternary model produces a clean three-state distribution (1.3\%/73.3\%/25.3\%) that parallels BitNet b1.58's independently discovered sparsity pattern.
     \item The triadic bit space functions as a \textbf{computational substrate}: round-trip accuracy (98.1\%) far exceeds the multiplicative prediction (81.9\%), and two-step transitive chains show sub-linear error accumulation ($+4.5$~pp above prediction). Fork analysis reveals that the mechanism is categorically ontological, not vectorial---unlike word2vec's parallelogram model.

@@ -248,6 +248,69 @@ class TriadicValidator:
         total = factors_a | factors_b
         return len(shared) / len(total) if total else 0.0
 
+    @staticmethod
+    def intersect(a, b):
+        """
+        Semantic Intersection: Features SHARED between A and B.
+
+        Returns GCD(A, B) — the common semantic backbone.
+        Example: intersect(30, 70) = 10 (shared: {2, 5})
+        """
+        return math.gcd(a, b)
+
+    @staticmethod
+    def difference(a, b):
+        """
+        Semantic Difference: Features in A but NOT in B.
+
+        Returns A / GCD(A, B).
+        Example: difference(30, 70) = 3 (only in A: {3})
+        """
+        return a // math.gcd(a, b)
+
+    @staticmethod
+    def symmetric_difference(a, b):
+        """
+        Symmetric Difference: Features in EXACTLY ONE of A or B.
+
+        Returns (A \\ B) * (B \\ A) — all distinguishing features.
+        Example: symmetric_difference(30, 70) = 21 = 3*7
+        """
+        g = math.gcd(a, b)
+        return (a // g) * (b // g)
+
+    @staticmethod
+    def negate(a, n_bits=64):
+        """
+        Semantic Negation: Complement of A within the universe of n_bits primes.
+
+        Returns Omega / A where Omega = product of first n_bits primes.
+        Caveat: Algebraically exact, semantically approximate — use dual axes
+        (bien/mal, vida/muerte) for domain-appropriate negation.
+        """
+        omega = 1
+        for i in range(n_bits):
+            omega *= nth_prime(i + 1)
+        return omega // a
+
+    @staticmethod
+    def project(a, category_primes):
+        """
+        Category Projection: Extract only features from a specific category.
+
+        Args:
+            a: composite integer
+            category_primes: list of primes defining the category
+
+        Returns: composite containing only A's factors that are in category_primes.
+        Example: project(210, [2, 3, 5]) = 30 (keeps {2,3,5} from {2,3,5,7})
+        """
+        result = 1
+        for p in category_primes:
+            if a % p == 0:
+                result *= p
+        return result
+
 
 # ============================================================
 # Triadic Loss — Differentiable loss for prime alignment

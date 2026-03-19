@@ -37,8 +37,9 @@ python benchmarks/scripts/language_quality.py --model checkpoints/torch/model_be
 |----------|---------|----------|
 | **A. Language** | `language_quality.py` | Perplexity, MAUVE, Distinct-n, Repetition |
 | **B. Triadic** | `bit_entropy.py`, `taxonomic_consistency.py`, `analogy.py`, `probe.py` | Entropy, diversity, subsumption, analogies |
-| **C. Ablation** | `ablation_alpha.py`, `ablation_bits.py`, `ablation_scaling.py` | Pareto curves, scaling laws |
-| **D. Comparison** | `compare_engine.py` | End-to-end vs post-hoc |
+| **C. Evolution** | `bit_evolution.py` | Bit births/deaths, semantic gap trajectory, phase transitions |
+| **D. Ablation** | `ablation_alpha.py`, `ablation_bits.py`, `ablation_scaling.py` | Pareto curves, scaling laws |
+| **E. Comparison** | `compare_engine.py` | End-to-end vs post-hoc |
 
 ## Full Specification
 
