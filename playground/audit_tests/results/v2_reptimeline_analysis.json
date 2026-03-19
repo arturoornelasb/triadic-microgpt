@@ -1,0 +1,77 @@
+{
+  "model": "DanzaTriadicGPT v2 (158 anchors)",
+  "checkpoint": "checkpoints/danza_63bit_xl_v2/model_best.pt",
+  "training_results": {
+    "bit_accuracy_train": 100.0,
+    "bit_accuracy_test": 93.0,
+    "subsumption_train": 99.4,
+    "subsumption_test": 98.3,
+    "dead_bits": 26,
+    "entropy": 0.369,
+    "r3_cosine": 0.844,
+    "r3_bit_accuracy": 90.7
+  },
+  "discovery": {
+    "n_concepts": 182,
+    "n_active_bits": 48,
+    "n_dead_bits": 15,
+    "n_duals": 7,
+    "n_deps": 635,
+    "n_triadic_deps": 68
+  },
+  "bitwise_tests": {
+    "subsumption": {
+      "correct": 124,
+      "total": 158,
+      "accuracy": 78.5
+    },
+    "analogies": {
+      "man:woman::king:queen": "EXACT",
+      "cold:hot::quiet:loud": 0.5,
+      "happy:sad::love:hate": 0.88,
+      "good:evil::light:dark": 0.286,
+      "teacher:student::doctor:patient": 0.826,
+      "big:small::fast:slow": 0.667,
+      "mean_similarity": 0.693,
+      "exact_matches": "1/6"
+    }
+  },
+  "gap_analysis": {
+    "love_hate": {
+      "shared": 21,
+      "only_a": 3,
+      "only_b": 1,
+      "sim": 0.84
+    },
+    "life_death": {
+      "shared": 16,
+      "only_a": 0,
+      "only_b": 5,
+      "sim": 0.762
+    },
+    "light_dark": {
+      "shared": 6,
+      "only_a": 0,
+      "only_b": 12,
+      "sim": 0.333
+    },
+    "good_evil": {
+      "shared": 17,
+      "only_a": 3,
+      "only_b": 3,
+      "sim": 0.739
+    },
+    "man_woman": {
+      "shared": 18,
+      "only_a": 1,
+      "only_b": 1,
+      "sim": 0.9
+    },
+    "king_queen": {
+      "shared": 21,
+      "only_a": 1,
+      "only_b": 1,
+      "sim": 0.913
+    }
+  }
+}
