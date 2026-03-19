@@ -32,7 +32,7 @@ SHARED_ARGS = [
     "--align-weight", "5.0",
     "--triadic-warmup-pct", "0.25",
     "--no-distill",
-    "--tokenizer", "checkpoints/torch_runXL/tokenizer.json",
+    "--tokenizer", "checkpoints/danza_bootstrap_xl/tokenizer.json",
     "--save-every", "10000",
     "--print-every", "200",
 ]

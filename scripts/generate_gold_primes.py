@@ -14,7 +14,11 @@ import argparse
 import sympy
 
 # Add local Triadic Engine to path to avoid pip install issues
-sys.path.insert(0, r'c:\Github\Triadic-Neurosymbolic-Engine\src')
+# Looks for Triadic-Neurosymbolic-Engine cloned alongside this repo
+_ENGINE_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                            '..', 'Triadic-Neurosymbolic-Engine', 'src')
+_ENGINE_PATH = os.environ.get('NEUROSYM_PATH', _ENGINE_PATH)
+sys.path.insert(0, _ENGINE_PATH)
 
 try:
     from neurosym import ContinuousEncoder, DiscreteMapper
