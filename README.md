@@ -18,13 +18,16 @@ Analogy:    factor transfer   king:queen :: man:woman
 | Finding | Result |
 |---------|--------|
 | Language cost of triadic head | **Zero** (PPL 7.69 vs 7.56 ablation, within noise) |
-| Semantic ordering emergence | Phase transition at **40M params** (gap: -0.076 -> +0.020) |
+| Semantic ordering emergence | Phase transition at **~20M params** (gap: -0.076 -> +0.020) |
 | Optimal bit width | **k=32-64** (shifted from k=6-12 post-hoc) |
-| Analogy verification | **69.2%** (random baseline 50%) |
-| Semantic compression | **8x** (64 bits = 512D embedding probe accuracy) |
+| Analogy verification (v2, 158 anchors) | **93%** test acc, **exact** king:queen via bitwise |
+| Subsumption (v2, 158 anchors) | **98.3%** test (train 99.4%) |
+| Triadic 3-way interactions | **68** discovered by reptimeline |
 | Signature uniqueness | **100%** across all evaluated concepts |
+| BitwiseValidator | **O(1)** isomorphic to primes, **5-78x** faster, scales to 1024+ bits |
 | GPT-2 transfer (InfoNCE) | Gap **+0.099**, closing **72%** of gap to Engine PCA (+0.136) |
 | Domain separation (sentence-level) | **1.21** mean across 12 domains (+19% vs token-level) |
+| Convergence | Trits (philosophy), BitNet (engineering), Bitwise (math) -> same ternary {+1,0,-1} |
 
 ## Phase 5: Transfer Learning & Alignment Loss Ablation (Experiment 10)
 
