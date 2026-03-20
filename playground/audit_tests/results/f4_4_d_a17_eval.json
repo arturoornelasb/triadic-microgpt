@@ -1,0 +1,76 @@
+{
+  "test": "EXP-F4.4",
+  "model": "D-A17 (GPT-2 Medium 355M + v2)",
+  "checkpoint": "C:\\Github\\triadic-microgpt\\checkpoints\\danza_gpt2medium_ternary_v2\\model_best.pt",
+  "anchors": "v2 (158)",
+  "n_train": 110,
+  "n_holdout": 48,
+  "n_bits": 63,
+  "bit_accuracy": {
+    "train": {
+      "mean_accuracy": 0.9831,
+      "n_concepts": 110,
+      "worst_3": [
+        {
+          "word": "cause",
+          "accuracy": 0.841
+        },
+        {
+          "word": "gas",
+          "accuracy": 0.841
+        },
+        {
+          "word": "bitter",
+          "accuracy": 0.873
+        }
+      ]
+    },
+    "holdout": {
+      "mean_accuracy": 0.9772,
+      "n_concepts": 48,
+      "worst_3": [
+        {
+          "word": "socialism",
+          "accuracy": 0.825
+        },
+        {
+          "word": "question",
+          "accuracy": 0.857
+        },
+        {
+          "word": "tyranny",
+          "accuracy": 0.857
+        }
+      ]
+    }
+  },
+  "subsumption": {
+    "train": {
+      "correct": 14,
+      "total": 716,
+      "rate": 0.0196
+    },
+    "test": {
+      "correct": 3,
+      "total": 179,
+      "rate": 0.0168
+    }
+  },
+  "ternary_distribution": {
+    "neg": 0.6933,
+    "zero": 0.0339,
+    "pos": 0.2729,
+    "collapsed_to_binary": false
+  },
+  "signature_uniqueness": {
+    "n_concepts": 158,
+    "n_unique": 133,
+    "n_duplicates": 20,
+    "uniqueness_rate": 0.8418
+  },
+  "analogy": {
+    "correct": 1,
+    "total": 15,
+    "rate": 0.0667
+  }
+}

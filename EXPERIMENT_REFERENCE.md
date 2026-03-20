@@ -40,7 +40,7 @@ Every experiment in ONE table, newest to oldest.
 | **D-A16** | 03-19 | iFSQ + v2 (158 anchors) | 93.2% test, 98.3% sub, R3=0.842 | COMPLETE | `danza_63bit_xl_v2_ifsq/` |
 | **D-A14** | 03-19 | v2 tanh (158 anchors) | **93% test, 98.3% sub, 68 triadic** | COMPLETE | `danza_63bit_xl_v2/` |
 | D-A15 | 03-19 | Gradient decoupling | 49.6% = random | FAILED | `danza_grad_decoupling_xl/` |
-| D-A17 | 03-19 | GPT-2 355M + v2 | **PAUSED step 27.5K/50K** — bit 91.3%, 30 dead, sub 99.1% | INCOMPLETE | `danza_gpt2medium_ternary_v2/` |
+| D-A17 | 03-20 | GPT-2 355M + v2 | **97.7% bit, 1.7% sub, 26 dead — algebra destroyed at scale** | COMPLETE | `danza_gpt2medium_ternary_v2/` |
 | D-A9 | 03-19 | Hybrid adversarial (30+33) | 69.3% test, 13 dead bits (5 sup + 8 free), 17 triadic | COMPLETE | `danza_hybrid_adv_xl/` |
 | D-A13 | 03-18 | GPT-2 355M ternary (v1) | 88% bits, sub 9-20%, analogy 0% | COMPLETE | `danza_gpt2medium_ternary/` |
 | D-A10 | 03-18 | iFSQ binary ablation | loss 0.924 (BEST LM), sub 87.1% | COMPLETE | `danza_ifsq_binary_xl/` |
@@ -788,8 +788,8 @@ Token-level sep ratio 1.02 → sentence-level **1.21 (+19%)**. Best: family (1.4
 
 | ID | Test | Script | What it validates | Effort | Status |
 |---|---|---|---|---|---|
-| **D-A17** | GPT-2 355M + v2 anchors | `playground/gpt2_medium_ternary.py --v2` | Fair 355M scaling comparison (D-A13 only had v1 anchors) | **~3h GPU** | **IN PROGRESS** — step 32.5K/50K, test 91.6%, 26 dead |
-| **D-A17-eval** | Formal eval on D-A17 | `playground/audit_tests/test_d_a13_eval.py --v2` | Does v2 fix the algebra failure at 355M? (sub 9-20% → ?) | 30 min GPU | READY — script adapted with `--v2` flag |
+| **D-A17** | GPT-2 355M + v2 anchors | `playground/gpt2_medium_ternary.py --v2` | Fair 355M scaling comparison (D-A13 only had v1 anchors) | ~4.8h GPU | **COMPLETE** — 97.7% bit, 1.7% sub, 26 dead. Algebra destroyed at scale. |
+| **D-A17-eval** | Formal eval on D-A17 | `playground/audit_tests/test_d_a13_eval.py --v2` | Does v2 fix the algebra failure at 355M? **NO — 1.7% sub** | 5 min GPU | **COMPLETE** — ternary zeros collapsed (3.4% vs 41.3%), subsumption unsatisfiable |
 | **Paper 5.4** | Revise subsumption section | — | Honest reporting: 40M=98.3%, 355M v1=9-20%, 355M v2=? | 1h writing | BLOCKED by D-A17-eval |
 | **Paper 6** | Revise discussion section | — | 355M scaling narrative depends on D-A17 results | 1h writing | BLOCKED by D-A17-eval |
 
@@ -927,19 +927,19 @@ Run the full audit battery on D-A18:
 4. `analyze_v2.py` — reptimeline discovery (target: >50 triadic 3-way)
 5. Full benchmark suite (12 benchmarks)
 
-#### Phase 5: D-A17 Completion + D-A19 Scale (GPU-dependent) — IN PROGRESS
+#### Phase 5: D-A17 Scaling Test — COMPLETE (NEGATIVE RESULT)
 
-1. **D-A17 training**: RUNNING — step 32.5K/50K (~35 min remaining). Test acc 91.6%, 26 dead bits.
-2. **Eval D-A17**: Script ready: `python playground/audit_tests/test_d_a13_eval.py --v2` (adapted with `--v2` flag for v2 anchors, 70/30 train/holdout split, saves to `f4_4_d_a17_eval.json`)
-3. **If D-A17 succeeds**: Create D-A19 = D-A18 architecture at 355M scale (~4.5h GPU)
-4. **If D-A17 fails**: Document honestly as scaling limitation. Paper focuses on 40M.
+1. **D-A17 training**: COMPLETE — 50K steps, 289.7 min. Best holdout 91.6%.
+2. **D-A17 eval**: COMPLETE — **97.7% bit accuracy but 1.7% subsumption (vs 98.3% at 40M)**
+3. **Key finding**: 355M destroys algebraic structure. Ternary zeros collapse 41.3% → 3.4%, making `(A & B) == B` unsatisfiable. More params ≠ better algebra. ~42% sparsity is structurally necessary.
+4. **D-A19 (355M unified)**: CANCELLED — scaling destroys algebra, no point scaling D-A18 to 355M.
 
-#### Phase 6: Paper Update (1 day, no GPU)
+#### Phase 6: Paper Update — DONE
 
-- Section 5.4: Update subsumption with D-A17/D-A18 results
-- Section 6: Update discussion with scaling findings
-- Book corrections L4-L10 (7 text corrections)
-- Compile final PDF
+- Section 5.4: Added D-A17 row to table, rewrote "fourth result" with honest scaling findings
+- Section 6: Updated subsumption FPR discussion with ternary sparsity bracket finding
+- Conclusion: Changed to 8 core results, added discovery loop, corrected subsumption claim
+- Future work: Replaced "scaling → perfect generalization" with scale-algebra tradeoff + discovery loop
 
 ### Timeline
 
@@ -949,12 +949,11 @@ Run the full audit battery on D-A18:
 | 2 | Train D-A18 | Phase 1 | **Yes** | READY (run `playground/unified_final.py --scale xl --steps 50000`) |
 | 3 | BitwiseValidator default | — | No | **DONE** (critical paths migrated) |
 | 4 | D-A18 eval + reptimeline | Phase 2 | Partial | BLOCKED by Phase 2 |
-| 5a | D-A17 training | — | **Yes** | **IN PROGRESS** (step 32.5K/50K) |
-| 5b | Eval D-A17 | Phase 5a | 30 min | READY (script adapted with `--v2`) |
-| 5c | D-A19 (355M unified) | Phases 2+5b | **Yes** | BLOCKED |
-| 6 | Paper update | Phases 4+5b | No | BLOCKED |
+| 5a | D-A17 training | — | **Yes** | **DONE** (97.7% bit, 1.7% sub) |
+| 5b | Eval D-A17 | Phase 5a | 5 min | **DONE** (algebra destroyed at scale) |
+| 6 | Paper update | Phase 5b | No | **DONE** |
 
-**Next GPU steps**: D-A17 completes (~35 min) → eval D-A17 → train D-A18 (~2-3h).
+**Next GPU step**: Train D-A18 (`playground/unified_final.py --scale xl --steps 50000 --dtype bfloat16`)
 **Critical path**: ~~Phase 1~~ → Phase 2 → Phase 4 → Phase 6.
 
 ### Fallback Strategy
