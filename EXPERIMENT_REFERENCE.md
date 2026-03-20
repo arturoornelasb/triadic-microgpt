@@ -40,6 +40,7 @@ Every experiment in ONE table, newest to oldest.
 | **D-A16** | 03-19 | iFSQ + v2 (158 anchors) | 93.2% test, 98.3% sub, R3=0.842 | COMPLETE | `danza_63bit_xl_v2_ifsq/` |
 | **D-A14** | 03-19 | v2 tanh (158 anchors) | **93% test, 98.3% sub, 68 triadic** | COMPLETE | `danza_63bit_xl_v2/` |
 | D-A15 | 03-19 | Gradient decoupling | 49.6% = random | FAILED | `danza_grad_decoupling_xl/` |
+| **D-A18** | 03-20 | Unified (iFSQ + hybrid 30+33 + v2) | 92.2% sup, 75.3% full, 96.5% sub, 15 dead, R3=0.851 | COMPLETE | `danza_unified_xl/` |
 | D-A17 | 03-20 | GPT-2 355M + v2 | **97.7% bit, 1.7% sub, 26 dead — algebra destroyed at scale** | COMPLETE | `danza_gpt2medium_ternary_v2/` |
 | D-A9 | 03-19 | Hybrid adversarial (30+33) | 69.3% test, 13 dead bits (5 sup + 8 free), 17 triadic | COMPLETE | `danza_hybrid_adv_xl/` |
 | D-A13 | 03-18 | GPT-2 355M ternary (v1) | 88% bits, sub 9-20%, analogy 0% | COMPLETE | `danza_gpt2medium_ternary/` |
@@ -854,7 +855,7 @@ Token-level sep ratio 1.02 → sentence-level **1.21 (+19%)**. Best: family (1.4
 
 ### Pending Tests — Before Publication
 
-> Updated: 2026-03-19 (evening). D-A18 script ready, D-A17 training, eval adapted.
+> Updated: 2026-03-20. D-A18 COMPLETE (92.2% sup, 96.5% sub, 15 dead). D-A17 COMPLETE (algebra destroyed). D-A14 confirmed as production model.
 
 #### Tier 0: Critical (blocks paper claims)
 
@@ -938,15 +939,16 @@ Text → BPE (4096) → TriadicGPT (12L/512D/8H, 40M params)
 
 ### Expected Outcomes
 
-| Metric | D-A14 (v2 tanh) | D-A9 (hybrid v1) | D-A18 Target | Rationale |
+| Metric | D-A14 (v2 tanh) | D-A9 (hybrid v1) | D-A18 Target | **D-A18 Actual** |
 |---|---|---|---|---|
-| Test accuracy | 93.0% | 69.3% | **≥90%** | v2 anchors dominate; hybrid may cost 1-3pp |
-| Subsumption | 98.3% | — | **≥95%** | v2 anchors proven |
-| Dead bits | 26/63 | 6/63 | **<10/63** | Hybrid mechanism validated in D-A9 |
-| Active bits | 37/63 | 57/63 | **>50/63** | More active = richer representation |
-| LM loss | 0.946 | ~1.0 | **<0.95** | iFSQ proven better (0.924 in D-A10) |
-| Triadic 3-way | 68 | 17 | **>50** | More active bits + v2 → more interactions |
-| R3 round-trip | ~60% | — | **>80%** | D-A16 iFSQ achieved 84.2% |
+| Test accuracy | 93.0% | 69.3% | ≥90% | **92.2% sup / 75.3% full** |
+| Subsumption | 98.3% | — | ≥95% | **96.5%** (864/895) |
+| Dead bits | 26/63 | 6/63 | <10/63 | **15/63** (22 formal) |
+| Active bits | 37/63 | 57/63 | >50/63 | **48/63** |
+| LM loss | 0.946 | ~1.0 | <0.95 | TBD |
+| Zero rate | ~42% | — | ~42% | **61.4%** (too sparse) |
+| R3 round-trip | ~60% | — | >80% | **85.1%** cosine |
+| Sig uniqueness | — | — | — | **56.3%** (89/158) |
 
 ### Implementation Steps
 
@@ -964,15 +966,30 @@ Combines:
 
 Verified: syntax OK, imports resolve, forward pass produces correct shapes (logits, proj, loss, sup_proj, adv_logits).
 
-#### Phase 2: D-A18 Training (2-3h GPU) — READY
+#### Phase 2: D-A18 Training (105 min GPU) — COMPLETE
 
 ```bash
 python playground/unified_final.py --scale xl --steps 50000 --dtype bfloat16
 ```
 
-v2 anchors (158), iFSQ activation, and hybrid 30+33 split are built into `UnifiedTriadicGPT` — no flags needed.
+**Results** (2026-03-20):
 
-**Decision point**: If test accuracy drops below 88%, fall back to full supervised (63 bits) with iFSQ + v2 — this is already validated as D-A16 (93.2%).
+| Metric | D-A18 Result | Target | Pass? |
+|---|---|---|---|
+| Test sup accuracy | 92.2% | ≥90% | **PASS** |
+| Full bit accuracy | 75.3% | — | — |
+| Subsumption (formal) | 96.5% (864/895) | ≥95% | **PASS** |
+| Dead bits | 15/63 (22 formal) | <10 | **FAIL** |
+| Active bits | 48/63 | >50 | **FAIL** |
+| Zero rate | 61.4% | ~42% | **FAIL** (too sparse) |
+| Signature uniqueness | 56.3% (89/158) | — | Low |
+| R3 cosine | +0.851 | >80% | **PASS** |
+| Adversary accuracy | 92.7% | ~50% | **FAIL** (not converged) |
+| Training time | 105.3 min | — | — |
+
+**Analysis**: Hybrid 30+33 successfully reduces dead bits vs D-A14 (15 vs 26) and activates more bits (48 vs 37). However, zero rate 61.4% (vs D-A14's ~42%) means the model over-zeroes, hurting signature uniqueness (56.3% vs D-A14's higher). Adversary at 92.7% (target 50%) indicates the backbone still encodes supervised information — gradient reversal didn't fully decouple.
+
+**Verdict**: D-A14 remains production model. D-A18 demonstrates the hybrid mechanism works directionally but doesn't beat all-supervised training.
 
 #### Phase 3: BitwiseValidator as Runtime Default (1 day, no GPU) — DONE
 
@@ -1018,15 +1035,15 @@ Run the full audit battery on D-A18:
 | Phase | Task | Depends on | GPU | Status |
 |---|---|---|---|---|
 | 1 | Write `unified_final.py` | — | No | **DONE** |
-| 2 | Train D-A18 | Phase 1 | **Yes** | **IN PROGRESS** (launched 2026-03-20, `playground/unified_final.py --scale xl --steps 50000 --dtype bfloat16`) |
+| 2 | Train D-A18 | Phase 1 | **Yes** | **DONE** (105 min, 92.2% sup test, 96.5% sub, 15 dead bits) |
 | 3 | BitwiseValidator default | — | No | **DONE** (critical paths migrated) |
-| 4 | D-A18 eval + reptimeline | Phase 2 | Partial | BLOCKED by Phase 2 |
+| 4 | D-A18 eval + reptimeline | Phase 2 | Partial | **EVAL DONE** (formal eval 2026-03-20, reptimeline pending) |
 | 5a | D-A17 training | — | **Yes** | **DONE** (97.7% bit, 1.7% sub) |
 | 5b | Eval D-A17 | Phase 5a | 5 min | **DONE** (algebra destroyed at scale) |
 | 6 | Paper update | Phase 5b | No | **DONE** |
 
-**Next GPU step**: Train D-A18 (`playground/unified_final.py --scale xl --steps 50000 --dtype bfloat16`)
-**Critical path**: ~~Phase 1~~ → Phase 2 → Phase 4 → Phase 6.
+**All phases complete** except reptimeline on D-A18 (optional — D-A14 analysis already done).
+**Production model**: D-A14 v2 tanh (93%, 98.3% sub). D-A18 is secondary evidence.
 
 ### Fallback Strategy
 
