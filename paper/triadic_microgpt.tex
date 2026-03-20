@@ -59,7 +59,7 @@ We present \microgpt{}, a 40M-parameter GPT language model augmented with a \emp
 Unlike the post-hoc approach of the Triadic-Neurosymbolic-Engine~\citep{ornelas2026prime}, which projects frozen sentence embeddings into prime composites, \microgpt{} learns triadic representations end-to-end through a dual-objective training loss that combines language modeling with a novel embedding alignment objective.
 
 Across 29+ training runs and systematic ablation studies, we demonstrate seven principal findings:
-(1)~the triadic head adds \textbf{zero measurable cost} to language quality (perplexity 7.69 vs.\ 7.56 ablation baseline, within noise);
+(1)~the triadic head adds \textbf{negligible cost} to language quality (perplexity 7.69 vs.\ 7.56 ablation baseline, $+1.7\%$);
 (2)~\textbf{semantic ordering emerges gradually with scale}---the gap between related and unrelated concept similarity crosses zero around 20M parameters, with a smooth crossover rather than a sharp phase transition;
 (3)~a \textbf{bits sweep} over $k \in \{8, 16, 32, 48, 64, 128\}$ reveals an optimal regime at $k=32$--$64$, shifted upward from the $k=6$--$12$ range reported for post-hoc projection;
 (4)~a \textbf{transfer experiment} attaching the triadic head to pre-trained GPT-2 with an InfoNCE alignment loss closes \textbf{48\% of the gap} to the Triadic Engine's post-hoc projection;
@@ -95,7 +95,7 @@ Our contributions are:
 \begin{enumerate}
     \item \textbf{Architecture and training.} We design a triadic projection head and a four-component loss function that enables joint language-triadic training. We identify coherence loss as a source of triadic collapse and embedding alignment as the critical ingredient for semantic structure (Section~\ref{sec:method}).
 
-    \item \textbf{Zero-cost ablation.} We show that the triadic head adds no measurable degradation to language quality across perplexity, lexical diversity, and repetition metrics (Section~\ref{sec:ablation}).
+    \item \textbf{Near-zero-cost ablation.} We show that the triadic head adds negligible degradation to language quality ($+1.7\%$ perplexity), with lexical diversity and repetition metrics unchanged (Section~\ref{sec:ablation}).
 
     \item \textbf{Emergent semantic ordering.} Through a four-point scaling study (1.3M to 40M parameters), we demonstrate that the semantic gap transitions from negative to positive, crossing zero around $\sim$20M parameters in a gradual crossover rather than a sharp phase transition (Section~\ref{sec:scaling}). Multi-seed validation ($n=3$) confirms reproducibility: gap $+0.038 \pm 0.005$ (95\% CI $[+0.029, +0.046]$).
 
@@ -288,7 +288,7 @@ All operations require only integer arithmetic (GCD, LCM, trial division), avoid
 \label{sec:results}
 % ============================================================
 
-\subsection{Ablation: Zero Language Cost}
+\subsection{Ablation: Near-Zero Language Cost}
 \label{sec:ablation}
 
 To isolate the effect of the triadic head, we compare Run~15 (full triadic training, $\alpha = 0.05$) against Run~18 (ablation: $\alpha = 0$, triadic head receives no gradient).
@@ -311,7 +311,7 @@ Wall Time        & 75 min & 74 min & $+1.3\%$ \\
 \end{tabular}
 \end{table}
 
-The perplexity difference (1.7\%) is within run-to-run variance. The triadic model actually achieves \emph{lower} training loss, suggesting that embedding alignment acts as beneficial multi-task regularization. Lexical diversity and repetition rates are identical. \textbf{The triadic head is a free addition.}
+The perplexity difference ($+1.7\%$) is small but nonzero; a controlled comparison (B2) confirms a $+2\%$ PPL cost. The triadic model actually achieves \emph{lower} training loss, suggesting that embedding alignment acts as beneficial multi-task regularization. Lexical diversity and repetition rates are identical. \textbf{The triadic head adds algebraic capabilities at negligible language cost.}
 
 
 \subsection{Scaling Study: Emergent Semantic Ordering}
@@ -397,7 +397,7 @@ We evaluate the XL model (Run~15) on three triadic-specific benchmarks.
 
 \paragraph{Analogy verification.} Given analogy quadruples (e.g., king:queen::man:woman), we compute the algebraic target via prime-factor transfer and measure whether the correct answer's similarity exceeds the median. On an expanded set of 51 diverse analogies (covering family, size, temperature, emotion, animal, and royalty relationships), the model achieves \textbf{98\% verification rate} (50/51 analogies). The original 13-quad evaluation yielded 69.2\% (9/13); expanding the evaluation set reveals that those failures were edge cases rather than systematic limitations. Top-1 retrieval accuracy remains low ($\sim$4\%), consistent with the Engine paper's reported 2--10\% range. The method excels at \emph{verification} rather than \emph{discovery}, as expected for a hash-based approach.
 
-\paragraph{Linear probe (interpretability).} A linear classifier trained on 64-bit triadic projections achieves 8.3\% accuracy across 13 categories---matching the 8.3\% achieved by a probe on 512-dimensional embedding vectors. Both probes perform near random chance (7.7\% for 13 categories), indicating that neither representation encodes sufficient category-level information for a simple linear probe. The relevant claim is therefore not information-theoretic compression but rather \textbf{zero perplexity cost}: the triadic head adds algebraic verification capabilities (98\% analogy, 92--100\% subsumption) without degrading language quality.
+\paragraph{Linear probe (interpretability).} A linear classifier trained on 64-bit triadic projections achieves 8.3\% accuracy across 13 categories---matching the 8.3\% achieved by a probe on 512-dimensional embedding vectors. Both probes perform near random chance (7.7\% for 13 categories), indicating that neither representation encodes sufficient category-level information for a simple linear probe. The relevant claim is therefore not information-theoretic compression but rather \textbf{negligible perplexity cost} ($+1.7\%$): the triadic head adds algebraic verification capabilities (98\% analogy, 92--100\% subsumption) at minimal language cost.
 
 \paragraph{Subsumption.} At $k=64$, exact prime divisibility ($\Phi(A) \mid \Phi(B)$) is too strict without explicit supervision: with $\sim$32 active bits per concept, all hypernym bits must appear in the hyponym, which is combinatorially improbable. Neither the base model nor the Engine achieves non-trivial subsumption recall at this bit count, confirming the Engine paper's finding that subsumption is practical only at low $k$ (6--12 bits). However, this limitation is \emph{not} inherent: Section~\ref{sec:subsumption} demonstrates that a differentiable subsumption loss recovers 100\% held-out subsumption at $k=64$.
 
@@ -439,7 +439,7 @@ Several findings emerge from the full comparison:
 \begin{itemize}
     \item \textbf{Self-contained}: single model, single forward pass, no external embedding model required.
     \item \textbf{End-to-end}: triadic representations \emph{emerge} from language modeling rather than being injected from frozen embeddings.
-    \item \textbf{Zero language cost}: triadic head adds no measurable degradation (Section~\ref{sec:ablation}).
+    \item \textbf{Negligible language cost}: triadic head adds $+1.7\%$ perplexity, with diversity and repetition unchanged (Section~\ref{sec:ablation}).
     \item \textbf{Emergent at scale}: semantic ordering crosses zero around $\sim$20M parameters (Section~\ref{sec:scaling}), suggesting that larger models would narrow the gap.
 \end{itemize}
 
@@ -883,7 +883,7 @@ Several directions emerge naturally:
 We have presented \microgpt{}, a generative language model that jointly learns next-token prediction and discrete prime-factor semantic representations. Through 29+ training runs spanning architecture search, ablation, scaling studies, bit-width analysis, transfer learning, subsumption recovery, and compositional analysis, we establish eight core results:
 
 \begin{enumerate}
-    \item The triadic projection head adds \textbf{zero measurable cost} to language modeling quality, acting as a free semantic annotation layer.
+    \item The triadic projection head adds \textbf{negligible cost} to language modeling quality ($+1.7\%$ perplexity), acting as a near-free semantic annotation layer.
     \item Meaningful semantic ordering in prime-factor space is an \textbf{emergent property of scale}, crossing zero around $\sim$20M parameters in a gradual crossover. Multi-seed validation confirms reproducibility (gap $+0.038 \pm 0.005$, $n=3$).
     \item End-to-end training shifts the optimal bit-width regime upward ($k=32$--$64$) compared to post-hoc projection ($k=6$--$12$), with a \textbf{U-shaped loss curve} and an \textbf{information bottleneck effect} at $k=32$ producing the best semantic separation.
     \item The alignment loss formulation is the \textbf{primary bottleneck}: replacing MSE with InfoNCE on GPT-2 transfer achieves semantic gap $+0.076$ (closing 48\% of the gap to post-hoc Engine PCA) with perfect analogy verification (100\%), while a \textbf{loss--embedding interaction} dictates that InfoNCE is optimal for rich embeddings and MSE for weak ones.
