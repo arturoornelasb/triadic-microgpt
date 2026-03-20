@@ -353,6 +353,7 @@ def train(args):
         # Log every step to CSV
         elapsed = time.time() - start_time
         csv_writer.writerow([step + 1, f'{lang_loss.item():.6f}', f'{tri_loss_val:.6f}', f'{dist_loss_val:.6f}', f'{lr_t:.8f}', f'{elapsed:.1f}'])
+        csv_file.flush()
 
         # Print logging with progress bar and ETA
         if step % args.print_every == 0 or step == args.steps - 1:
@@ -411,7 +412,6 @@ def train(args):
 
         step += 1
 
-    # Close CSV log
     csv_file.close()
     print(f"  Training log: {csv_path}")
 

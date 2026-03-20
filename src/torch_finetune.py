@@ -244,7 +244,7 @@ def finetune(args):
                 
                 if match_found:
                     dist_loss = model.distillation_loss(triadic_proj, targets_proj, b_mask)
-                    dist_alpha = args.alpha * 5.0
+                    dist_alpha = args.alpha * args.dist_weight
                     total_loss = total_loss + dist_alpha * dist_loss
                     dist_loss_val = dist_loss.item()
 
@@ -347,6 +347,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch-size', type=int, default=16, help='Batch size')
     parser.add_argument('--lr', type=float, default=5e-5, help='Learning rate (lower for fine-tune)')
     parser.add_argument('--alpha', type=float, default=0.05, help='Triadic loss weight')
+    parser.add_argument('--dist-weight', type=float, default=1.0, help='Distillation weight multiplier (default 1.0; 5.0 causes collapse)')
     parser.add_argument('--dropout', type=float, default=0.1, help='Dropout')
     parser.add_argument('--max-examples', type=int, default=2000, help='Max instruction examples')
     parser.add_argument('--print-every', type=int, default=50, help='Print frequency')
