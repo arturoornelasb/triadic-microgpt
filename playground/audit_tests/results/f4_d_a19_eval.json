@@ -1,0 +1,71 @@
+{
+  "experiment": "D-A19_formal_eval",
+  "checkpoint": "C:\\Github\\triadic-microgpt\\checkpoints\\danza_gpt2_355m_sparsity_v2\\model_best.pt",
+  "step": 17500,
+  "n_anchors": 158,
+  "n_projected": 158,
+  "holdout_bit_accuracy": 0.9713064713064713,
+  "sub_rate": 0.7687150837988826,
+  "sub_pass": 688,
+  "sub_total": 895,
+  "sub_failures": [
+    "acceptance->tolerance",
+    "acceptance->guest",
+    "acceptance->follower",
+    "recklessness->hot",
+    "fear->rage",
+    "fear->irritation",
+    "fear->disgust",
+    "fear->shame",
+    "fear->anxiety",
+    "fear->hate",
+    "surprise->shame",
+    "surprise->anxiety",
+    "anxiety->shame",
+    "pleasure->excitement",
+    "pleasure->happy",
+    "stone->slow",
+    "water->sweet",
+    "number->knowledge",
+    "number->innocent",
+    "velocity->water"
+  ],
+  "zero_rate": 0.7263411693791441,
+  "dead_bits": 16,
+  "always_on": 4,
+  "unique_sigs": 126,
+  "r3_pass": 6,
+  "r3_total": 6,
+  "r3_details": [
+    {
+      "quad": "man:woman=king:queen",
+      "cosine": 0.9209094643592834,
+      "bit_accuracy": 0.9841270446777344
+    },
+    {
+      "quad": "cold:hot=quiet:loud",
+      "cosine": 0.8114513158798218,
+      "bit_accuracy": 0.9047619700431824
+    },
+    {
+      "quad": "happy:sad=love:hate",
+      "cosine": 0.8724945187568665,
+      "bit_accuracy": 0.9523810148239136
+    },
+    {
+      "quad": "open:close=free:prisoner",
+      "cosine": 0.8367317914962769,
+      "bit_accuracy": 0.9206349849700928
+    },
+    {
+      "quad": "bright:dark=loud:quiet",
+      "cosine": 0.8201662302017212,
+      "bit_accuracy": 0.9047619700431824
+    },
+    {
+      "quad": "teach:learn=king:queen",
+      "cosine": 0.8297818899154663,
+      "bit_accuracy": 0.9365079998970032
+    }
+  ]
+}
