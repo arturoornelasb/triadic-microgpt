@@ -41,6 +41,7 @@ Every experiment in ONE table, newest to oldest.
 | **D-A14** | 03-19 | v2 tanh (158 anchors) | **93% test, 98.3% sub, 68 triadic** | COMPLETE | `danza_63bit_xl_v2/` |
 | D-A15 | 03-19 | Gradient decoupling | 49.6% = random | FAILED | `danza_grad_decoupling_xl/` |
 | **D-A18** | 03-20 | Unified (iFSQ + hybrid 30+33 + v2) | 92.2% sup, 75.3% full, 96.5% sub, 15 dead, R3=0.851 | COMPLETE | `danza_unified_xl/` |
+| **D-A19** | 03-20 | GPT-2 355M + full losses + sparsity | Fix D-A17: full triadic loss, diff. sub, sparsity target | RUNNING | `danza_gpt2_355m_sparsity_v2/` |
 | D-A17 | 03-20 | GPT-2 355M + v2 | **97.7% bit, 1.7% sub, 26 dead — algebra destroyed at scale** | COMPLETE | `danza_gpt2medium_ternary_v2/` |
 | D-A9 | 03-19 | Hybrid adversarial (30+33) | 69.3% test, 13 dead bits (5 sup + 8 free), 17 triadic | COMPLETE | `danza_hybrid_adv_xl/` |
 | D-A13 | 03-18 | GPT-2 355M ternary (v1) | 88% bits, sub 9-20%, analogy 0% | COMPLETE | `danza_gpt2medium_ternary/` |
@@ -855,7 +856,7 @@ Token-level sep ratio 1.02 → sentence-level **1.21 (+19%)**. Best: family (1.4
 
 ### Pending Tests — Before Publication
 
-> Updated: 2026-03-20. D-A18 COMPLETE (92.2% sup, 96.5% sub, 15 dead). D-A17 COMPLETE (algebra destroyed). D-A14 confirmed as production model.
+> Updated: 2026-03-20. D-A19 RUNNING (fix D-A17 scale-algebra tradeoff). D-A18 COMPLETE (92.2% sup, 96.5% sub, 15 dead). D-A17 COMPLETE (algebra destroyed). D-A14 confirmed as production model.
 
 #### Tier 0: Critical (blocks paper claims)
 
@@ -989,7 +990,19 @@ python playground/unified_final.py --scale xl --steps 50000 --dtype bfloat16
 
 **Analysis**: Hybrid 30+33 successfully reduces dead bits vs D-A14 (15 vs 26) and activates more bits (48 vs 37). However, zero rate 61.4% (vs D-A14's ~42%) means the model over-zeroes, hurting signature uniqueness (56.3% vs D-A14's higher). Adversary at 92.7% (target 50%) indicates the backbone still encodes supervised information — gradient reversal didn't fully decouple.
 
-**Verdict**: D-A14 remains production model. D-A18 demonstrates the hybrid mechanism works directionally but doesn't beat all-supervised training.
+**reptimeline BitDiscovery** (2026-03-20):
+
+| Metric | D-A18 | D-A14 v2 |
+|---|---|---|
+| Active bits | 41 | 49 |
+| Dead bits | 22 | 14 |
+| Duals | 5 | 14 |
+| Dependencies | 855 | 526 |
+| **Triadic interactions** | **11** | **328** |
+
+The 30× reduction in triadic interactions is the strongest evidence against the hybrid approach. High dependency count (855) reflects trivial always-ON bit correlations, not genuine structure. D-A14's 328 triadic interactions emerge from a balanced ternary code; D-A18's binary +1/0 code cannot produce meaningful three-way relationships.
+
+**Verdict**: D-A14 remains production model. D-A18 demonstrates the hybrid mechanism works directionally for subsumption but fundamentally impoverishes algebraic structure.
 
 #### Phase 3: BitwiseValidator as Runtime Default (1 day, no GPU) — DONE
 
@@ -1037,13 +1050,13 @@ Run the full audit battery on D-A18:
 | 1 | Write `unified_final.py` | — | No | **DONE** |
 | 2 | Train D-A18 | Phase 1 | **Yes** | **DONE** (105 min, 92.2% sup test, 96.5% sub, 15 dead bits) |
 | 3 | BitwiseValidator default | — | No | **DONE** (critical paths migrated) |
-| 4 | D-A18 eval + reptimeline | Phase 2 | Partial | **EVAL DONE** (formal eval 2026-03-20, reptimeline pending) |
+| 4 | D-A18 eval + reptimeline | Phase 2 | Partial | **DONE** (formal eval + reptimeline 2026-03-20: 41 active, 5 duals, 11 triadic vs D-A14's 328) |
 | 5a | D-A17 training | — | **Yes** | **DONE** (97.7% bit, 1.7% sub) |
 | 5b | Eval D-A17 | Phase 5a | 5 min | **DONE** (algebra destroyed at scale) |
 | 6 | Paper update | Phase 5b | No | **DONE** |
 
-**All phases complete** except reptimeline on D-A18 (optional — D-A14 analysis already done).
-**Production model**: D-A14 v2 tanh (93%, 98.3% sub). D-A18 is secondary evidence.
+**All phases complete.**
+**Production model**: D-A14 v2 tanh (93%, 98.3% sub, 328 triadic interactions). D-A18 reptimeline confirms: hybrid architecture collapses triadic structure (11 interactions vs 328).
 
 ### Fallback Strategy
 

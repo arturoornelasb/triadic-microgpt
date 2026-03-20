@@ -1,0 +1,1380 @@
+{
+  "model": "D-A18 UnifiedTriadicGPT (iFSQ + hybrid 30+33)",
+  "checkpoint": "C:\\Github\\triadic-microgpt\\checkpoints\\danza_unified_xl\\model_best.pt",
+  "n_concepts": 158,
+  "n_bits": 63,
+  "n_supervised": 30,
+  "n_free": 33,
+  "n_active_bits": 41,
+  "n_dead_bits": 22,
+  "n_duals": 5,
+  "n_dependencies": 855,
+  "n_triadic_interactions": 11,
+  "bit_semantics": [
+    {
+      "bit": 0,
+      "activation_rate": 0.228,
+      "is_supervised": true,
+      "top_concepts": [
+        "tyranny",
+        "caution",
+        "calm",
+        "shame",
+        "absence",
+        "blindness",
+        "silence",
+        "ignorance",
+        "despair",
+        "poverty"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "democracy",
+        "fanaticism",
+        "tolerance"
+      ]
+    },
+    {
+      "bit": 1,
+      "activation_rate": 0.937,
+      "is_supervised": true,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "recklessness",
+        "caution"
+      ],
+      "anti_concepts": [
+        "stone",
+        "gravity",
+        "iron",
+        "nitrogen",
+        "light"
+      ]
+    },
+    {
+      "bit": 2,
+      "activation_rate": 1.0,
+      "is_supervised": true,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "recklessness",
+        "caution"
+      ],
+      "anti_concepts": []
+    },
+    {
+      "bit": 3,
+      "activation_rate": 0.12,
+      "is_supervised": true,
+      "top_concepts": [
+        "fanaticism",
+        "recklessness",
+        "boldness",
+        "rage",
+        "irritation",
+        "passion",
+        "young",
+        "visible",
+        "obsession",
+        "excitement"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "tolerance"
+      ]
+    },
+    {
+      "bit": 4,
+      "activation_rate": 0.127,
+      "is_supervised": true,
+      "top_concepts": [
+        "caution",
+        "stone",
+        "gravity",
+        "mass",
+        "carbon",
+        "captivity",
+        "short",
+        "heavy",
+        "old",
+        "cold"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 5,
+      "activation_rate": 0.051,
+      "is_supervised": true,
+      "top_concepts": [
+        "calm",
+        "water",
+        "love",
+        "woman",
+        "queen",
+        "moon",
+        "sweet",
+        "liquid"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 6,
+      "activation_rate": 0.07,
+      "is_supervised": true,
+      "top_concepts": [
+        "oxygen",
+        "nitrogen",
+        "hydrogen",
+        "freedom",
+        "question",
+        "light_weight",
+        "free",
+        "loud",
+        "noisy",
+        "quiet"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 7,
+      "activation_rate": 0.829,
+      "is_supervised": true,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "recklessness",
+        "caution"
+      ],
+      "anti_concepts": [
+        "stone",
+        "water",
+        "number",
+        "triangle",
+        "velocity"
+      ]
+    },
+    {
+      "bit": 8,
+      "activation_rate": 1.0,
+      "is_supervised": true,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "recklessness",
+        "caution"
+      ],
+      "anti_concepts": []
+    },
+    {
+      "bit": 9,
+      "activation_rate": 0.0,
+      "is_supervised": true,
+      "top_concepts": [],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 10,
+      "activation_rate": 0.867,
+      "is_supervised": true,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "caution",
+        "boldness"
+      ],
+      "anti_concepts": [
+        "recklessness",
+        "number",
+        "velocity",
+        "distance",
+        "hydrogen"
+      ]
+    },
+    {
+      "bit": 11,
+      "activation_rate": 0.93,
+      "is_supervised": true,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "recklessness",
+        "caution"
+      ],
+      "anti_concepts": [
+        "velocity",
+        "distance",
+        "hydrogen",
+        "light",
+        "tall"
+      ]
+    },
+    {
+      "bit": 12,
+      "activation_rate": 0.829,
+      "is_supervised": true,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "caution",
+        "boldness"
+      ],
+      "anti_concepts": [
+        "recklessness",
+        "stone",
+        "number",
+        "triangle",
+        "gravity"
+      ]
+    },
+    {
+      "bit": 13,
+      "activation_rate": 0.69,
+      "is_supervised": true,
+      "top_concepts": [
+        "socialism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "caution",
+        "boldness",
+        "greed"
+      ],
+      "anti_concepts": [
+        "capitalism",
+        "recklessness",
+        "generosity",
+        "surprise",
+        "stone"
+      ]
+    },
+    {
+      "bit": 14,
+      "activation_rate": 0.063,
+      "is_supervised": true,
+      "top_concepts": [
+        "silence",
+        "teacher",
+        "seller",
+        "answer",
+        "sweet",
+        "loud",
+        "noisy",
+        "quiet",
+        "silent",
+        "teach"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 15,
+      "activation_rate": 0.025,
+      "is_supervised": true,
+      "top_concepts": [
+        "numbness",
+        "cold",
+        "hard",
+        "liquid"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 16,
+      "activation_rate": 0.0,
+      "is_supervised": true,
+      "top_concepts": [],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 17,
+      "activation_rate": 0.0,
+      "is_supervised": true,
+      "top_concepts": [],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 18,
+      "activation_rate": 0.0,
+      "is_supervised": true,
+      "top_concepts": [],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 19,
+      "activation_rate": 0.095,
+      "is_supervised": true,
+      "top_concepts": [
+        "rage",
+        "irritation",
+        "passion",
+        "shame",
+        "anxiety",
+        "pleasure",
+        "happiness",
+        "health",
+        "disease",
+        "hunger"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 20,
+      "activation_rate": 0.063,
+      "is_supervised": true,
+      "top_concepts": [
+        "tolerance",
+        "generosity",
+        "health",
+        "trust",
+        "host",
+        "innocent",
+        "worship",
+        "good",
+        "rich",
+        "proud"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 21,
+      "activation_rate": 0.07,
+      "is_supervised": true,
+      "top_concepts": [
+        "greed",
+        "shame",
+        "guilt",
+        "disease",
+        "distrust",
+        "effect",
+        "guilty_person",
+        "resentment",
+        "betrayal",
+        "bad"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 22,
+      "activation_rate": 0.886,
+      "is_supervised": true,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "caution",
+        "boldness"
+      ],
+      "anti_concepts": [
+        "recklessness",
+        "velocity",
+        "distance",
+        "hydrogen",
+        "light"
+      ]
+    },
+    {
+      "bit": 23,
+      "activation_rate": 0.12,
+      "is_supervised": true,
+      "top_concepts": [
+        "fanaticism",
+        "recklessness",
+        "greed",
+        "shame",
+        "guilt",
+        "anxiety",
+        "disease",
+        "distrust",
+        "effect",
+        "guilty_person"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "tolerance"
+      ]
+    },
+    {
+      "bit": 24,
+      "activation_rate": 0.823,
+      "is_supervised": true,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "recklessness",
+        "caution"
+      ],
+      "anti_concepts": [
+        "stone",
+        "number",
+        "triangle",
+        "gravity",
+        "velocity"
+      ]
+    },
+    {
+      "bit": 25,
+      "activation_rate": 0.209,
+      "is_supervised": true,
+      "top_concepts": [
+        "tyranny",
+        "fanaticism",
+        "recklessness",
+        "boldness",
+        "rage",
+        "irritation",
+        "passion",
+        "absence",
+        "despair",
+        "disease"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "democracy",
+        "tolerance",
+        "perfectionism"
+      ]
+    },
+    {
+      "bit": 26,
+      "activation_rate": 0.19,
+      "is_supervised": true,
+      "top_concepts": [
+        "socialism",
+        "tolerance",
+        "acceptance",
+        "generosity",
+        "happiness",
+        "carbon",
+        "health",
+        "wealth",
+        "trust",
+        "teacher"
+      ],
+      "anti_concepts": [
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "perfectionism"
+      ]
+    },
+    {
+      "bit": 27,
+      "activation_rate": 0.88,
+      "is_supervised": true,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "caution",
+        "boldness"
+      ],
+      "anti_concepts": [
+        "recklessness",
+        "number",
+        "velocity",
+        "hydrogen",
+        "light"
+      ]
+    },
+    {
+      "bit": 28,
+      "activation_rate": 0.089,
+      "is_supervised": true,
+      "top_concepts": [
+        "democracy",
+        "perfectionism",
+        "guilt",
+        "number",
+        "triangle",
+        "trust",
+        "answer",
+        "innocent",
+        "guilty_person",
+        "good"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "fanaticism",
+        "tolerance"
+      ]
+    },
+    {
+      "bit": 29,
+      "activation_rate": 0.038,
+      "is_supervised": true,
+      "top_concepts": [
+        "fanaticism",
+        "distrust",
+        "effect",
+        "betrayal",
+        "bad",
+        "evil"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "tolerance"
+      ]
+    },
+    {
+      "bit": 30,
+      "activation_rate": 0.0,
+      "is_supervised": false,
+      "top_concepts": [],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 31,
+      "activation_rate": 0.038,
+      "is_supervised": false,
+      "top_concepts": [
+        "trust",
+        "seller",
+        "answer",
+        "hot",
+        "hate",
+        "sweet"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 32,
+      "activation_rate": 1.0,
+      "is_supervised": false,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "recklessness",
+        "caution"
+      ],
+      "anti_concepts": []
+    },
+    {
+      "bit": 33,
+      "activation_rate": 0.987,
+      "is_supervised": false,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "recklessness",
+        "caution"
+      ],
+      "anti_concepts": [
+        "velocity",
+        "light_weight"
+      ]
+    },
+    {
+      "bit": 34,
+      "activation_rate": 0.0,
+      "is_supervised": false,
+      "top_concepts": [],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 35,
+      "activation_rate": 0.994,
+      "is_supervised": false,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "recklessness",
+        "caution"
+      ],
+      "anti_concepts": [
+        "velocity"
+      ]
+    },
+    {
+      "bit": 36,
+      "activation_rate": 0.994,
+      "is_supervised": false,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "recklessness",
+        "caution"
+      ],
+      "anti_concepts": [
+        "velocity"
+      ]
+    },
+    {
+      "bit": 37,
+      "activation_rate": 0.127,
+      "is_supervised": false,
+      "top_concepts": [
+        "tyranny",
+        "fanaticism",
+        "rage",
+        "irritation",
+        "shame",
+        "guilt",
+        "happiness",
+        "trust",
+        "effect",
+        "answer"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "democracy",
+        "tolerance",
+        "perfectionism"
+      ]
+    },
+    {
+      "bit": 38,
+      "activation_rate": 0.956,
+      "is_supervised": false,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "recklessness",
+        "caution"
+      ],
+      "anti_concepts": [
+        "number",
+        "velocity",
+        "hydrogen",
+        "silence",
+        "light_weight"
+      ]
+    },
+    {
+      "bit": 39,
+      "activation_rate": 0.0,
+      "is_supervised": false,
+      "top_concepts": [],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 40,
+      "activation_rate": 1.0,
+      "is_supervised": false,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "recklessness",
+        "caution"
+      ],
+      "anti_concepts": []
+    },
+    {
+      "bit": 41,
+      "activation_rate": 0.994,
+      "is_supervised": false,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "recklessness",
+        "caution"
+      ],
+      "anti_concepts": [
+        "velocity"
+      ]
+    },
+    {
+      "bit": 42,
+      "activation_rate": 0.0,
+      "is_supervised": false,
+      "top_concepts": [],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 43,
+      "activation_rate": 0.006,
+      "is_supervised": false,
+      "top_concepts": [
+        "rage"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 44,
+      "activation_rate": 0.006,
+      "is_supervised": false,
+      "top_concepts": [
+        "numbness"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 45,
+      "activation_rate": 0.0,
+      "is_supervised": false,
+      "top_concepts": [],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 46,
+      "activation_rate": 0.0,
+      "is_supervised": false,
+      "top_concepts": [],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 47,
+      "activation_rate": 0.0,
+      "is_supervised": false,
+      "top_concepts": [],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 48,
+      "activation_rate": 0.994,
+      "is_supervised": false,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "recklessness",
+        "caution"
+      ],
+      "anti_concepts": [
+        "velocity"
+      ]
+    },
+    {
+      "bit": 49,
+      "activation_rate": 0.019,
+      "is_supervised": false,
+      "top_concepts": [
+        "rage",
+        "irritation",
+        "dead"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 50,
+      "activation_rate": 0.0,
+      "is_supervised": false,
+      "top_concepts": [],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 51,
+      "activation_rate": 0.994,
+      "is_supervised": false,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "recklessness",
+        "caution"
+      ],
+      "anti_concepts": [
+        "velocity"
+      ]
+    },
+    {
+      "bit": 52,
+      "activation_rate": 0.0,
+      "is_supervised": false,
+      "top_concepts": [],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 53,
+      "activation_rate": 0.0,
+      "is_supervised": false,
+      "top_concepts": [],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 54,
+      "activation_rate": 0.981,
+      "is_supervised": false,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "recklessness",
+        "caution"
+      ],
+      "anti_concepts": [
+        "velocity",
+        "light_weight",
+        "open"
+      ]
+    },
+    {
+      "bit": 55,
+      "activation_rate": 0.019,
+      "is_supervised": false,
+      "top_concepts": [
+        "fanaticism",
+        "hate",
+        "sweet"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "tolerance"
+      ]
+    },
+    {
+      "bit": 56,
+      "activation_rate": 0.0,
+      "is_supervised": false,
+      "top_concepts": [],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 57,
+      "activation_rate": 0.987,
+      "is_supervised": false,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "recklessness",
+        "caution"
+      ],
+      "anti_concepts": [
+        "velocity",
+        "light_weight"
+      ]
+    },
+    {
+      "bit": 58,
+      "activation_rate": 0.006,
+      "is_supervised": false,
+      "top_concepts": [
+        "hate"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 59,
+      "activation_rate": 0.987,
+      "is_supervised": false,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "recklessness",
+        "caution"
+      ],
+      "anti_concepts": [
+        "velocity",
+        "light_weight"
+      ]
+    },
+    {
+      "bit": 60,
+      "activation_rate": 0.019,
+      "is_supervised": false,
+      "top_concepts": [
+        "answer",
+        "hate",
+        "sweet"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    },
+    {
+      "bit": 61,
+      "activation_rate": 0.994,
+      "is_supervised": false,
+      "top_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism",
+        "tolerance",
+        "perfectionism",
+        "acceptance",
+        "recklessness",
+        "caution"
+      ],
+      "anti_concepts": [
+        "velocity"
+      ]
+    },
+    {
+      "bit": 62,
+      "activation_rate": 0.013,
+      "is_supervised": false,
+      "top_concepts": [
+        "hot",
+        "hate"
+      ],
+      "anti_concepts": [
+        "socialism",
+        "capitalism",
+        "tyranny",
+        "democracy",
+        "fanaticism"
+      ]
+    }
+  ],
+  "discovered_duals": [
+    {
+      "bit_a": 6,
+      "bit_b": 27,
+      "anti_correlation": -0.358,
+      "a_is_supervised": true,
+      "b_is_supervised": true
+    },
+    {
+      "bit_a": 6,
+      "bit_b": 10,
+      "anti_correlation": -0.332,
+      "a_is_supervised": true,
+      "b_is_supervised": true
+    },
+    {
+      "bit_a": 6,
+      "bit_b": 24,
+      "anti_correlation": -0.329,
+      "a_is_supervised": true,
+      "b_is_supervised": true
+    },
+    {
+      "bit_a": 6,
+      "bit_b": 38,
+      "anti_correlation": -0.304,
+      "a_is_supervised": true,
+      "b_is_supervised": false
+    },
+    {
+      "bit_a": 14,
+      "bit_b": 27,
+      "anti_correlation": -0.303,
+      "a_is_supervised": true,
+      "b_is_supervised": true
+    }
+  ],
+  "discovered_triadic": [
+    {
+      "bit_i": 4,
+      "bit_j": 25,
+      "bit_r": 0,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.3,
+      "p_r_j": 0.303,
+      "strength": 0.697,
+      "support": 3
+    },
+    {
+      "bit_i": 26,
+      "bit_j": 31,
+      "bit_r": 28,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.167,
+      "p_r_j": 0.5,
+      "strength": 0.5,
+      "support": 3
+    },
+    {
+      "bit_i": 28,
+      "bit_j": 31,
+      "bit_r": 26,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.357,
+      "p_r_j": 0.5,
+      "strength": 0.5,
+      "support": 3
+    },
+    {
+      "bit_i": 28,
+      "bit_j": 37,
+      "bit_r": 31,
+      "p_r_ij": 0.75,
+      "p_r_i": 0.214,
+      "p_r_j": 0.25,
+      "strength": 0.5,
+      "support": 4
+    },
+    {
+      "bit_i": 10,
+      "bit_j": 14,
+      "bit_r": 26,
+      "p_r_ij": 0.8,
+      "p_r_i": 0.219,
+      "p_r_j": 0.4,
+      "strength": 0.4,
+      "support": 5
+    },
+    {
+      "bit_i": 13,
+      "bit_j": 14,
+      "bit_r": 26,
+      "p_r_ij": 0.8,
+      "p_r_i": 0.239,
+      "p_r_j": 0.4,
+      "strength": 0.4,
+      "support": 5
+    },
+    {
+      "bit_i": 14,
+      "bit_j": 24,
+      "bit_r": 26,
+      "p_r_ij": 0.8,
+      "p_r_i": 0.4,
+      "p_r_j": 0.223,
+      "strength": 0.4,
+      "support": 5
+    },
+    {
+      "bit_i": 14,
+      "bit_j": 27,
+      "bit_r": 26,
+      "p_r_ij": 0.8,
+      "p_r_i": 0.4,
+      "p_r_j": 0.216,
+      "strength": 0.4,
+      "support": 5
+    },
+    {
+      "bit_i": 28,
+      "bit_j": 37,
+      "bit_r": 26,
+      "p_r_ij": 0.75,
+      "p_r_i": 0.357,
+      "p_r_j": 0.3,
+      "strength": 0.393,
+      "support": 4
+    },
+    {
+      "bit_i": 3,
+      "bit_j": 37,
+      "bit_r": 19,
+      "p_r_ij": 0.833,
+      "p_r_i": 0.316,
+      "p_r_j": 0.45,
+      "strength": 0.383,
+      "support": 6
+    },
+    {
+      "bit_i": 3,
+      "bit_j": 19,
+      "bit_r": 37,
+      "p_r_ij": 0.833,
+      "p_r_i": 0.316,
+      "p_r_j": 0.6,
+      "strength": 0.233,
+      "support": 6
+    }
+  ]
+}
