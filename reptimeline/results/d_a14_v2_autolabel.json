@@ -1,0 +1,1266 @@
+{
+  "version": "discovered_1.0",
+  "total": 49,
+  "description": "Primitives discovered by reptimeline AutoLabeler. Not manually defined — learned from model behavior.",
+  "primitivos": [
+    {
+      "bit": 0,
+      "nombre": "man",
+      "discovered": true,
+      "confidence": 0.275,
+      "method": "contrastive",
+      "top_concepts": [
+        "alive",
+        "artifice",
+        "dependence",
+        "dirty",
+        "dystopia",
+        "enlightenment",
+        "evil",
+        "fast",
+        "flow",
+        "good"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 1,
+      "nombre": "abundance",
+      "discovered": true,
+      "confidence": 0.332,
+      "method": "contrastive",
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "anti_concepts": [
+        "illusion",
+        "play",
+        "red",
+        "sweet",
+        "village"
+      ]
+    },
+    {
+      "bit": 2,
+      "nombre": "bit_2",
+      "discovered": true,
+      "confidence": 0.0,
+      "method": "contrastive",
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "anti_concepts": []
+    },
+    {
+      "bit": 3,
+      "nombre": "alive",
+      "discovered": true,
+      "confidence": 0.289,
+      "method": "contrastive",
+      "top_concepts": [
+        "adventure",
+        "alive",
+        "arrogance",
+        "bad",
+        "betrayal",
+        "boy",
+        "break",
+        "build",
+        "butterfly",
+        "compassion"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "anarchy",
+        "angry",
+        "anxiety"
+      ]
+    },
+    {
+      "bit": 4,
+      "nombre": "home",
+      "discovered": true,
+      "confidence": 0.382,
+      "method": "contrastive",
+      "top_concepts": [
+        "alive",
+        "bird",
+        "butterfly",
+        "capitalism",
+        "deep",
+        "discord",
+        "distraction",
+        "dry",
+        "enlightenment",
+        "envy"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 5,
+      "nombre": "humility",
+      "discovered": true,
+      "confidence": 0.356,
+      "method": "contrastive",
+      "top_concepts": [
+        "apathy",
+        "artifice",
+        "ecstasy",
+        "fast",
+        "full",
+        "hide",
+        "home",
+        "house",
+        "humility",
+        "imagination"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 6,
+      "nombre": "happy",
+      "discovered": true,
+      "confidence": 0.314,
+      "method": "contrastive",
+      "top_concepts": [
+        "adventure",
+        "bad",
+        "book",
+        "cold",
+        "happy",
+        "hate",
+        "illusion",
+        "intuition",
+        "kind",
+        "king"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 7,
+      "nombre": "bad",
+      "discovered": true,
+      "confidence": 0.24,
+      "method": "contrastive",
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "anti_concepts": [
+        "bridge",
+        "bright",
+        "brother",
+        "chaos",
+        "child"
+      ]
+    },
+    {
+      "bit": 8,
+      "nombre": "bear",
+      "discovered": true,
+      "confidence": 0.468,
+      "method": "contrastive",
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "anti_concepts": [
+        "adventure",
+        "death",
+        "deep",
+        "fish",
+        "instinct"
+      ]
+    },
+    {
+      "bit": 9,
+      "nombre": "reality",
+      "discovered": true,
+      "confidence": 0.291,
+      "method": "contrastive",
+      "top_concepts": [
+        "adventure",
+        "alive",
+        "break",
+        "butterfly",
+        "envy",
+        "home",
+        "illusion",
+        "man",
+        "old",
+        "open"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "anarchy",
+        "angry",
+        "anxiety"
+      ]
+    },
+    {
+      "bit": 10,
+      "nombre": "anxiety",
+      "discovered": true,
+      "confidence": 0.318,
+      "method": "contrastive",
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "arrogance",
+        "artifice",
+        "authenticity",
+        "baby"
+      ],
+      "anti_concepts": [
+        "adventure",
+        "apathy",
+        "bridge",
+        "bright",
+        "brother"
+      ]
+    },
+    {
+      "bit": 11,
+      "nombre": "bear",
+      "discovered": true,
+      "confidence": 0.413,
+      "method": "contrastive",
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "arrogance",
+        "artifice",
+        "authenticity",
+        "baby"
+      ],
+      "anti_concepts": [
+        "alive",
+        "apathy",
+        "bridge",
+        "bright",
+        "brother"
+      ]
+    },
+    {
+      "bit": 12,
+      "nombre": "angry",
+      "discovered": true,
+      "confidence": 0.253,
+      "method": "contrastive",
+      "top_concepts": [
+        "abundance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "anti_concepts": [
+        "acceptance",
+        "beauty",
+        "bridge",
+        "bright",
+        "brother"
+      ]
+    },
+    {
+      "bit": 13,
+      "nombre": "bad",
+      "discovered": true,
+      "confidence": 0.521,
+      "method": "contrastive",
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "angry",
+        "artifice",
+        "authenticity",
+        "baby",
+        "bad",
+        "ball"
+      ],
+      "anti_concepts": [
+        "anarchy",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "bear"
+      ]
+    },
+    {
+      "bit": 14,
+      "nombre": "wind",
+      "discovered": true,
+      "confidence": 0.38,
+      "method": "contrastive",
+      "top_concepts": [
+        "alive",
+        "artifice",
+        "illusion",
+        "king",
+        "man",
+        "peace",
+        "reason",
+        "silence",
+        "warm",
+        "weak"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 15,
+      "nombre": "river",
+      "discovered": true,
+      "confidence": 0.415,
+      "method": "contrastive",
+      "top_concepts": [
+        "apathy",
+        "dance",
+        "day",
+        "full",
+        "home",
+        "humility",
+        "imagination",
+        "instinct",
+        "reason",
+        "rich"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 16,
+      "nombre": "open",
+      "discovered": true,
+      "confidence": 0.44,
+      "method": "contrastive",
+      "top_concepts": [
+        "adventure",
+        "alive",
+        "day",
+        "ecstasy",
+        "enlightenment",
+        "envy",
+        "open",
+        "scared",
+        "selfishness"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "anarchy",
+        "angry",
+        "anxiety"
+      ]
+    },
+    {
+      "bit": 18,
+      "nombre": "alive",
+      "discovered": true,
+      "confidence": 0.24,
+      "method": "contrastive",
+      "top_concepts": [
+        "alive",
+        "apathy",
+        "arrogance",
+        "comfort",
+        "fast",
+        "full",
+        "illusion",
+        "imagination",
+        "old",
+        "rage"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 19,
+      "nombre": "dog",
+      "discovered": true,
+      "confidence": 0.307,
+      "method": "contrastive",
+      "top_concepts": [
+        "artifice",
+        "dog",
+        "doubt",
+        "dry",
+        "gift",
+        "humble",
+        "ignorant",
+        "logic",
+        "logical",
+        "man"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 20,
+      "nombre": "open",
+      "discovered": true,
+      "confidence": 0.324,
+      "method": "contrastive",
+      "top_concepts": [
+        "adventure",
+        "calm",
+        "enlightenment",
+        "envy",
+        "fish",
+        "illusion",
+        "indifference",
+        "open",
+        "rage",
+        "reason"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 22,
+      "nombre": "bear",
+      "discovered": true,
+      "confidence": 0.304,
+      "method": "contrastive",
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "anti_concepts": [
+        "bridge",
+        "bright",
+        "brother",
+        "butterfly",
+        "child"
+      ]
+    },
+    {
+      "bit": 23,
+      "nombre": "help",
+      "discovered": true,
+      "confidence": 0.45,
+      "method": "contrastive",
+      "top_concepts": [
+        "authenticity",
+        "bad",
+        "book",
+        "boy",
+        "butterfly",
+        "cheerful",
+        "dead",
+        "dystopia",
+        "fear",
+        "find"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 24,
+      "nombre": "bad",
+      "discovered": true,
+      "confidence": 0.299,
+      "method": "contrastive",
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "anti_concepts": [
+        "apathy",
+        "bridge",
+        "bright",
+        "brother",
+        "faith"
+      ]
+    },
+    {
+      "bit": 25,
+      "nombre": "bad",
+      "discovered": true,
+      "confidence": 0.541,
+      "method": "contrastive",
+      "top_concepts": [
+        "abundance",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "arrogance",
+        "artifice",
+        "baby",
+        "bad",
+        "betrayal"
+      ],
+      "anti_concepts": [
+        "acceptance",
+        "adventure",
+        "apathy",
+        "authenticity",
+        "ball"
+      ]
+    },
+    {
+      "bit": 26,
+      "nombre": "humility",
+      "discovered": true,
+      "confidence": 0.317,
+      "method": "contrastive",
+      "top_concepts": [
+        "adventure",
+        "alive",
+        "bad",
+        "butterfly",
+        "confusion",
+        "discord",
+        "distraction",
+        "dream",
+        "dystopia",
+        "envy"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "anarchy",
+        "angry",
+        "anxiety"
+      ]
+    },
+    {
+      "bit": 27,
+      "nombre": "bad",
+      "discovered": true,
+      "confidence": 0.325,
+      "method": "contrastive",
+      "top_concepts": [
+        "abundance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "anti_concepts": [
+        "acceptance",
+        "boat",
+        "bridge",
+        "bright",
+        "brother"
+      ]
+    },
+    {
+      "bit": 28,
+      "nombre": "fish",
+      "discovered": true,
+      "confidence": 0.317,
+      "method": "contrastive",
+      "top_concepts": [
+        "adventure",
+        "apathy",
+        "cold",
+        "comfort",
+        "enlightenment",
+        "envy",
+        "fish",
+        "happy",
+        "harmony",
+        "horse"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 30,
+      "nombre": "fish",
+      "discovered": true,
+      "confidence": 0.327,
+      "method": "contrastive",
+      "top_concepts": [
+        "artifice",
+        "betrayal",
+        "boat",
+        "break",
+        "cold",
+        "comfort",
+        "creation",
+        "ecstasy",
+        "excited",
+        "fish"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 31,
+      "nombre": "blue",
+      "discovered": true,
+      "confidence": 0.602,
+      "method": "contrastive",
+      "top_concepts": [
+        "abundance",
+        "betrayal",
+        "bird",
+        "birth",
+        "bitter",
+        "black",
+        "blue",
+        "boat",
+        "book",
+        "break"
+      ],
+      "anti_concepts": [
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 32,
+      "nombre": "betrayal",
+      "discovered": true,
+      "confidence": 0.29,
+      "method": "contrastive",
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "anti_concepts": [
+        "bear",
+        "beauty",
+        "bridge",
+        "bright",
+        "brother"
+      ]
+    },
+    {
+      "bit": 33,
+      "nombre": "open",
+      "discovered": true,
+      "confidence": 0.427,
+      "method": "contrastive",
+      "top_concepts": [
+        "apathy",
+        "artifice",
+        "curiosity",
+        "dystopia",
+        "enlightenment",
+        "envy",
+        "fast",
+        "generosity",
+        "instinct",
+        "open"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 34,
+      "nombre": "wind",
+      "discovered": true,
+      "confidence": 0.54,
+      "method": "contrastive",
+      "top_concepts": [
+        "apathy",
+        "despair",
+        "dry",
+        "warm",
+        "wet",
+        "white",
+        "wind",
+        "winter",
+        "wisdom",
+        "wolf"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 35,
+      "nombre": "comfort",
+      "discovered": true,
+      "confidence": 0.284,
+      "method": "contrastive",
+      "top_concepts": [
+        "apathy",
+        "comfort",
+        "corruption",
+        "day",
+        "enlightenment",
+        "envy",
+        "family",
+        "fast",
+        "forgiveness",
+        "full"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 36,
+      "nombre": "bad",
+      "discovered": true,
+      "confidence": 0.497,
+      "method": "contrastive",
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "angry",
+        "anxiety",
+        "artifice",
+        "authenticity",
+        "baby",
+        "bad"
+      ],
+      "anti_concepts": [
+        "anarchy",
+        "apathy",
+        "arrogance",
+        "bear",
+        "beauty"
+      ]
+    },
+    {
+      "bit": 37,
+      "nombre": "wind",
+      "discovered": true,
+      "confidence": 0.488,
+      "method": "contrastive",
+      "top_concepts": [
+        "apathy",
+        "enlightenment",
+        "fast",
+        "fish",
+        "full",
+        "illusion",
+        "night",
+        "obsession",
+        "war",
+        "warm"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 40,
+      "nombre": "bad",
+      "discovered": true,
+      "confidence": 0.479,
+      "method": "contrastive",
+      "top_concepts": [
+        "bad",
+        "big",
+        "bird",
+        "birth",
+        "blue",
+        "book",
+        "capitalism",
+        "contamination",
+        "dead",
+        "deception"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 42,
+      "nombre": "ignorance",
+      "discovered": true,
+      "confidence": 0.36,
+      "method": "contrastive",
+      "top_concepts": [
+        "baby",
+        "ignorance",
+        "ignorant",
+        "instinct",
+        "open",
+        "reality",
+        "shadow",
+        "sharp",
+        "time",
+        "utopia"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 43,
+      "nombre": "wind",
+      "discovered": true,
+      "confidence": 0.41,
+      "method": "contrastive",
+      "top_concepts": [
+        "adventure",
+        "artifice",
+        "ignorance",
+        "illusion",
+        "imagination",
+        "indifference",
+        "peace",
+        "resistance",
+        "selfishness",
+        "warm"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 44,
+      "nombre": "bear",
+      "discovered": true,
+      "confidence": 0.259,
+      "method": "contrastive",
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "anti_concepts": [
+        "envy",
+        "winter"
+      ]
+    },
+    {
+      "bit": 45,
+      "nombre": "old",
+      "discovered": true,
+      "confidence": 0.398,
+      "method": "contrastive",
+      "top_concepts": [
+        "adventure",
+        "corruption",
+        "excited",
+        "fish",
+        "forest",
+        "gold",
+        "ignorance",
+        "instinct",
+        "old",
+        "rage"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 46,
+      "nombre": "open",
+      "discovered": true,
+      "confidence": 0.358,
+      "method": "contrastive",
+      "top_concepts": [
+        "adventure",
+        "comfort",
+        "fast",
+        "nervous",
+        "old",
+        "open",
+        "reality"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 48,
+      "nombre": "bad",
+      "discovered": true,
+      "confidence": 0.294,
+      "method": "contrastive",
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "anti_concepts": [
+        "bridge",
+        "bright",
+        "brother",
+        "chaos",
+        "day"
+      ]
+    },
+    {
+      "bit": 49,
+      "nombre": "bad",
+      "discovered": true,
+      "confidence": 0.674,
+      "method": "contrastive",
+      "top_concepts": [
+        "adventure",
+        "anxiety",
+        "artifice",
+        "baby",
+        "bad",
+        "big",
+        "birth",
+        "bitter",
+        "black",
+        "blue"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 50,
+      "nombre": "anarchy",
+      "discovered": true,
+      "confidence": 0.506,
+      "method": "contrastive",
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "anti_concepts": [
+        "adventure",
+        "reality",
+        "scared"
+      ]
+    },
+    {
+      "bit": 51,
+      "nombre": "river",
+      "discovered": true,
+      "confidence": 0.304,
+      "method": "contrastive",
+      "top_concepts": [
+        "adventure",
+        "arrogance",
+        "day",
+        "full",
+        "hide",
+        "horse",
+        "ignorance",
+        "imagination",
+        "river",
+        "selfishness"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 53,
+      "nombre": "open",
+      "discovered": true,
+      "confidence": 0.377,
+      "method": "contrastive",
+      "top_concepts": [
+        "bad",
+        "day",
+        "full",
+        "instinct",
+        "open",
+        "rage",
+        "reason",
+        "revenge",
+        "river",
+        "sad"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 58,
+      "nombre": "open",
+      "discovered": true,
+      "confidence": 0.261,
+      "method": "contrastive",
+      "top_concepts": [
+        "adventure",
+        "artifice",
+        "ecstasy",
+        "fast",
+        "ignorance",
+        "imagination",
+        "indifference",
+        "instinct",
+        "old",
+        "open"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 61,
+      "nombre": "anarchy",
+      "discovered": true,
+      "confidence": 0.465,
+      "method": "contrastive",
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "anti_concepts": [
+        "alive",
+        "bridge",
+        "bright",
+        "day",
+        "fish"
+      ]
+    },
+    {
+      "bit": 62,
+      "nombre": "gas",
+      "discovered": true,
+      "confidence": 0.265,
+      "method": "contrastive",
+      "top_concepts": [
+        "apathy",
+        "artifice",
+        "ball",
+        "corruption",
+        "decay",
+        "dependence",
+        "ecstasy",
+        "excited",
+        "fast",
+        "flow"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    }
+  ]
+}

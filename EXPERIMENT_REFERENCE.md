@@ -840,17 +840,17 @@ Token-level sep ratio 1.02 → sentence-level **1.21 (+19%)**. Best: family (1.4
 | L3: Blind prime assignment | PASS (vacuous) | 03-19 |
 | F0: Data validation | 93.7% bit acc | 03-19 |
 
-### Book Corrections Pending (L4-L10)
+### Book Corrections (L4-L10)
 
-| Line | Correction | Status |
-|---|---|---|
-| L4 | "40M" → "~20M" params threshold | TODO |
-| L5 | Rewrite "8x compression" (refuted by E6) | TODO |
-| L6 | Locate source for "108,694 discrepancies" | TODO |
-| L7 | Update "69.2%" → 98% analogies | TODO |
-| L8 | Add Placer/Dolor to primitives | TODO |
-| L9 | Include new results (iFSQ, BitNet, R3, composition) | TODO |
-| L10 | Document zeros→0% collapse at 355M | TODO |
+| Line | Correction | Evidence | Status |
+|---|---|---|---|
+| L4 | "40M" → "~20M" params threshold | E5: gap crosses zero at ~20M params, gradual crossover (NOT phase transition). Run 15 (40M) and scale interpolation confirm. | **READY** — use ~20M |
+| L5 | Rewrite "8x compression" claim | E6 REFUTED: both triadic and raw are near-random for compression. Correct claim: "no PPL cost" (+2% PPL per B2), NOT "8x no info loss". | **READY** — replace with "no language cost" |
+| L6 | Locate source for "108,694 discrepancies" | From Engine's original prime-factor audit on WordNet concepts. The number represents prime assignments that fail algebraic consistency when checked against human-labeled ontological relations. Exact source: `Triadic-Neurosymbolic-Engine` audit logs. | **READY** — cite Engine repo |
+| L7 | Update "69.2%" → 98% analogies | E3: 98% verification on 51 quads (revised UP from 69.2% on 13 quads). Discovery ~0%. Paper already updated. | **READY** — use 98% (51 quads) |
+| L8 | Add Placer/Dolor to primitives | reptimeline D-A14 v2: placer/dolor dual = 1.00 coherence (strongest axis). vida/muerte = 0.91. 9 total duals discovered. See `reptimeline/results/d_a14_v2_discovery.json`. | **READY** — duals confirmed by model |
+| L9 | Include new results (iFSQ, BitNet, R3, composition) | iFSQ: D-A16 93.2% (tied best). BitNet connection: ternary {-1,0,+1} = same as BitNet 1.58-bit. R3: dead at k=64, alive at k=6-12 but destroys gap. Composition: 100% by construction (bitwise OR). | **READY** — 4 results to add |
+| L10 | Document zeros→0% collapse at 355M | D-A17: 97.7% bit accuracy BUT 1.7% subsumption. Ternary zeros collapsed 41.3%→3.4%. ~42% sparsity is structurally necessary for `(A&B)==B` to work. More params ≠ better algebra. | **READY** — key finding for book |
 
 ### Pending Tests — Before Publication
 
@@ -862,10 +862,10 @@ Token-level sep ratio 1.02 → sentence-level **1.21 (+19%)**. Best: family (1.4
 |---|---|---|---|---|---|
 | **D-A17** | GPT-2 355M + v2 anchors | `playground/gpt2_medium_ternary.py --v2` | Fair 355M scaling comparison (D-A13 only had v1 anchors) | ~4.8h GPU | **COMPLETE** — 97.7% bit, 1.7% sub, 26 dead. Algebra destroyed at scale. |
 | **D-A17-eval** | Formal eval on D-A17 | `playground/audit_tests/test_d_a13_eval.py --v2` | Does v2 fix the algebra failure at 355M? **NO — 1.7% sub** | 5 min GPU | **COMPLETE** — ternary zeros collapsed (3.4% vs 41.3%), subsumption unsatisfiable |
-| **Paper 5.4** | Revise subsumption section | — | Honest reporting: 40M=98.3%, 355M v1=9-20%, 355M v2=? | 1h writing | BLOCKED by D-A17-eval |
-| **Paper 6** | Revise discussion section | — | 355M scaling narrative depends on D-A17 results | 1h writing | BLOCKED by D-A17-eval |
+| **Paper 5.4** | Revise subsumption section | — | Honest reporting: 40M=98.3%, 355M=1.7%. Ternary zeros collapse. | 1h writing | **DONE** (2026-03-19) |
+| **Paper 6** | Revise discussion section | — | Scaling destroys algebra (ternary zeros 41.3%→3.4%). Discovery loop added. | 1h writing | **DONE** (2026-03-19) |
 
-**D-A17 status** (updated 2026-03-19): Training RUNNING — step 32,500/50,000. Test accuracy 91.6%, 26 dead bits, sub train 99.9%. Eval script adapted with `--v2` flag (`test_d_a13_eval.py --v2`). Checkpoint dir: `danza_gpt2medium_ternary_v2/`.
+**D-A17 status** (updated 2026-03-20): **COMPLETE** — 97.7% bit accuracy, 1.7% subsumption, 26 dead bits. Algebra destroyed at scale (ternary zeros collapsed from 41.3%→3.4%). Formal eval done. Paper sections 5.4, 5.8, 6 updated with honest results. Checkpoint dir: `danza_gpt2medium_ternary_v2/`.
 
 #### Tier 1: Valuable (strengthens paper, not blocking)
 
@@ -890,7 +890,7 @@ L17: Categorical bits architecture (own paper) | L18: Semantic compositions dept
 | Q4 hardcoded `cat5_start=28` | `test_pf_bridge.py` | Uses actual `ejes_duales` from primitivos.json (12 real dual pairs) | **FIXED** |
 | Q5 `bit_idx // 7` categories | `test_pf_bridge.py` | Builds categories from actual `capa` field | **FIXED** |
 | Q6 wrong observer bits (56-62) | `test_pf_bridge.py` | Uses real bits: consciente(36), ausente(37), temporal_obs(38), eterno_obs(39), receptivo(42), creador_obs(43) | **FIXED** |
-| Hardcoded tokenizer paths | `src/auditor.py`, `src/test_generalization.py` | Parameterize | PENDING |
+| Hardcoded tokenizer paths | `src/auditor.py`, `src/test_generalization.py` | Migrated to BitwiseMapper + argparse | **FIXED** |
 
 ---
 
@@ -1018,7 +1018,7 @@ Run the full audit battery on D-A18:
 | Phase | Task | Depends on | GPU | Status |
 |---|---|---|---|---|
 | 1 | Write `unified_final.py` | — | No | **DONE** |
-| 2 | Train D-A18 | Phase 1 | **Yes** | READY (run `playground/unified_final.py --scale xl --steps 50000`) |
+| 2 | Train D-A18 | Phase 1 | **Yes** | **IN PROGRESS** (launched 2026-03-20, `playground/unified_final.py --scale xl --steps 50000 --dtype bfloat16`) |
 | 3 | BitwiseValidator default | — | No | **DONE** (critical paths migrated) |
 | 4 | D-A18 eval + reptimeline | Phase 2 | Partial | BLOCKED by Phase 2 |
 | 5a | D-A17 training | — | **Yes** | **DONE** (97.7% bit, 1.7% sub) |

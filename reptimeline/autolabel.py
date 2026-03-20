@@ -291,7 +291,7 @@ class AutoLabeler:
                 'confidence': round(bl.confidence, 3),
                 'method': bl.method,
                 'top_concepts': bl.active_concepts[:10],
-                'anti_concepts': bl.anti_concepts[:5],
+                'anti_concepts': bl.inactive_concepts[:5],
             })
 
         data = {

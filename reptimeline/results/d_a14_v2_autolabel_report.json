@@ -1,0 +1,4050 @@
+{
+  "model": "D-A14 v2 tanh (93% test, 98.3% sub)",
+  "checkpoint": "C:\\Github\\triadic-microgpt\\checkpoints\\danza_63bit_xl_v2\\model_best.pt",
+  "n_concepts_analyzed": 302,
+  "n_active_bits": 49,
+  "n_dead_bits": 14,
+  "n_duals": 14,
+  "n_dependencies": 526,
+  "n_triadic_interactions": 328,
+  "labels_embedding": [
+    {
+      "bit": 0,
+      "label": "hate",
+      "confidence": 0.596,
+      "active_concepts": [
+        "alive",
+        "artifice",
+        "dependence",
+        "dirty",
+        "dystopia",
+        "enlightenment",
+        "evil",
+        "fast",
+        "flow",
+        "good"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 1,
+      "label": "anarchy",
+      "confidence": 0.686,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "inactive_concepts": [
+        "illusion",
+        "play",
+        "red",
+        "sweet",
+        "village"
+      ]
+    },
+    {
+      "bit": 2,
+      "label": "anarchy",
+      "confidence": 0.686,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "inactive_concepts": []
+    },
+    {
+      "bit": 3,
+      "label": "bad",
+      "confidence": 0.714,
+      "active_concepts": [
+        "adventure",
+        "alive",
+        "arrogance",
+        "bad",
+        "betrayal",
+        "boy",
+        "break",
+        "build",
+        "butterfly",
+        "compassion"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "anarchy",
+        "angry",
+        "anxiety"
+      ]
+    },
+    {
+      "bit": 4,
+      "label": "hard",
+      "confidence": 0.625,
+      "active_concepts": [
+        "alive",
+        "bird",
+        "butterfly",
+        "capitalism",
+        "deep",
+        "discord",
+        "distraction",
+        "dry",
+        "enlightenment",
+        "envy"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 5,
+      "label": "house",
+      "confidence": 0.592,
+      "active_concepts": [
+        "apathy",
+        "artifice",
+        "ecstasy",
+        "fast",
+        "full",
+        "hide",
+        "home",
+        "house",
+        "humility",
+        "imagination"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 6,
+      "label": "rebellion",
+      "confidence": 0.541,
+      "active_concepts": [
+        "adventure",
+        "bad",
+        "book",
+        "cold",
+        "happy",
+        "hate",
+        "illusion",
+        "intuition",
+        "kind",
+        "king"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 7,
+      "label": "anarchy",
+      "confidence": 0.686,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "inactive_concepts": [
+        "bridge",
+        "bright",
+        "brother",
+        "chaos",
+        "child"
+      ]
+    },
+    {
+      "bit": 8,
+      "label": "anarchy",
+      "confidence": 0.701,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "inactive_concepts": [
+        "adventure",
+        "death",
+        "deep",
+        "fish",
+        "instinct"
+      ]
+    },
+    {
+      "bit": 9,
+      "label": "envy",
+      "confidence": 0.529,
+      "active_concepts": [
+        "adventure",
+        "alive",
+        "break",
+        "butterfly",
+        "envy",
+        "home",
+        "illusion",
+        "man",
+        "old",
+        "open"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "anarchy",
+        "angry",
+        "anxiety"
+      ]
+    },
+    {
+      "bit": 10,
+      "label": "anarchy",
+      "confidence": 0.669,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "arrogance",
+        "artifice",
+        "authenticity",
+        "baby"
+      ],
+      "inactive_concepts": [
+        "adventure",
+        "apathy",
+        "bridge",
+        "bright",
+        "brother"
+      ]
+    },
+    {
+      "bit": 11,
+      "label": "anarchy",
+      "confidence": 0.665,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "arrogance",
+        "artifice",
+        "authenticity",
+        "baby"
+      ],
+      "inactive_concepts": [
+        "alive",
+        "apathy",
+        "bridge",
+        "bright",
+        "brother"
+      ]
+    },
+    {
+      "bit": 12,
+      "label": "anarchy",
+      "confidence": 0.663,
+      "active_concepts": [
+        "abundance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "inactive_concepts": [
+        "acceptance",
+        "beauty",
+        "bridge",
+        "bright",
+        "brother"
+      ]
+    },
+    {
+      "bit": 13,
+      "label": "big",
+      "confidence": 0.758,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "angry",
+        "artifice",
+        "authenticity",
+        "baby",
+        "bad",
+        "ball"
+      ],
+      "inactive_concepts": [
+        "anarchy",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "bear"
+      ]
+    },
+    {
+      "bit": 14,
+      "label": "weak",
+      "confidence": 0.641,
+      "active_concepts": [
+        "alive",
+        "artifice",
+        "illusion",
+        "king",
+        "man",
+        "peace",
+        "reason",
+        "silence",
+        "warm",
+        "weak"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 15,
+      "label": "day",
+      "confidence": 0.478,
+      "active_concepts": [
+        "apathy",
+        "dance",
+        "day",
+        "full",
+        "home",
+        "humility",
+        "imagination",
+        "instinct",
+        "reason",
+        "rich"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 16,
+      "label": "open",
+      "confidence": 0.597,
+      "active_concepts": [
+        "adventure",
+        "alive",
+        "day",
+        "ecstasy",
+        "enlightenment",
+        "envy",
+        "open",
+        "scared",
+        "selfishness"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "anarchy",
+        "angry",
+        "anxiety"
+      ]
+    },
+    {
+      "bit": 18,
+      "label": "sword",
+      "confidence": 0.417,
+      "active_concepts": [
+        "alive",
+        "apathy",
+        "arrogance",
+        "comfort",
+        "fast",
+        "full",
+        "illusion",
+        "imagination",
+        "old",
+        "rage"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 19,
+      "label": "doubt",
+      "confidence": 0.618,
+      "active_concepts": [
+        "artifice",
+        "dog",
+        "doubt",
+        "dry",
+        "gift",
+        "humble",
+        "ignorant",
+        "logic",
+        "logical",
+        "man"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 20,
+      "label": "envy",
+      "confidence": 0.558,
+      "active_concepts": [
+        "adventure",
+        "calm",
+        "enlightenment",
+        "envy",
+        "fish",
+        "illusion",
+        "indifference",
+        "open",
+        "rage",
+        "reason"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 22,
+      "label": "anarchy",
+      "confidence": 0.686,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "inactive_concepts": [
+        "bridge",
+        "bright",
+        "brother",
+        "butterfly",
+        "child"
+      ]
+    },
+    {
+      "bit": 23,
+      "label": "boy",
+      "confidence": 0.623,
+      "active_concepts": [
+        "authenticity",
+        "bad",
+        "book",
+        "boy",
+        "butterfly",
+        "cheerful",
+        "dead",
+        "dystopia",
+        "fear",
+        "find"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 24,
+      "label": "anarchy",
+      "confidence": 0.682,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "inactive_concepts": [
+        "apathy",
+        "bridge",
+        "bright",
+        "brother",
+        "faith"
+      ]
+    },
+    {
+      "bit": 25,
+      "label": "big",
+      "confidence": 0.783,
+      "active_concepts": [
+        "abundance",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "arrogance",
+        "artifice",
+        "baby",
+        "bad",
+        "betrayal"
+      ],
+      "inactive_concepts": [
+        "acceptance",
+        "adventure",
+        "apathy",
+        "authenticity",
+        "ball"
+      ]
+    },
+    {
+      "bit": 26,
+      "label": "doubt",
+      "confidence": 0.582,
+      "active_concepts": [
+        "adventure",
+        "alive",
+        "bad",
+        "butterfly",
+        "confusion",
+        "discord",
+        "distraction",
+        "dream",
+        "dystopia",
+        "envy"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "anarchy",
+        "angry",
+        "anxiety"
+      ]
+    },
+    {
+      "bit": 27,
+      "label": "anarchy",
+      "confidence": 0.693,
+      "active_concepts": [
+        "abundance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "inactive_concepts": [
+        "acceptance",
+        "boat",
+        "bridge",
+        "bright",
+        "brother"
+      ]
+    },
+    {
+      "bit": 28,
+      "label": "hard",
+      "confidence": 0.571,
+      "active_concepts": [
+        "adventure",
+        "apathy",
+        "cold",
+        "comfort",
+        "enlightenment",
+        "envy",
+        "fish",
+        "happy",
+        "harmony",
+        "horse"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 30,
+      "label": "cold",
+      "confidence": 0.533,
+      "active_concepts": [
+        "artifice",
+        "betrayal",
+        "boat",
+        "break",
+        "cold",
+        "comfort",
+        "creation",
+        "ecstasy",
+        "excited",
+        "fish"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 31,
+      "label": "blue",
+      "confidence": 0.769,
+      "active_concepts": [
+        "abundance",
+        "betrayal",
+        "bird",
+        "birth",
+        "bitter",
+        "black",
+        "blue",
+        "boat",
+        "book",
+        "break"
+      ],
+      "inactive_concepts": [
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 32,
+      "label": "abundance",
+      "confidence": 0.626,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "inactive_concepts": [
+        "bear",
+        "beauty",
+        "bridge",
+        "bright",
+        "brother"
+      ]
+    },
+    {
+      "bit": 33,
+      "label": "envy",
+      "confidence": 0.572,
+      "active_concepts": [
+        "apathy",
+        "artifice",
+        "curiosity",
+        "dystopia",
+        "enlightenment",
+        "envy",
+        "fast",
+        "generosity",
+        "instinct",
+        "open"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 34,
+      "label": "wet",
+      "confidence": 0.699,
+      "active_concepts": [
+        "apathy",
+        "despair",
+        "dry",
+        "warm",
+        "wet",
+        "white",
+        "wind",
+        "winter",
+        "wisdom",
+        "wolf"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 35,
+      "label": "greed",
+      "confidence": 0.568,
+      "active_concepts": [
+        "apathy",
+        "comfort",
+        "corruption",
+        "day",
+        "enlightenment",
+        "envy",
+        "family",
+        "fast",
+        "forgiveness",
+        "full"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 36,
+      "label": "big",
+      "confidence": 0.725,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "angry",
+        "anxiety",
+        "artifice",
+        "authenticity",
+        "baby",
+        "bad"
+      ],
+      "inactive_concepts": [
+        "anarchy",
+        "apathy",
+        "arrogance",
+        "bear",
+        "beauty"
+      ]
+    },
+    {
+      "bit": 37,
+      "label": "war",
+      "confidence": 0.694,
+      "active_concepts": [
+        "apathy",
+        "enlightenment",
+        "fast",
+        "fish",
+        "full",
+        "illusion",
+        "night",
+        "obsession",
+        "war",
+        "warm"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 40,
+      "label": "bad",
+      "confidence": 0.732,
+      "active_concepts": [
+        "bad",
+        "big",
+        "bird",
+        "birth",
+        "blue",
+        "book",
+        "capitalism",
+        "contamination",
+        "dead",
+        "deception"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 42,
+      "label": "sharp",
+      "confidence": 0.466,
+      "active_concepts": [
+        "baby",
+        "ignorance",
+        "ignorant",
+        "instinct",
+        "open",
+        "reality",
+        "shadow",
+        "sharp",
+        "time",
+        "utopia"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 43,
+      "label": "wind",
+      "confidence": 0.745,
+      "active_concepts": [
+        "adventure",
+        "artifice",
+        "ignorance",
+        "illusion",
+        "imagination",
+        "indifference",
+        "peace",
+        "resistance",
+        "selfishness",
+        "warm"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 44,
+      "label": "anarchy",
+      "confidence": 0.686,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "inactive_concepts": [
+        "envy",
+        "winter"
+      ]
+    },
+    {
+      "bit": 45,
+      "label": "gold",
+      "confidence": 0.634,
+      "active_concepts": [
+        "adventure",
+        "corruption",
+        "excited",
+        "fish",
+        "forest",
+        "gold",
+        "ignorance",
+        "instinct",
+        "old",
+        "rage"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 46,
+      "label": "fast",
+      "confidence": 0.548,
+      "active_concepts": [
+        "adventure",
+        "comfort",
+        "fast",
+        "nervous",
+        "old",
+        "open",
+        "reality"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 48,
+      "label": "anarchy",
+      "confidence": 0.686,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "inactive_concepts": [
+        "bridge",
+        "bright",
+        "brother",
+        "chaos",
+        "day"
+      ]
+    },
+    {
+      "bit": 49,
+      "label": "big",
+      "confidence": 0.821,
+      "active_concepts": [
+        "adventure",
+        "anxiety",
+        "artifice",
+        "baby",
+        "bad",
+        "big",
+        "birth",
+        "bitter",
+        "black",
+        "blue"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 50,
+      "label": "anarchy",
+      "confidence": 0.701,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "inactive_concepts": [
+        "adventure",
+        "reality",
+        "scared"
+      ]
+    },
+    {
+      "bit": 51,
+      "label": "white",
+      "confidence": 0.569,
+      "active_concepts": [
+        "adventure",
+        "arrogance",
+        "day",
+        "full",
+        "hide",
+        "horse",
+        "ignorance",
+        "imagination",
+        "river",
+        "selfishness"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 53,
+      "label": "sad",
+      "confidence": 0.538,
+      "active_concepts": [
+        "bad",
+        "day",
+        "full",
+        "instinct",
+        "open",
+        "rage",
+        "reason",
+        "revenge",
+        "river",
+        "sad"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 58,
+      "label": "fast",
+      "confidence": 0.48,
+      "active_concepts": [
+        "adventure",
+        "artifice",
+        "ecstasy",
+        "fast",
+        "ignorance",
+        "imagination",
+        "indifference",
+        "instinct",
+        "old",
+        "open"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 61,
+      "label": "anarchy",
+      "confidence": 0.694,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "inactive_concepts": [
+        "alive",
+        "bridge",
+        "bright",
+        "day",
+        "fish"
+      ]
+    },
+    {
+      "bit": 62,
+      "label": "gas",
+      "confidence": 0.58,
+      "active_concepts": [
+        "apathy",
+        "artifice",
+        "ball",
+        "corruption",
+        "decay",
+        "dependence",
+        "ecstasy",
+        "excited",
+        "fast",
+        "flow"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    }
+  ],
+  "labels_contrastive": [
+    {
+      "bit": 0,
+      "label": "man",
+      "confidence": 0.275,
+      "active_concepts": [
+        "alive",
+        "artifice",
+        "dependence",
+        "dirty",
+        "dystopia",
+        "enlightenment",
+        "evil",
+        "fast",
+        "flow",
+        "good"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 1,
+      "label": "abundance",
+      "confidence": 0.332,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "inactive_concepts": [
+        "illusion",
+        "play",
+        "red",
+        "sweet",
+        "village"
+      ]
+    },
+    {
+      "bit": 2,
+      "label": "bit_2",
+      "confidence": 0.0,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "inactive_concepts": []
+    },
+    {
+      "bit": 3,
+      "label": "alive",
+      "confidence": 0.289,
+      "active_concepts": [
+        "adventure",
+        "alive",
+        "arrogance",
+        "bad",
+        "betrayal",
+        "boy",
+        "break",
+        "build",
+        "butterfly",
+        "compassion"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "anarchy",
+        "angry",
+        "anxiety"
+      ]
+    },
+    {
+      "bit": 4,
+      "label": "home",
+      "confidence": 0.382,
+      "active_concepts": [
+        "alive",
+        "bird",
+        "butterfly",
+        "capitalism",
+        "deep",
+        "discord",
+        "distraction",
+        "dry",
+        "enlightenment",
+        "envy"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 5,
+      "label": "humility",
+      "confidence": 0.356,
+      "active_concepts": [
+        "apathy",
+        "artifice",
+        "ecstasy",
+        "fast",
+        "full",
+        "hide",
+        "home",
+        "house",
+        "humility",
+        "imagination"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 6,
+      "label": "happy",
+      "confidence": 0.314,
+      "active_concepts": [
+        "adventure",
+        "bad",
+        "book",
+        "cold",
+        "happy",
+        "hate",
+        "illusion",
+        "intuition",
+        "kind",
+        "king"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 7,
+      "label": "bad",
+      "confidence": 0.24,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "inactive_concepts": [
+        "bridge",
+        "bright",
+        "brother",
+        "chaos",
+        "child"
+      ]
+    },
+    {
+      "bit": 8,
+      "label": "bear",
+      "confidence": 0.468,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "inactive_concepts": [
+        "adventure",
+        "death",
+        "deep",
+        "fish",
+        "instinct"
+      ]
+    },
+    {
+      "bit": 9,
+      "label": "reality",
+      "confidence": 0.291,
+      "active_concepts": [
+        "adventure",
+        "alive",
+        "break",
+        "butterfly",
+        "envy",
+        "home",
+        "illusion",
+        "man",
+        "old",
+        "open"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "anarchy",
+        "angry",
+        "anxiety"
+      ]
+    },
+    {
+      "bit": 10,
+      "label": "anxiety",
+      "confidence": 0.318,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "arrogance",
+        "artifice",
+        "authenticity",
+        "baby"
+      ],
+      "inactive_concepts": [
+        "adventure",
+        "apathy",
+        "bridge",
+        "bright",
+        "brother"
+      ]
+    },
+    {
+      "bit": 11,
+      "label": "bear",
+      "confidence": 0.413,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "arrogance",
+        "artifice",
+        "authenticity",
+        "baby"
+      ],
+      "inactive_concepts": [
+        "alive",
+        "apathy",
+        "bridge",
+        "bright",
+        "brother"
+      ]
+    },
+    {
+      "bit": 12,
+      "label": "angry",
+      "confidence": 0.253,
+      "active_concepts": [
+        "abundance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "inactive_concepts": [
+        "acceptance",
+        "beauty",
+        "bridge",
+        "bright",
+        "brother"
+      ]
+    },
+    {
+      "bit": 13,
+      "label": "bad",
+      "confidence": 0.521,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "angry",
+        "artifice",
+        "authenticity",
+        "baby",
+        "bad",
+        "ball"
+      ],
+      "inactive_concepts": [
+        "anarchy",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "bear"
+      ]
+    },
+    {
+      "bit": 14,
+      "label": "wind",
+      "confidence": 0.38,
+      "active_concepts": [
+        "alive",
+        "artifice",
+        "illusion",
+        "king",
+        "man",
+        "peace",
+        "reason",
+        "silence",
+        "warm",
+        "weak"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 15,
+      "label": "river",
+      "confidence": 0.415,
+      "active_concepts": [
+        "apathy",
+        "dance",
+        "day",
+        "full",
+        "home",
+        "humility",
+        "imagination",
+        "instinct",
+        "reason",
+        "rich"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 16,
+      "label": "open",
+      "confidence": 0.44,
+      "active_concepts": [
+        "adventure",
+        "alive",
+        "day",
+        "ecstasy",
+        "enlightenment",
+        "envy",
+        "open",
+        "scared",
+        "selfishness"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "anarchy",
+        "angry",
+        "anxiety"
+      ]
+    },
+    {
+      "bit": 18,
+      "label": "alive",
+      "confidence": 0.24,
+      "active_concepts": [
+        "alive",
+        "apathy",
+        "arrogance",
+        "comfort",
+        "fast",
+        "full",
+        "illusion",
+        "imagination",
+        "old",
+        "rage"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 19,
+      "label": "dog",
+      "confidence": 0.307,
+      "active_concepts": [
+        "artifice",
+        "dog",
+        "doubt",
+        "dry",
+        "gift",
+        "humble",
+        "ignorant",
+        "logic",
+        "logical",
+        "man"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 20,
+      "label": "open",
+      "confidence": 0.324,
+      "active_concepts": [
+        "adventure",
+        "calm",
+        "enlightenment",
+        "envy",
+        "fish",
+        "illusion",
+        "indifference",
+        "open",
+        "rage",
+        "reason"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 22,
+      "label": "bear",
+      "confidence": 0.304,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "inactive_concepts": [
+        "bridge",
+        "bright",
+        "brother",
+        "butterfly",
+        "child"
+      ]
+    },
+    {
+      "bit": 23,
+      "label": "help",
+      "confidence": 0.45,
+      "active_concepts": [
+        "authenticity",
+        "bad",
+        "book",
+        "boy",
+        "butterfly",
+        "cheerful",
+        "dead",
+        "dystopia",
+        "fear",
+        "find"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 24,
+      "label": "bad",
+      "confidence": 0.299,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "inactive_concepts": [
+        "apathy",
+        "bridge",
+        "bright",
+        "brother",
+        "faith"
+      ]
+    },
+    {
+      "bit": 25,
+      "label": "bad",
+      "confidence": 0.541,
+      "active_concepts": [
+        "abundance",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "arrogance",
+        "artifice",
+        "baby",
+        "bad",
+        "betrayal"
+      ],
+      "inactive_concepts": [
+        "acceptance",
+        "adventure",
+        "apathy",
+        "authenticity",
+        "ball"
+      ]
+    },
+    {
+      "bit": 26,
+      "label": "humility",
+      "confidence": 0.317,
+      "active_concepts": [
+        "adventure",
+        "alive",
+        "bad",
+        "butterfly",
+        "confusion",
+        "discord",
+        "distraction",
+        "dream",
+        "dystopia",
+        "envy"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "anarchy",
+        "angry",
+        "anxiety"
+      ]
+    },
+    {
+      "bit": 27,
+      "label": "bad",
+      "confidence": 0.325,
+      "active_concepts": [
+        "abundance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "inactive_concepts": [
+        "acceptance",
+        "boat",
+        "bridge",
+        "bright",
+        "brother"
+      ]
+    },
+    {
+      "bit": 28,
+      "label": "fish",
+      "confidence": 0.317,
+      "active_concepts": [
+        "adventure",
+        "apathy",
+        "cold",
+        "comfort",
+        "enlightenment",
+        "envy",
+        "fish",
+        "happy",
+        "harmony",
+        "horse"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 30,
+      "label": "fish",
+      "confidence": 0.327,
+      "active_concepts": [
+        "artifice",
+        "betrayal",
+        "boat",
+        "break",
+        "cold",
+        "comfort",
+        "creation",
+        "ecstasy",
+        "excited",
+        "fish"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 31,
+      "label": "blue",
+      "confidence": 0.602,
+      "active_concepts": [
+        "abundance",
+        "betrayal",
+        "bird",
+        "birth",
+        "bitter",
+        "black",
+        "blue",
+        "boat",
+        "book",
+        "break"
+      ],
+      "inactive_concepts": [
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 32,
+      "label": "betrayal",
+      "confidence": 0.29,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "inactive_concepts": [
+        "bear",
+        "beauty",
+        "bridge",
+        "bright",
+        "brother"
+      ]
+    },
+    {
+      "bit": 33,
+      "label": "open",
+      "confidence": 0.427,
+      "active_concepts": [
+        "apathy",
+        "artifice",
+        "curiosity",
+        "dystopia",
+        "enlightenment",
+        "envy",
+        "fast",
+        "generosity",
+        "instinct",
+        "open"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 34,
+      "label": "wind",
+      "confidence": 0.54,
+      "active_concepts": [
+        "apathy",
+        "despair",
+        "dry",
+        "warm",
+        "wet",
+        "white",
+        "wind",
+        "winter",
+        "wisdom",
+        "wolf"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 35,
+      "label": "comfort",
+      "confidence": 0.284,
+      "active_concepts": [
+        "apathy",
+        "comfort",
+        "corruption",
+        "day",
+        "enlightenment",
+        "envy",
+        "family",
+        "fast",
+        "forgiveness",
+        "full"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 36,
+      "label": "bad",
+      "confidence": 0.497,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "angry",
+        "anxiety",
+        "artifice",
+        "authenticity",
+        "baby",
+        "bad"
+      ],
+      "inactive_concepts": [
+        "anarchy",
+        "apathy",
+        "arrogance",
+        "bear",
+        "beauty"
+      ]
+    },
+    {
+      "bit": 37,
+      "label": "wind",
+      "confidence": 0.488,
+      "active_concepts": [
+        "apathy",
+        "enlightenment",
+        "fast",
+        "fish",
+        "full",
+        "illusion",
+        "night",
+        "obsession",
+        "war",
+        "warm"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 40,
+      "label": "bad",
+      "confidence": 0.479,
+      "active_concepts": [
+        "bad",
+        "big",
+        "bird",
+        "birth",
+        "blue",
+        "book",
+        "capitalism",
+        "contamination",
+        "dead",
+        "deception"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 42,
+      "label": "ignorance",
+      "confidence": 0.36,
+      "active_concepts": [
+        "baby",
+        "ignorance",
+        "ignorant",
+        "instinct",
+        "open",
+        "reality",
+        "shadow",
+        "sharp",
+        "time",
+        "utopia"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 43,
+      "label": "wind",
+      "confidence": 0.41,
+      "active_concepts": [
+        "adventure",
+        "artifice",
+        "ignorance",
+        "illusion",
+        "imagination",
+        "indifference",
+        "peace",
+        "resistance",
+        "selfishness",
+        "warm"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 44,
+      "label": "bear",
+      "confidence": 0.259,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "inactive_concepts": [
+        "envy",
+        "winter"
+      ]
+    },
+    {
+      "bit": 45,
+      "label": "old",
+      "confidence": 0.398,
+      "active_concepts": [
+        "adventure",
+        "corruption",
+        "excited",
+        "fish",
+        "forest",
+        "gold",
+        "ignorance",
+        "instinct",
+        "old",
+        "rage"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 46,
+      "label": "open",
+      "confidence": 0.358,
+      "active_concepts": [
+        "adventure",
+        "comfort",
+        "fast",
+        "nervous",
+        "old",
+        "open",
+        "reality"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 48,
+      "label": "bad",
+      "confidence": 0.294,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "inactive_concepts": [
+        "bridge",
+        "bright",
+        "brother",
+        "chaos",
+        "day"
+      ]
+    },
+    {
+      "bit": 49,
+      "label": "bad",
+      "confidence": 0.674,
+      "active_concepts": [
+        "adventure",
+        "anxiety",
+        "artifice",
+        "baby",
+        "bad",
+        "big",
+        "birth",
+        "bitter",
+        "black",
+        "blue"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 50,
+      "label": "anarchy",
+      "confidence": 0.506,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "inactive_concepts": [
+        "adventure",
+        "reality",
+        "scared"
+      ]
+    },
+    {
+      "bit": 51,
+      "label": "river",
+      "confidence": 0.304,
+      "active_concepts": [
+        "adventure",
+        "arrogance",
+        "day",
+        "full",
+        "hide",
+        "horse",
+        "ignorance",
+        "imagination",
+        "river",
+        "selfishness"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 53,
+      "label": "open",
+      "confidence": 0.377,
+      "active_concepts": [
+        "bad",
+        "day",
+        "full",
+        "instinct",
+        "open",
+        "rage",
+        "reason",
+        "revenge",
+        "river",
+        "sad"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 58,
+      "label": "open",
+      "confidence": 0.261,
+      "active_concepts": [
+        "adventure",
+        "artifice",
+        "ecstasy",
+        "fast",
+        "ignorance",
+        "imagination",
+        "indifference",
+        "instinct",
+        "old",
+        "open"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 61,
+      "label": "anarchy",
+      "confidence": 0.465,
+      "active_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "inactive_concepts": [
+        "alive",
+        "bridge",
+        "bright",
+        "day",
+        "fish"
+      ]
+    },
+    {
+      "bit": 62,
+      "label": "gas",
+      "confidence": 0.265,
+      "active_concepts": [
+        "apathy",
+        "artifice",
+        "ball",
+        "corruption",
+        "decay",
+        "dependence",
+        "ecstasy",
+        "excited",
+        "fast",
+        "flow"
+      ],
+      "inactive_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    }
+  ],
+  "bit_semantics": [
+    {
+      "bit": 0,
+      "activation_rate": 0.079,
+      "top_concepts": [
+        "alive",
+        "artifice",
+        "dependence",
+        "dirty",
+        "dystopia",
+        "enlightenment",
+        "evil",
+        "fast",
+        "flow",
+        "good"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 1,
+      "activation_rate": 0.983,
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "anti_concepts": [
+        "illusion",
+        "play",
+        "red",
+        "sweet",
+        "village"
+      ]
+    },
+    {
+      "bit": 2,
+      "activation_rate": 1.0,
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "anti_concepts": []
+    },
+    {
+      "bit": 3,
+      "activation_rate": 0.192,
+      "top_concepts": [
+        "adventure",
+        "alive",
+        "arrogance",
+        "bad",
+        "betrayal",
+        "boy",
+        "break",
+        "build",
+        "butterfly",
+        "compassion"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "anarchy",
+        "angry",
+        "anxiety"
+      ]
+    },
+    {
+      "bit": 4,
+      "activation_rate": 0.096,
+      "top_concepts": [
+        "alive",
+        "bird",
+        "butterfly",
+        "capitalism",
+        "deep",
+        "discord",
+        "distraction",
+        "dry",
+        "enlightenment",
+        "envy"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 5,
+      "activation_rate": 0.06,
+      "top_concepts": [
+        "apathy",
+        "artifice",
+        "ecstasy",
+        "fast",
+        "full",
+        "hide",
+        "home",
+        "house",
+        "humility",
+        "imagination"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 6,
+      "activation_rate": 0.043,
+      "top_concepts": [
+        "adventure",
+        "bad",
+        "book",
+        "cold",
+        "happy",
+        "hate",
+        "illusion",
+        "intuition",
+        "kind",
+        "king"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 7,
+      "activation_rate": 0.94,
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "anti_concepts": [
+        "bridge",
+        "bright",
+        "brother",
+        "chaos",
+        "child"
+      ]
+    },
+    {
+      "bit": 8,
+      "activation_rate": 0.97,
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "anti_concepts": [
+        "adventure",
+        "death",
+        "deep",
+        "fish",
+        "instinct"
+      ]
+    },
+    {
+      "bit": 9,
+      "activation_rate": 0.063,
+      "top_concepts": [
+        "adventure",
+        "alive",
+        "break",
+        "butterfly",
+        "envy",
+        "home",
+        "illusion",
+        "man",
+        "old",
+        "open"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "anarchy",
+        "angry",
+        "anxiety"
+      ]
+    },
+    {
+      "bit": 10,
+      "activation_rate": 0.884,
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "arrogance",
+        "artifice",
+        "authenticity",
+        "baby"
+      ],
+      "anti_concepts": [
+        "adventure",
+        "apathy",
+        "bridge",
+        "bright",
+        "brother"
+      ]
+    },
+    {
+      "bit": 11,
+      "activation_rate": 0.927,
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "arrogance",
+        "artifice",
+        "authenticity",
+        "baby"
+      ],
+      "anti_concepts": [
+        "alive",
+        "apathy",
+        "bridge",
+        "bright",
+        "brother"
+      ]
+    },
+    {
+      "bit": 12,
+      "activation_rate": 0.861,
+      "top_concepts": [
+        "abundance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "anti_concepts": [
+        "acceptance",
+        "beauty",
+        "bridge",
+        "bright",
+        "brother"
+      ]
+    },
+    {
+      "bit": 13,
+      "activation_rate": 0.659,
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "angry",
+        "artifice",
+        "authenticity",
+        "baby",
+        "bad",
+        "ball"
+      ],
+      "anti_concepts": [
+        "anarchy",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "bear"
+      ]
+    },
+    {
+      "bit": 14,
+      "activation_rate": 0.046,
+      "top_concepts": [
+        "alive",
+        "artifice",
+        "illusion",
+        "king",
+        "man",
+        "peace",
+        "reason",
+        "silence",
+        "warm",
+        "weak"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 15,
+      "activation_rate": 0.043,
+      "top_concepts": [
+        "apathy",
+        "dance",
+        "day",
+        "full",
+        "home",
+        "humility",
+        "imagination",
+        "instinct",
+        "reason",
+        "rich"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 16,
+      "activation_rate": 0.03,
+      "top_concepts": [
+        "adventure",
+        "alive",
+        "day",
+        "ecstasy",
+        "enlightenment",
+        "envy",
+        "open",
+        "scared",
+        "selfishness"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "anarchy",
+        "angry",
+        "anxiety"
+      ]
+    },
+    {
+      "bit": 17,
+      "activation_rate": 0.007,
+      "top_concepts": [
+        "apathy",
+        "revenge"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 18,
+      "activation_rate": 0.05,
+      "top_concepts": [
+        "alive",
+        "apathy",
+        "arrogance",
+        "comfort",
+        "fast",
+        "full",
+        "illusion",
+        "imagination",
+        "old",
+        "rage"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 19,
+      "activation_rate": 0.07,
+      "top_concepts": [
+        "artifice",
+        "dog",
+        "doubt",
+        "dry",
+        "gift",
+        "humble",
+        "ignorant",
+        "logic",
+        "logical",
+        "man"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 20,
+      "activation_rate": 0.043,
+      "top_concepts": [
+        "adventure",
+        "calm",
+        "enlightenment",
+        "envy",
+        "fish",
+        "illusion",
+        "indifference",
+        "open",
+        "rage",
+        "reason"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 21,
+      "activation_rate": 0.013,
+      "top_concepts": [
+        "authenticity",
+        "indifference",
+        "instinct",
+        "resistance"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 22,
+      "activation_rate": 0.871,
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "anti_concepts": [
+        "bridge",
+        "bright",
+        "brother",
+        "butterfly",
+        "child"
+      ]
+    },
+    {
+      "bit": 23,
+      "activation_rate": 0.113,
+      "top_concepts": [
+        "authenticity",
+        "bad",
+        "book",
+        "boy",
+        "butterfly",
+        "cheerful",
+        "dead",
+        "dystopia",
+        "fear",
+        "find"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 24,
+      "activation_rate": 0.93,
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "anti_concepts": [
+        "apathy",
+        "bridge",
+        "bright",
+        "brother",
+        "faith"
+      ]
+    },
+    {
+      "bit": 25,
+      "activation_rate": 0.278,
+      "top_concepts": [
+        "abundance",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "arrogance",
+        "artifice",
+        "baby",
+        "bad",
+        "betrayal"
+      ],
+      "anti_concepts": [
+        "acceptance",
+        "adventure",
+        "apathy",
+        "authenticity",
+        "ball"
+      ]
+    },
+    {
+      "bit": 26,
+      "activation_rate": 0.126,
+      "top_concepts": [
+        "adventure",
+        "alive",
+        "bad",
+        "butterfly",
+        "confusion",
+        "discord",
+        "distraction",
+        "dream",
+        "dystopia",
+        "envy"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "anarchy",
+        "angry",
+        "anxiety"
+      ]
+    },
+    {
+      "bit": 27,
+      "activation_rate": 0.848,
+      "top_concepts": [
+        "abundance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "anti_concepts": [
+        "acceptance",
+        "boat",
+        "bridge",
+        "bright",
+        "brother"
+      ]
+    },
+    {
+      "bit": 28,
+      "activation_rate": 0.079,
+      "top_concepts": [
+        "adventure",
+        "apathy",
+        "cold",
+        "comfort",
+        "enlightenment",
+        "envy",
+        "fish",
+        "happy",
+        "harmony",
+        "horse"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 29,
+      "activation_rate": 0.003,
+      "top_concepts": [
+        "enlightenment"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 30,
+      "activation_rate": 0.132,
+      "top_concepts": [
+        "artifice",
+        "betrayal",
+        "boat",
+        "break",
+        "cold",
+        "comfort",
+        "creation",
+        "ecstasy",
+        "excited",
+        "fish"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 31,
+      "activation_rate": 0.113,
+      "top_concepts": [
+        "abundance",
+        "betrayal",
+        "bird",
+        "birth",
+        "bitter",
+        "black",
+        "blue",
+        "boat",
+        "book",
+        "break"
+      ],
+      "anti_concepts": [
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 32,
+      "activation_rate": 0.765,
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "anti_concepts": [
+        "bear",
+        "beauty",
+        "bridge",
+        "bright",
+        "brother"
+      ]
+    },
+    {
+      "bit": 33,
+      "activation_rate": 0.053,
+      "top_concepts": [
+        "apathy",
+        "artifice",
+        "curiosity",
+        "dystopia",
+        "enlightenment",
+        "envy",
+        "fast",
+        "generosity",
+        "instinct",
+        "open"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 34,
+      "activation_rate": 0.033,
+      "top_concepts": [
+        "apathy",
+        "despair",
+        "dry",
+        "warm",
+        "wet",
+        "white",
+        "wind",
+        "winter",
+        "wisdom",
+        "wolf"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 35,
+      "activation_rate": 0.076,
+      "top_concepts": [
+        "apathy",
+        "comfort",
+        "corruption",
+        "day",
+        "enlightenment",
+        "envy",
+        "family",
+        "fast",
+        "forgiveness",
+        "full"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 36,
+      "activation_rate": 0.672,
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "angry",
+        "anxiety",
+        "artifice",
+        "authenticity",
+        "baby",
+        "bad"
+      ],
+      "anti_concepts": [
+        "anarchy",
+        "apathy",
+        "arrogance",
+        "bear",
+        "beauty"
+      ]
+    },
+    {
+      "bit": 37,
+      "activation_rate": 0.07,
+      "top_concepts": [
+        "apathy",
+        "enlightenment",
+        "fast",
+        "fish",
+        "full",
+        "illusion",
+        "night",
+        "obsession",
+        "war",
+        "warm"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 38,
+      "activation_rate": 0.017,
+      "top_concepts": [
+        "day",
+        "full",
+        "instinct",
+        "open",
+        "utopia"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 39,
+      "activation_rate": 0.02,
+      "top_concepts": [
+        "family",
+        "full",
+        "impulsiveness",
+        "night",
+        "river",
+        "sweet"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 40,
+      "activation_rate": 0.099,
+      "top_concepts": [
+        "bad",
+        "big",
+        "bird",
+        "birth",
+        "blue",
+        "book",
+        "capitalism",
+        "contamination",
+        "dead",
+        "deception"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 41,
+      "activation_rate": 0.007,
+      "top_concepts": [
+        "ignorance",
+        "revenge"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 42,
+      "activation_rate": 0.033,
+      "top_concepts": [
+        "baby",
+        "ignorance",
+        "ignorant",
+        "instinct",
+        "open",
+        "reality",
+        "shadow",
+        "sharp",
+        "time",
+        "utopia"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 43,
+      "activation_rate": 0.066,
+      "top_concepts": [
+        "adventure",
+        "artifice",
+        "ignorance",
+        "illusion",
+        "imagination",
+        "indifference",
+        "peace",
+        "resistance",
+        "selfishness",
+        "warm"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 44,
+      "activation_rate": 0.993,
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "anti_concepts": [
+        "envy",
+        "winter"
+      ]
+    },
+    {
+      "bit": 45,
+      "activation_rate": 0.043,
+      "top_concepts": [
+        "adventure",
+        "corruption",
+        "excited",
+        "fish",
+        "forest",
+        "gold",
+        "ignorance",
+        "instinct",
+        "old",
+        "rage"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 46,
+      "activation_rate": 0.023,
+      "top_concepts": [
+        "adventure",
+        "comfort",
+        "fast",
+        "nervous",
+        "old",
+        "open",
+        "reality"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 47,
+      "activation_rate": 0.007,
+      "top_concepts": [
+        "fish",
+        "reality"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 48,
+      "activation_rate": 0.897,
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice"
+      ],
+      "anti_concepts": [
+        "bridge",
+        "bright",
+        "brother",
+        "chaos",
+        "day"
+      ]
+    },
+    {
+      "bit": 49,
+      "activation_rate": 0.106,
+      "top_concepts": [
+        "adventure",
+        "anxiety",
+        "artifice",
+        "baby",
+        "bad",
+        "big",
+        "birth",
+        "bitter",
+        "black",
+        "blue"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 50,
+      "activation_rate": 0.99,
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "anti_concepts": [
+        "adventure",
+        "reality",
+        "scared"
+      ]
+    },
+    {
+      "bit": 51,
+      "activation_rate": 0.06,
+      "top_concepts": [
+        "adventure",
+        "arrogance",
+        "day",
+        "full",
+        "hide",
+        "horse",
+        "ignorance",
+        "imagination",
+        "river",
+        "selfishness"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 52,
+      "activation_rate": 0.017,
+      "top_concepts": [
+        "envy",
+        "old",
+        "rage",
+        "rebellion",
+        "sweet"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 53,
+      "activation_rate": 0.053,
+      "top_concepts": [
+        "bad",
+        "day",
+        "full",
+        "instinct",
+        "open",
+        "rage",
+        "reason",
+        "revenge",
+        "river",
+        "sad"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 54,
+      "activation_rate": 0.01,
+      "top_concepts": [
+        "adventure",
+        "alive",
+        "open"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "anarchy",
+        "angry",
+        "anxiety"
+      ]
+    },
+    {
+      "bit": 55,
+      "activation_rate": 0.0,
+      "top_concepts": [],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 56,
+      "activation_rate": 0.007,
+      "top_concepts": [
+        "order",
+        "resistance"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 57,
+      "activation_rate": 0.013,
+      "top_concepts": [
+        "comfort",
+        "curiosity",
+        "order",
+        "sweet"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 58,
+      "activation_rate": 0.04,
+      "top_concepts": [
+        "adventure",
+        "artifice",
+        "ecstasy",
+        "fast",
+        "ignorance",
+        "imagination",
+        "indifference",
+        "instinct",
+        "old",
+        "open"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "alive",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 59,
+      "activation_rate": 0.02,
+      "top_concepts": [
+        "alive",
+        "ecstasy",
+        "full",
+        "imagination",
+        "purity",
+        "socialism"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry"
+      ]
+    },
+    {
+      "bit": 60,
+      "activation_rate": 0.01,
+      "top_concepts": [
+        "break",
+        "open",
+        "weak"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    },
+    {
+      "bit": 61,
+      "activation_rate": 0.974,
+      "top_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "anarchy",
+        "angry",
+        "anxiety",
+        "apathy",
+        "arrogance",
+        "artifice",
+        "authenticity"
+      ],
+      "anti_concepts": [
+        "alive",
+        "bridge",
+        "bright",
+        "day",
+        "fish"
+      ]
+    },
+    {
+      "bit": 62,
+      "activation_rate": 0.096,
+      "top_concepts": [
+        "apathy",
+        "artifice",
+        "ball",
+        "corruption",
+        "decay",
+        "dependence",
+        "ecstasy",
+        "excited",
+        "fast",
+        "flow"
+      ],
+      "anti_concepts": [
+        "abundance",
+        "acceptance",
+        "adventure",
+        "alive",
+        "anarchy"
+      ]
+    }
+  ],
+  "discovered_duals": [
+    {
+      "bit_a": 47,
+      "bit_b": 61,
+      "anti_correlation": -0.495
+    },
+    {
+      "bit_a": 46,
+      "bit_b": 50,
+      "anti_correlation": -0.428
+    },
+    {
+      "bit_a": 47,
+      "bit_b": 50,
+      "anti_correlation": -0.403
+    },
+    {
+      "bit_a": 22,
+      "bit_b": 23,
+      "anti_correlation": -0.394
+    },
+    {
+      "bit_a": 16,
+      "bit_b": 50,
+      "anti_correlation": -0.375
+    },
+    {
+      "bit_a": 8,
+      "bit_b": 54,
+      "anti_correlation": -0.375
+    },
+    {
+      "bit_a": 8,
+      "bit_b": 58,
+      "anti_correlation": -0.363
+    },
+    {
+      "bit_a": 33,
+      "bit_b": 44,
+      "anti_correlation": -0.345
+    },
+    {
+      "bit_a": 22,
+      "bit_b": 43,
+      "anti_correlation": -0.334
+    },
+    {
+      "bit_a": 50,
+      "bit_b": 54,
+      "anti_correlation": -0.327
+    },
+    {
+      "bit_a": 9,
+      "bit_b": 44,
+      "anti_correlation": -0.315
+    },
+    {
+      "bit_a": 44,
+      "bit_b": 52,
+      "anti_correlation": -0.309
+    },
+    {
+      "bit_a": 8,
+      "bit_b": 33,
+      "anti_correlation": -0.306
+    },
+    {
+      "bit_a": 38,
+      "bit_b": 61,
+      "anti_correlation": -0.302
+    }
+  ],
+  "discovered_triadic": [
+    {
+      "bit_i": 23,
+      "bit_j": 62,
+      "bit_r": 31,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.235,
+      "p_r_j": 0.207,
+      "strength": 0.765,
+      "support": 3
+    },
+    {
+      "bit_i": 3,
+      "bit_j": 37,
+      "bit_r": 35,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.138,
+      "p_r_j": 0.238,
+      "strength": 0.762,
+      "support": 3
+    },
+    {
+      "bit_i": 5,
+      "bit_j": 37,
+      "bit_r": 18,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.278,
+      "p_r_j": 0.19,
+      "strength": 0.722,
+      "support": 3
+    },
+    {
+      "bit_i": 5,
+      "bit_j": 37,
+      "bit_r": 35,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.278,
+      "p_r_j": 0.238,
+      "strength": 0.722,
+      "support": 3
+    },
+    {
+      "bit_i": 5,
+      "bit_j": 40,
+      "bit_r": 35,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.278,
+      "p_r_j": 0.133,
+      "strength": 0.722,
+      "support": 3
+    },
+    {
+      "bit_i": 3,
+      "bit_j": 37,
+      "bit_r": 0,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.155,
+      "p_r_j": 0.286,
+      "strength": 0.714,
+      "support": 3
+    },
+    {
+      "bit_i": 19,
+      "bit_j": 43,
+      "bit_r": 62,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.19,
+      "p_r_j": 0.3,
+      "strength": 0.7,
+      "support": 3
+    },
+    {
+      "bit_i": 30,
+      "bit_j": 43,
+      "bit_r": 62,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.225,
+      "p_r_j": 0.3,
+      "strength": 0.7,
+      "support": 3
+    },
+    {
+      "bit_i": 35,
+      "bit_j": 40,
+      "bit_r": 15,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.304,
+      "p_r_j": 0.167,
+      "strength": 0.696,
+      "support": 4
+    },
+    {
+      "bit_i": 35,
+      "bit_j": 51,
+      "bit_r": 15,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.304,
+      "p_r_j": 0.278,
+      "strength": 0.696,
+      "support": 4
+    },
+    {
+      "bit_i": 20,
+      "bit_j": 31,
+      "bit_r": 23,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.308,
+      "p_r_j": 0.235,
+      "strength": 0.692,
+      "support": 3
+    },
+    {
+      "bit_i": 20,
+      "bit_j": 33,
+      "bit_r": 16,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.308,
+      "p_r_j": 0.188,
+      "strength": 0.692,
+      "support": 3
+    },
+    {
+      "bit_i": 20,
+      "bit_j": 62,
+      "bit_r": 30,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.308,
+      "p_r_j": 0.31,
+      "strength": 0.69,
+      "support": 3
+    },
+    {
+      "bit_i": 33,
+      "bit_j": 62,
+      "bit_r": 5,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.312,
+      "p_r_j": 0.276,
+      "strength": 0.688,
+      "support": 4
+    },
+    {
+      "bit_i": 35,
+      "bit_j": 53,
+      "bit_r": 15,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.304,
+      "p_r_j": 0.312,
+      "strength": 0.688,
+      "support": 5
+    },
+    {
+      "bit_i": 42,
+      "bit_j": 53,
+      "bit_r": 38,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.3,
+      "p_r_j": 0.312,
+      "strength": 0.688,
+      "support": 3
+    },
+    {
+      "bit_i": 9,
+      "bit_j": 30,
+      "bit_r": 31,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.316,
+      "p_r_j": 0.275,
+      "strength": 0.684,
+      "support": 4
+    },
+    {
+      "bit_i": 0,
+      "bit_j": 4,
+      "bit_r": 3,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.375,
+      "p_r_j": 0.241,
+      "strength": 0.625,
+      "support": 4
+    },
+    {
+      "bit_i": 0,
+      "bit_j": 26,
+      "bit_r": 3,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.375,
+      "p_r_j": 0.316,
+      "strength": 0.625,
+      "support": 4
+    },
+    {
+      "bit_i": 0,
+      "bit_j": 35,
+      "bit_r": 3,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.375,
+      "p_r_j": 0.348,
+      "strength": 0.625,
+      "support": 4
+    },
+    {
+      "bit_i": 23,
+      "bit_j": 28,
+      "bit_r": 43,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.176,
+      "p_r_j": 0.375,
+      "strength": 0.625,
+      "support": 4
+    },
+    {
+      "bit_i": 23,
+      "bit_j": 62,
+      "bit_r": 30,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.382,
+      "p_r_j": 0.31,
+      "strength": 0.618,
+      "support": 3
+    },
+    {
+      "bit_i": 15,
+      "bit_j": 23,
+      "bit_r": 53,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.385,
+      "p_r_j": 0.147,
+      "strength": 0.615,
+      "support": 3
+    },
+    {
+      "bit_i": 20,
+      "bit_j": 33,
+      "bit_r": 4,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.385,
+      "p_r_j": 0.312,
+      "strength": 0.615,
+      "support": 3
+    },
+    {
+      "bit_i": 5,
+      "bit_j": 40,
+      "bit_r": 15,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.389,
+      "p_r_j": 0.167,
+      "strength": 0.611,
+      "support": 3
+    },
+    {
+      "bit_i": 23,
+      "bit_j": 51,
+      "bit_r": 37,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.206,
+      "p_r_j": 0.389,
+      "strength": 0.611,
+      "support": 3
+    },
+    {
+      "bit_i": 18,
+      "bit_j": 45,
+      "bit_r": 9,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.4,
+      "p_r_j": 0.308,
+      "strength": 0.6,
+      "support": 3
+    },
+    {
+      "bit_i": 0,
+      "bit_j": 4,
+      "bit_r": 35,
+      "p_r_ij": 0.75,
+      "p_r_i": 0.167,
+      "p_r_j": 0.138,
+      "strength": 0.583,
+      "support": 4
+    },
+    {
+      "bit_i": 0,
+      "bit_j": 26,
+      "bit_r": 25,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.417,
+      "p_r_j": 0.395,
+      "strength": 0.583,
+      "support": 4
+    },
+    {
+      "bit_i": 53,
+      "bit_j": 58,
+      "bit_r": 33,
+      "p_r_ij": 1.0,
+      "p_r_i": 0.25,
+      "p_r_j": 0.417,
+      "strength": 0.583,
+      "support": 3
+    }
+  ]
+}
