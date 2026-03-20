@@ -1,12 +1,12 @@
 """
-Análisis post-entrenamiento del Bootstrap D-A5.
+Post-training analysis of Bootstrap D-A5.
 
-Ejecutar después de que termine el XL:
+Run after the XL training finishes:
   python playground/analyze_bootstrap.py --checkpoint checkpoints/danza_bootstrap_xl/
 
-Genera:
+Generates:
   1. Training curves (loss, bit_acc, dead_bits)
-  2. Per-bit accuracy heatmap (cuáles bits aprende y cuáles no)
+  2. Per-bit accuracy heatmap (which bits it learns and which it doesn't)
   3. Exact vs approximate quads comparison
   4. Success criteria evaluation
   5. Comparison vs base scale and vs D2 full-supervision baseline

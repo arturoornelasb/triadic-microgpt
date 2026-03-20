@@ -1,0 +1,512 @@
+{
+  "test": "EXP-F2.2",
+  "model": "Danza v2 (40M, 158 anchors)",
+  "type_metrics": {
+    "contraries": {
+      "pairs": [
+        {
+          "pair": "hot/cold",
+          "hamming": 17,
+          "inverted": 17,
+          "shared": 0.37,
+          "similarity": 0.37,
+          "asymmetry": 0.458,
+          "active_1": 24,
+          "active_2": 13
+        },
+        {
+          "pair": "love/hate",
+          "hamming": 4,
+          "inverted": 4,
+          "shared": 0.84,
+          "similarity": 0.84,
+          "asymmetry": 0.083,
+          "active_1": 24,
+          "active_2": 22
+        },
+        {
+          "pair": "tall/short",
+          "hamming": 7,
+          "inverted": 7,
+          "shared": 0.462,
+          "similarity": 0.462,
+          "asymmetry": 0.538,
+          "active_1": 6,
+          "active_2": 13
+        },
+        {
+          "pair": "fast/slow",
+          "hamming": 5,
+          "inverted": 5,
+          "shared": 0.667,
+          "similarity": 0.667,
+          "asymmetry": 0.333,
+          "active_1": 10,
+          "active_2": 15
+        },
+        {
+          "pair": "bright/dark",
+          "hamming": 10,
+          "inverted": 10,
+          "shared": 0.5,
+          "similarity": 0.5,
+          "asymmetry": 0.333,
+          "active_1": 12,
+          "active_2": 18
+        },
+        {
+          "pair": "heavy/light",
+          "hamming": 7,
+          "inverted": 7,
+          "shared": 0.417,
+          "similarity": 0.417,
+          "asymmetry": 0.455,
+          "active_1": 11,
+          "active_2": 6
+        },
+        {
+          "pair": "loud/quiet",
+          "hamming": 4,
+          "inverted": 4,
+          "shared": 0.75,
+          "similarity": 0.75,
+          "asymmetry": 0.133,
+          "active_1": 13,
+          "active_2": 15
+        },
+        {
+          "pair": "rich/poor",
+          "hamming": 8,
+          "inverted": 8,
+          "shared": 0.652,
+          "similarity": 0.652,
+          "asymmetry": 0.1,
+          "active_1": 18,
+          "active_2": 20
+        },
+        {
+          "pair": "young/old",
+          "hamming": 9,
+          "inverted": 9,
+          "shared": 0.654,
+          "similarity": 0.654,
+          "asymmetry": 0.045,
+          "active_1": 22,
+          "active_2": 21
+        },
+        {
+          "pair": "happy/sad",
+          "hamming": 2,
+          "inverted": 2,
+          "shared": 0.895,
+          "similarity": 0.895,
+          "asymmetry": 0.105,
+          "active_1": 17,
+          "active_2": 19
+        }
+      ],
+      "means": {
+        "hamming": 7.3,
+        "inverted": 7.3,
+        "shared": 0.621,
+        "asymmetry": 0.258
+      },
+      "stds": {
+        "hamming": 4.0,
+        "inverted": 4.0,
+        "shared": 0.17,
+        "asymmetry": 0.176
+      }
+    },
+    "contradictories": {
+      "pairs": [
+        {
+          "pair": "alive/dead",
+          "hamming": 5,
+          "inverted": 5,
+          "shared": 0.773,
+          "similarity": 0.773,
+          "asymmetry": 0.227,
+          "active_1": 17,
+          "active_2": 22
+        },
+        {
+          "pair": "true/false",
+          "hamming": 4,
+          "inverted": 4,
+          "shared": 0.81,
+          "similarity": 0.81,
+          "asymmetry": 0.0,
+          "active_1": 19,
+          "active_2": 19
+        },
+        {
+          "pair": "present/absent",
+          "hamming": 4,
+          "inverted": 4,
+          "shared": 0.81,
+          "similarity": 0.81,
+          "asymmetry": 0.19,
+          "active_1": 17,
+          "active_2": 21
+        },
+        {
+          "pair": "even/odd",
+          "hamming": 3,
+          "inverted": 3,
+          "shared": 0.842,
+          "similarity": 0.842,
+          "asymmetry": 0.056,
+          "active_1": 17,
+          "active_2": 18
+        },
+        {
+          "pair": "married/single",
+          "hamming": 4,
+          "inverted": 4,
+          "shared": 0.8,
+          "similarity": 0.8,
+          "asymmetry": 0.105,
+          "active_1": 19,
+          "active_2": 17
+        },
+        {
+          "pair": "guilty/innocent",
+          "hamming": 4,
+          "inverted": 4,
+          "shared": 0.826,
+          "similarity": 0.826,
+          "asymmetry": 0.0,
+          "active_1": 21,
+          "active_2": 21
+        },
+        {
+          "pair": "legal/illegal",
+          "hamming": 3,
+          "inverted": 3,
+          "shared": 0.85,
+          "similarity": 0.85,
+          "asymmetry": 0.053,
+          "active_1": 19,
+          "active_2": 18
+        },
+        {
+          "pair": "open/closed",
+          "hamming": 6,
+          "inverted": 6,
+          "shared": 0.5,
+          "similarity": 0.5,
+          "asymmetry": 0.2,
+          "active_1": 8,
+          "active_2": 10
+        },
+        {
+          "pair": "visible/invisible",
+          "hamming": 12,
+          "inverted": 12,
+          "shared": 0.455,
+          "similarity": 0.455,
+          "asymmetry": 0.4,
+          "active_1": 12,
+          "active_2": 20
+        },
+        {
+          "pair": "possible/impossible",
+          "hamming": 3,
+          "inverted": 3,
+          "shared": 0.85,
+          "similarity": 0.85,
+          "asymmetry": 0.15,
+          "active_1": 20,
+          "active_2": 17
+        }
+      ],
+      "means": {
+        "hamming": 4.8,
+        "inverted": 4.8,
+        "shared": 0.752,
+        "asymmetry": 0.138
+      },
+      "stds": {
+        "hamming": 2.6,
+        "inverted": 2.6,
+        "shared": 0.139,
+        "asymmetry": 0.117
+      }
+    },
+    "privatives": {
+      "pairs": [
+        {
+          "pair": "sight/blindness",
+          "hamming": 3,
+          "inverted": 3,
+          "shared": 0.842,
+          "similarity": 0.842,
+          "asymmetry": 0.158,
+          "active_1": 16,
+          "active_2": 19
+        },
+        {
+          "pair": "sound/silence",
+          "hamming": 9,
+          "inverted": 9,
+          "shared": 0.5,
+          "similarity": 0.5,
+          "asymmetry": 0.2,
+          "active_1": 15,
+          "active_2": 12
+        },
+        {
+          "pair": "knowledge/ignorance",
+          "hamming": 2,
+          "inverted": 2,
+          "shared": 0.895,
+          "similarity": 0.895,
+          "asymmetry": 0.105,
+          "active_1": 17,
+          "active_2": 19
+        },
+        {
+          "pair": "hope/despair",
+          "hamming": 6,
+          "inverted": 6,
+          "shared": 0.739,
+          "similarity": 0.739,
+          "asymmetry": 0.095,
+          "active_1": 19,
+          "active_2": 21
+        },
+        {
+          "pair": "health/disease",
+          "hamming": 9,
+          "inverted": 9,
+          "shared": 0.625,
+          "similarity": 0.625,
+          "asymmetry": 0.05,
+          "active_1": 20,
+          "active_2": 19
+        },
+        {
+          "pair": "wealth/poverty",
+          "hamming": 8,
+          "inverted": 8,
+          "shared": 0.652,
+          "similarity": 0.652,
+          "asymmetry": 0.1,
+          "active_1": 20,
+          "active_2": 18
+        },
+        {
+          "pair": "freedom/captivity",
+          "hamming": 10,
+          "inverted": 10,
+          "shared": 0.583,
+          "similarity": 0.583,
+          "asymmetry": 0.1,
+          "active_1": 20,
+          "active_2": 18
+        },
+        {
+          "pair": "order/chaos",
+          "hamming": 13,
+          "inverted": 13,
+          "shared": 0.35,
+          "similarity": 0.35,
+          "asymmetry": 0.071,
+          "active_1": 13,
+          "active_2": 14
+        },
+        {
+          "pair": "trust/distrust",
+          "hamming": 8,
+          "inverted": 8,
+          "shared": 0.68,
+          "similarity": 0.68,
+          "asymmetry": 0.0,
+          "active_1": 21,
+          "active_2": 21
+        },
+        {
+          "pair": "courage/cowardice",
+          "hamming": 4,
+          "inverted": 4,
+          "shared": 0.818,
+          "similarity": 0.818,
+          "asymmetry": 0.095,
+          "active_1": 19,
+          "active_2": 21
+        }
+      ],
+      "means": {
+        "hamming": 7.2,
+        "inverted": 7.2,
+        "shared": 0.668,
+        "asymmetry": 0.097
+      },
+      "stds": {
+        "hamming": 3.2,
+        "inverted": 3.2,
+        "shared": 0.158,
+        "asymmetry": 0.052
+      }
+    },
+    "relatives": {
+      "pairs": [
+        {
+          "pair": "parent/child",
+          "hamming": 11,
+          "inverted": 11,
+          "shared": 0.476,
+          "similarity": 0.476,
+          "asymmetry": 0.176,
+          "active_1": 17,
+          "active_2": 14
+        },
+        {
+          "pair": "teacher/student",
+          "hamming": 5,
+          "inverted": 5,
+          "shared": 0.792,
+          "similarity": 0.792,
+          "asymmetry": 0.045,
+          "active_1": 22,
+          "active_2": 21
+        },
+        {
+          "pair": "buyer/seller",
+          "hamming": 6,
+          "inverted": 6,
+          "shared": 0.75,
+          "similarity": 0.75,
+          "asymmetry": 0.174,
+          "active_1": 19,
+          "active_2": 23
+        },
+        {
+          "pair": "doctor/patient",
+          "hamming": 5,
+          "inverted": 5,
+          "shared": 0.783,
+          "similarity": 0.783,
+          "asymmetry": 0.048,
+          "active_1": 21,
+          "active_2": 20
+        },
+        {
+          "pair": "predator/prey",
+          "hamming": 2,
+          "inverted": 2,
+          "shared": 0.895,
+          "similarity": 0.895,
+          "asymmetry": 0.105,
+          "active_1": 19,
+          "active_2": 17
+        },
+        {
+          "pair": "cause/effect",
+          "hamming": 1,
+          "inverted": 1,
+          "shared": 0.944,
+          "similarity": 0.944,
+          "asymmetry": 0.056,
+          "active_1": 18,
+          "active_2": 17
+        },
+        {
+          "pair": "question/answer",
+          "hamming": 5,
+          "inverted": 5,
+          "shared": 0.773,
+          "similarity": 0.773,
+          "asymmetry": 0.227,
+          "active_1": 17,
+          "active_2": 22
+        },
+        {
+          "pair": "host/guest",
+          "hamming": 3,
+          "inverted": 3,
+          "shared": 0.864,
+          "similarity": 0.864,
+          "asymmetry": 0.048,
+          "active_1": 21,
+          "active_2": 20
+        },
+        {
+          "pair": "employer/employee",
+          "hamming": 0,
+          "inverted": 0,
+          "shared": 1.0,
+          "similarity": 1.0,
+          "asymmetry": 0.0,
+          "active_1": 22,
+          "active_2": 22
+        },
+        {
+          "pair": "leader/follower",
+          "hamming": 3,
+          "inverted": 3,
+          "shared": 0.87,
+          "similarity": 0.87,
+          "asymmetry": 0.045,
+          "active_1": 21,
+          "active_2": 22
+        }
+      ],
+      "means": {
+        "hamming": 4.1,
+        "inverted": 4.1,
+        "shared": 0.815,
+        "asymmetry": 0.092
+      },
+      "stds": {
+        "hamming": 2.9,
+        "inverted": 2.9,
+        "shared": 0.136,
+        "asymmetry": 0.071
+      }
+    }
+  },
+  "kruskal_wallis": {
+    "hamming": {
+      "H": 6.36,
+      "p": 0.0952,
+      "significant": "False"
+    },
+    "inverted": {
+      "H": 6.36,
+      "p": 0.0952,
+      "significant": "False"
+    },
+    "shared": {
+      "H": 7.71,
+      "p": 0.0524,
+      "significant": "False"
+    },
+    "asymmetry": {
+      "H": 5.87,
+      "p": 0.1183,
+      "significant": "False"
+    }
+  },
+  "hypothesis_checks": [
+    {
+      "check": "Contraries have more inverted bits than contradictories",
+      "pass": true
+    },
+    {
+      "check": "Privatives are most asymmetric",
+      "pass": false
+    },
+    {
+      "check": "Relatives share the most bits",
+      "pass": true
+    },
+    {
+      "check": "Contradictories have highest Hamming",
+      "pass": false
+    }
+  ],
+  "n_significant": 0,
+  "overall_pass": false
+}

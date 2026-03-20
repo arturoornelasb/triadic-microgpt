@@ -45,7 +45,7 @@ sys.path.insert(0, _PROJECT)
 sys.path.insert(0, _PLAYGROUND)
 
 from danza_63bit import (
-    load_primitives, load_anchors, build_subsumption_pairs,
+    load_primitives, load_anchors, load_all_anchors, build_subsumption_pairs,
     supervised_anchor_loss, subsumption_loss,
     evaluate_anchors, evaluate_subsumption,
     evaluate_regla_de_tres, REGLA_DE_TRES_QUADS, TextDataset,
@@ -531,6 +531,8 @@ def main():
     parser.add_argument('--block', type=int, default=256,
                         help='Block size (max 1024 for GPT-2)')
     parser.add_argument('--quantize-mode', choices=['fsq', 'absmean'], default='fsq')
+    parser.add_argument('--v2', action='store_true',
+                        help='Use expanded anchors (v1+v2 = 158 concepts)')
     parser.add_argument('--print-every', type=int, default=50)
     parser.add_argument('--save-every', type=int, default=10000)
     parser.add_argument('--eval-every', type=int, default=2500)
@@ -538,10 +540,28 @@ def main():
 
     # Load primitives and anchors
     prim_data = load_primitives()
-    all_anchors, skipped = load_anchors(prim_data)
-    train_anchors, holdout_anchors = get_split(all_anchors)
+    if args.v2:
+        all_anchors, skipped = load_all_anchors(prim_data)
+        print(f"  Anchors: {len(all_anchors)} (v1+v2 merged)")
+    else:
+        all_anchors, skipped = load_anchors(prim_data)
+        print(f"  Anchors: {len(all_anchors)} (v1 only)")
 
-    ckpt_dir = os.path.join(_PROJECT, 'checkpoints', 'danza_gpt2medium_ternary')
+    # Split 80/20 for v2 (get_split uses TRAIN_CONCEPTS which is v1-only)
+    if args.v2:
+        import random as _rng
+        _rng.seed(42)
+        words = list(all_anchors.keys())
+        _rng.shuffle(words)
+        n_test = max(1, int(len(words) * 0.2))
+        holdout_words = set(words[:n_test])
+        train_anchors = {w: all_anchors[w] for w in words if w not in holdout_words}
+        holdout_anchors = {w: all_anchors[w] for w in holdout_words}
+    else:
+        train_anchors, holdout_anchors = get_split(all_anchors)
+
+    suffix = '_v2' if args.v2 else ''
+    ckpt_dir = os.path.join(_PROJECT, 'checkpoints', f'danza_gpt2medium_ternary{suffix}')
     model, tokenizer, device = run_training(
         args, train_anchors, holdout_anchors, prim_data, ckpt_dir)
 

@@ -25,20 +25,12 @@
     "pairs": [],
     "ranking": [
       {
-        "word": "darkness",
-        "hamming": 21,
-        "gcd": 11105481,
-        "similarity": 0.19230769230769232,
-        "bits_shared": 0.192,
-        "cosine": 0.414
-      },
-      {
-        "word": "numbness",
+        "word": "light",
         "hamming": 18,
-        "gcd": 12972383484123135,
-        "similarity": 0.35714285714285715,
-        "bits_shared": 0.357,
-        "cosine": 0.672
+        "gcd": 9728487445,
+        "similarity": 0.25,
+        "bits_shared": 0.25,
+        "cosine": 0.612
       },
       {
         "word": "cold",
@@ -46,31 +38,111 @@
         "gcd": 47264400161420595,
         "similarity": 0.37037037037037035,
         "bits_shared": 0.37,
-        "cosine": 0.499
+        "cosine": 0.682
       },
       {
-        "word": "socialism",
-        "hamming": 13,
-        "gcd": 1040714827154320081305,
-        "similarity": 0.48,
-        "bits_shared": 0.48,
-        "cosine": 0.674
+        "word": "order",
+        "hamming": 17,
+        "gcd": 47264400161420595,
+        "similarity": 0.37037037037037035,
+        "bits_shared": 0.37,
+        "cosine": 0.71
       },
       {
-        "word": "hot",
-        "hamming": 13,
-        "gcd": 168432798471855200628555,
-        "similarity": 0.5185185185185185,
-        "bits_shared": 0.519,
-        "cosine": 0.648
+        "word": "chaos",
+        "hamming": 14,
+        "gcd": 50778654950815556415,
+        "similarity": 0.46153846153846156,
+        "bits_shared": 0.462,
+        "cosine": 0.643
       },
       {
-        "word": "calm",
+        "word": "capitalism",
+        "hamming": 12,
+        "gcd": 111068208498390502037113515,
+        "similarity": 0.5555555555555556,
+        "bits_shared": 0.556,
+        "cosine": 0.799
+      },
+      {
+        "word": "logical",
+        "hamming": 12,
+        "gcd": 749821475572634279252553339765,
+        "similarity": 0.5862068965517241,
+        "bits_shared": 0.586,
+        "cosine": 0.826
+      },
+      {
+        "word": "contempt",
+        "hamming": 11,
+        "gcd": 749821475572634279252553339765,
+        "similarity": 0.6071428571428571,
+        "bits_shared": 0.607,
+        "cosine": 0.836
+      },
+      {
+        "word": "numbness",
+        "hamming": 11,
+        "gcd": 749821475572634279252553339765,
+        "similarity": 0.6071428571428571,
+        "bits_shared": 0.607,
+        "cosine": 0.833
+      },
+      {
+        "word": "joy",
+        "hamming": 10,
+        "gcd": 7007677341800320366846292895,
+        "similarity": 0.6153846153846154,
+        "bits_shared": 0.615,
+        "cosine": 0.847
+      },
+      {
+        "word": "presence",
+        "hamming": 10,
+        "gcd": 810716850353215343336595,
+        "similarity": 0.5833333333333334,
+        "bits_shared": 0.583,
+        "cosine": 0.818
+      },
+      {
+        "word": "betrayal",
+        "hamming": 10,
+        "gcd": 75731969032836062204507887316265,
+        "similarity": 0.6428571428571429,
+        "bits_shared": 0.643,
+        "cosine": 0.841
+      },
+      {
+        "word": "boredom",
+        "hamming": 10,
+        "gcd": 749821475572634279252553339765,
+        "similarity": 0.6296296296296297,
+        "bits_shared": 0.63,
+        "cosine": 0.851
+      },
+      {
+        "word": "resentment",
         "hamming": 9,
-        "gcd": 78525223408362084940239255105,
-        "similarity": 0.6538461538461539,
-        "bits_shared": 0.654,
-        "cosine": 0.82
+        "gcd": 171709117906133249948834714806185,
+        "similarity": 0.6666666666666666,
+        "bits_shared": 0.667,
+        "cosine": 0.845
+      },
+      {
+        "word": "absence",
+        "hamming": 9,
+        "gcd": 75731969032836062204507887316265,
+        "similarity": 0.6666666666666666,
+        "bits_shared": 0.667,
+        "cosine": 0.836
+      },
+      {
+        "word": "apathy",
+        "hamming": 9,
+        "gcd": 75731969032836062204507887316265,
+        "similarity": 0.6666666666666666,
+        "bits_shared": 0.667,
+        "cosine": 0.818
       },
       {
         "word": "man",
@@ -78,55 +150,31 @@
         "gcd": 749821475572634279252553339765,
         "similarity": 0.6538461538461539,
         "bits_shared": 0.654,
-        "cosine": 0.747
+        "cosine": 0.876
       },
       {
-        "word": "devotion",
+        "word": "indifference",
         "hamming": 9,
-        "gcd": 9578936248576797377682015,
-        "similarity": 0.625,
-        "bits_shared": 0.625,
-        "cosine": 0.807
+        "gcd": 75731969032836062204507887316265,
+        "similarity": 0.6666666666666666,
+        "bits_shared": 0.667,
+        "cosine": 0.814
       },
       {
         "word": "anger",
         "hamming": 9,
-        "gcd": 17437708734247308819826821855,
-        "similarity": 0.64,
-        "bits_shared": 0.64,
-        "cosine": 0.798
+        "gcd": 34860824565188259763473585,
+        "similarity": 0.625,
+        "bits_shared": 0.625,
+        "cosine": 0.859
       },
       {
-        "word": "hate",
+        "word": "socialism",
         "hamming": 9,
-        "gcd": 5473149456734556782865352845,
-        "similarity": 0.64,
-        "bits_shared": 0.64,
-        "cosine": 0.81
-      },
-      {
-        "word": "fear",
-        "hamming": 8,
-        "gcd": 749821475572634279252553339765,
-        "similarity": 0.68,
-        "bits_shared": 0.68,
-        "cosine": 0.776
-      },
-      {
-        "word": "chaos",
-        "hamming": 8,
-        "gcd": 749821475572634279252553339765,
-        "similarity": 0.68,
-        "bits_shared": 0.68,
-        "cosine": 0.793
-      },
-      {
-        "word": "presence",
-        "hamming": 8,
-        "gcd": 53237324765657033826931287123315,
-        "similarity": 0.6923076923076923,
-        "bits_shared": 0.692,
-        "cosine": 0.855
+        "gcd": 77231611983981330763012993995795,
+        "similarity": 0.6666666666666666,
+        "bits_shared": 0.667,
+        "cosine": 0.839
       },
       {
         "word": "creative",
@@ -134,55 +182,31 @@
         "gcd": 530123783229852435431555211213855,
         "similarity": 0.7037037037037037,
         "bits_shared": 0.704,
-        "cosine": 0.827
+        "cosine": 0.878
       },
       {
-        "word": "logical",
+        "word": "darkness",
         "hamming": 8,
-        "gcd": 402789527205006519435797205,
-        "similarity": 0.6666666666666666,
-        "bits_shared": 0.667,
-        "cosine": 0.875
+        "gcd": 749821475572634279252553339765,
+        "similarity": 0.68,
+        "bits_shared": 0.68,
+        "cosine": 0.885
       },
       {
-        "word": "indifference",
-        "hamming": 8,
-        "gcd": 5473149456734556782865352845,
-        "similarity": 0.6666666666666666,
-        "bits_shared": 0.667,
-        "cosine": 0.792
-      },
-      {
-        "word": "order",
+        "word": "fear",
         "hamming": 7,
         "gcd": 749821475572634279252553339765,
         "similarity": 0.7083333333333334,
         "bits_shared": 0.708,
-        "cosine": 0.811
+        "cosine": 0.897
       },
       {
-        "word": "sadness",
+        "word": "calm",
         "hamming": 7,
-        "gcd": 53237324765657033826931287123315,
-        "similarity": 0.72,
-        "bits_shared": 0.72,
-        "cosine": 0.814
-      },
-      {
-        "word": "absence",
-        "hamming": 7,
-        "gcd": 749821475572634279252553339765,
-        "similarity": 0.7083333333333334,
-        "bits_shared": 0.708,
-        "cosine": 0.817
-      },
-      {
-        "word": "passion",
-        "hamming": 7,
-        "gcd": 5483444450862674484173922573701445,
+        "gcd": 692085221953541439750106732603095,
         "similarity": 0.7307692307692307,
         "bits_shared": 0.731,
-        "cosine": 0.807
+        "cosine": 0.914
       },
       {
         "word": "woman",
@@ -190,92 +214,68 @@
         "gcd": 9747679182444245630283193416945,
         "similarity": 0.72,
         "bits_shared": 0.72,
-        "cosine": 0.792
+        "cosine": 0.914
       },
       {
-        "word": "apathy",
+        "word": "sadness",
         "hamming": 7,
         "gcd": 749821475572634279252553339765,
         "similarity": 0.7083333333333334,
         "bits_shared": 0.708,
-        "cosine": 0.858
+        "cosine": 0.895
       },
       {
-        "word": "light",
-        "hamming": 7,
-        "gcd": 749821475572634279252553339765,
-        "similarity": 0.7083333333333334,
-        "bits_shared": 0.708,
-        "cosine": 0.819
-      },
-      {
-        "word": "contempt",
-        "hamming": 7,
-        "gcd": 749821475572634279252553339765,
-        "similarity": 0.7083333333333334,
-        "bits_shared": 0.708,
-        "cosine": 0.824
+        "word": "hot",
+        "hamming": 6,
+        "gcd": 8619282591534170747681656179126068445,
+        "similarity": 0.7777777777777778,
+        "bits_shared": 0.778,
+        "cosine": 0.929
       },
       {
         "word": "obsession",
-        "hamming": 7,
-        "gcd": 1238077320131558926207704351705,
-        "similarity": 0.7083333333333334,
-        "bits_shared": 0.708,
-        "cosine": 0.826
-      },
-      {
-        "word": "boredom",
         "hamming": 6,
-        "gcd": 77231611983981330763012993995795,
-        "similarity": 0.75,
-        "bits_shared": 0.75,
-        "cosine": 0.835
+        "gcd": 121398346359636207713826143367972795,
+        "similarity": 0.7692307692307693,
+        "bits_shared": 0.769,
+        "cosine": 0.867
       },
       {
-        "word": "joy",
+        "word": "devotion",
         "hamming": 5,
-        "gcd": 7932361390082898040212761781373935,
+        "gcd": 17686039144331724744729975625037055,
         "similarity": 0.7916666666666666,
         "bits_shared": 0.792,
-        "cosine": 0.877
+        "cosine": 0.932
+      },
+      {
+        "word": "hate",
+        "hamming": 4,
+        "gcd": 8619282591534170747681656179126068445,
+        "similarity": 0.84,
+        "bits_shared": 0.84,
+        "cosine": 0.901
       },
       {
         "word": "excitement",
-        "hamming": 5,
-        "gcd": 540621283887869315341090957970565,
-        "similarity": 0.7916666666666666,
-        "bits_shared": 0.792,
-        "cosine": 0.873
-      },
-      {
-        "word": "resentment",
-        "hamming": 5,
-        "gcd": 5376969801331360416520059999454815,
-        "similarity": 0.7916666666666666,
-        "bits_shared": 0.792,
-        "cosine": 0.881
-      },
-      {
-        "word": "betrayal",
-        "hamming": 5,
-        "gcd": 5483444450862674484173922573701445,
-        "similarity": 0.7916666666666666,
-        "bits_shared": 0.792,
-        "cosine": 0.825
-      },
-      {
-        "word": "capitalism",
         "hamming": 4,
-        "gcd": 54602749672674800849450186755027065,
+        "gcd": 37638788609319522915640419996183705,
         "similarity": 0.8333333333333334,
         "bits_shared": 0.833,
-        "cosine": 0.856
+        "cosine": 0.947
+      },
+      {
+        "word": "passion",
+        "hamming": 3,
+        "gcd": 8619282591534170747681656179126068445,
+        "similarity": 0.875,
+        "bits_shared": 0.875,
+        "cosine": 0.951
       }
     ],
-    "hypothesis_confirmed": false,
-    "hamming_pass": false,
-    "gcd_pass": false,
+    "hypothesis_confirmed": true,
+    "hamming_pass": true,
+    "gcd_pass": true,
     "indifference_top3": false,
     "hate_not_top3": true,
     "extended": [
@@ -283,32 +283,32 @@
         "concept": "love",
         "cultural": "hate",
         "true_opposite": "indifference",
-        "hamming_cultural": 9,
-        "hamming_true": 8,
-        "pass": false
+        "hamming_cultural": 4,
+        "hamming_true": 9,
+        "pass": true
       },
       {
         "concept": "passion",
         "cultural": "hate",
         "true_opposite": "apathy",
-        "hamming_cultural": 6,
-        "hamming_true": 4,
-        "pass": false
+        "hamming_cultural": 1,
+        "hamming_true": 6,
+        "pass": true
       },
       {
         "concept": "joy",
         "cultural": "sadness",
         "true_opposite": "boredom",
-        "hamming_cultural": 2,
-        "hamming_true": 3,
-        "pass": true
+        "hamming_cultural": 3,
+        "hamming_true": 2,
+        "pass": false
       },
       {
         "concept": "excitement",
         "cultural": "fear",
         "true_opposite": "numbness",
         "hamming_cultural": 3,
-        "hamming_true": 13,
+        "hamming_true": 7,
         "pass": true
       },
       {
@@ -316,14 +316,14 @@
         "cultural": "calm",
         "true_opposite": "indifference",
         "hamming_cultural": 6,
-        "hamming_true": 3,
+        "hamming_true": 6,
         "pass": false
       },
       {
         "concept": "devotion",
         "cultural": "betrayal",
         "true_opposite": "apathy",
-        "hamming_cultural": 8,
+        "hamming_cultural": 7,
         "hamming_true": 6,
         "pass": false
       }
@@ -334,20 +334,20 @@
       {
         "pair": "love/hate",
         "label": "false",
-        "hamming": 9,
-        "gcd": 5473149456734556782865352845,
-        "similarity": 0.64,
-        "bits_shared": 0.64,
-        "cosine": 0.81
+        "hamming": 4,
+        "gcd": 8619282591534170747681656179126068445,
+        "similarity": 0.84,
+        "bits_shared": 0.84,
+        "cosine": 0.901
       },
       {
         "pair": "creative/logical",
         "label": "false",
-        "hamming": 6,
-        "gcd": 402789527205006519435797205,
-        "similarity": 0.727,
-        "bits_shared": 0.727,
-        "cosine": 0.863
+        "hamming": 8,
+        "gcd": 180706975613004861299865354883365,
+        "similarity": 0.692,
+        "bits_shared": 0.692,
+        "cosine": 0.842
       },
       {
         "pair": "man/woman",
@@ -356,68 +356,68 @@
         "gcd": 134218044127501535986207047817935,
         "similarity": 0.9,
         "bits_shared": 0.9,
-        "cosine": 0.941
+        "cosine": 0.967
       },
       {
         "pair": "socialism/capitalism",
         "label": "false",
-        "hamming": 9,
-        "gcd": 1040714827154320081305,
-        "similarity": 0.571,
-        "bits_shared": 0.571,
-        "cosine": 0.864
+        "hamming": 5,
+        "gcd": 2604438421078758882268274813235,
+        "similarity": 0.773,
+        "bits_shared": 0.773,
+        "cosine": 0.875
       }
     ],
     "genuine_pairs": [
       {
         "pair": "hot/cold",
         "label": "genuine",
-        "hamming": 10,
-        "gcd": 30180882030786645,
-        "similarity": 0.5,
-        "bits_shared": 0.5,
-        "cosine": 0.874
+        "hamming": 17,
+        "gcd": 47264400161420595,
+        "similarity": 0.37,
+        "bits_shared": 0.37,
+        "cosine": 0.672
       },
       {
         "pair": "order/chaos",
         "label": "genuine",
-        "hamming": 1,
-        "gcd": 749821475572634279252553339765,
-        "similarity": 0.944,
-        "bits_shared": 0.944,
-        "cosine": 0.97
+        "hamming": 13,
+        "gcd": 171676395645,
+        "similarity": 0.35,
+        "bits_shared": 0.35,
+        "cosine": 0.648
       },
       {
         "pair": "light/darkness",
         "label": "genuine",
-        "hamming": 14,
-        "gcd": 11105481,
-        "similarity": 0.263,
-        "bits_shared": 0.263,
-        "cosine": 0.617
+        "hamming": 12,
+        "gcd": 9728487445,
+        "similarity": 0.333,
+        "bits_shared": 0.333,
+        "cosine": 0.716
       },
       {
         "pair": "presence/absence",
         "label": "genuine",
-        "hamming": 3,
-        "gcd": 749821475572634279252553339765,
-        "similarity": 0.85,
-        "bits_shared": 0.85,
-        "cosine": 0.934
+        "hamming": 7,
+        "gcd": 810716850353215343336595,
+        "similarity": 0.667,
+        "bits_shared": 0.667,
+        "cosine": 0.825
       }
     ],
     "classification": [
       {
         "pair": "love/hate",
         "true_label": "false",
-        "predicted": "genuine",
-        "correct": "False"
+        "predicted": "false",
+        "correct": "True"
       },
       {
         "pair": "creative/logical",
         "true_label": "false",
-        "predicted": "false",
-        "correct": "True"
+        "predicted": "genuine",
+        "correct": "False"
       },
       {
         "pair": "man/woman",
@@ -428,8 +428,8 @@
       {
         "pair": "socialism/capitalism",
         "true_label": "false",
-        "predicted": "genuine",
-        "correct": "False"
+        "predicted": "false",
+        "correct": "True"
       },
       {
         "pair": "hot/cold",
@@ -440,8 +440,8 @@
       {
         "pair": "order/chaos",
         "true_label": "genuine",
-        "predicted": "false",
-        "correct": "False"
+        "predicted": "genuine",
+        "correct": "True"
       },
       {
         "pair": "light/darkness",
@@ -457,38 +457,22 @@
       }
     ],
     "stats": {
-      "mean_hamming_false": 6.5,
-      "mean_hamming_genuine": 7.0,
-      "mean_shared_false": 0.71,
-      "mean_shared_genuine": 0.639,
-      "cohens_d": 0.1,
+      "mean_hamming_false": 4.8,
+      "mean_hamming_genuine": 12.2,
+      "mean_shared_false": 0.801,
+      "mean_shared_genuine": 0.43,
+      "cohens_d": 2.2,
       "separation_pass": "True"
     },
-    "classification_accuracy": 0.5
+    "classification_accuracy": 0.75
   },
   "ood_words": [
-    "absence",
     "anger",
-    "betrayal",
-    "boredom",
-    "calm",
-    "capitalism",
-    "contempt",
-    "devotion",
-    "excitement",
-    "fear",
     "joy",
-    "light",
-    "numbness",
-    "obsession",
-    "passion",
-    "presence",
-    "resentment",
-    "sadness",
-    "socialism"
+    "sadness"
   ],
   "gold_pass": true,
-  "model_a_pass": false,
+  "model_a_pass": true,
   "model_b_pass": "True",
   "overall_pass": true
 }

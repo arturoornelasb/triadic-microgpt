@@ -1,3 +1,5 @@
+> **⚠ ARCHIVED — High-level content migrated to [`EXPERIMENT_REFERENCE.md`](../EXPERIMENT_REFERENCE.md).** This file preserved in `archive/` for detailed tables, bugs #1-7, R3 formula comparisons, and analytical narrative not captured in the master document.
+
 # Audit Report — triadic-microgpt
 **Auditor:** Claude Opus 4.6 | **Fecha:** 2026-03-18
 **Scope:** Computational validation pipeline, paper claims, code quality, experiment coverage

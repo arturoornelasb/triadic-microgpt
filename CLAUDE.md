@@ -33,8 +33,10 @@ checkpoints/               # All model checkpoints (organized by run)
 reports/                   # Evaluation outputs (JSON, PNG)
 tests/test_all.py          # 37 unit tests (autograd, transformer, triadic, integration)
 scripts/                   # Utility scripts (vocab building, gold prime generation)
-experiment_log.md          # Historical record of ALL training runs with metrics
-benchmarks/                # Industry-standard evaluation suite (NEW)
+experiment_log.md          # Detailed data store — raw logs for all training runs
+EXPERIMENT_REFERENCE.md    # MASTER consolidated reference (all experiments, organized by research line)
+benchmarks/                # Industry-standard evaluation suite
+archive/                   # Archived docs (detailed tables, methodology, designs — see banners)
 .claude/                   # Agent guide and workflow documentation
 ```
 
@@ -69,7 +71,7 @@ Text → FastBPETokenizer → Token IDs → TriadicGPT (12L/512D/8H) → Two Hea
 - **Checkpoint**: `checkpoints/torch_run15_strongalign/model_L12_D512_B64_best.pt`
 - **Tokenizer**: `checkpoints/torch_run15_strongalign/tokenizer.json` (different from `checkpoints/torch/`)
 - **Language Cost**: Zero (PPL 7.69 vs 7.56 ablation, within noise)
-- **Semantic Gap**: +0.020 from-scratch; +0.099 GPT-2 transfer (InfoNCE, closes 72% to Engine PCA)
+- **Semantic Gap**: +0.020 from-scratch; +0.076 GPT-2 transfer (InfoNCE, closes 48% to Engine PCA)
 - **Domain Separation**: 1.21 mean (sentence-level aggregation; was ~1.02 token-level) — Experiment 11
 - **Paper**: 16 pages compiled (`paper/triadic_microgpt.pdf`), all 11 experiments included
 - **PyPI**: `triadic-head` v0.1.0 built & validated (signal +8.5% above random), not yet published

@@ -1,3 +1,5 @@
+> **⚠ ARCHIVED — High-level content migrated to [`EXPERIMENT_REFERENCE.md`](../EXPERIMENT_REFERENCE.md) Section 2.** This file preserved in `archive/` for the ranked evidence table, ASCII architecture diagram, implementation phases 2-5, and next actions checklist.
+
 # Implementation Plan — Final Model for Paper
 
 > Date: 2026-03-19 | Status: ACTIVE
@@ -38,12 +40,12 @@
 
 ### What's Ambiguous
 
-| Question | Evidence | Resolution needed |
-|----------|----------|------------------|
-| Ternary vs binary at scale | D-A13 (355M): zeros -> 0% | Is ternary only for small models? Test at scale |
-| iFSQ + v2 anchors together | Not tested — iFSQ used 54 anchors, v2 used tanh | **KEY EXPERIMENT: combine both** |
-| Discovery loop closed | Manual proof-of-concept works | Automate and test convergence |
-| L11/L12 with v2 | Gold PASS but model FAIL with old anchors | **Re-run with v2 checkpoint** |
+| Question | Evidence | Resolution |
+|----------|----------|------------|
+| Ternary vs binary at scale | D-A13 (355M): zeros -> 0% | **OPEN** — ternary may only work at small scale |
+| iFSQ + v2 anchors together | **D-A16: tested 2026-03-19** | **RESOLVED** — matches v2 tanh on accuracy (93.2%), improves analogies (R3=0.842), but LM loss slightly worse (0.993 vs 0.946). v2 anchors dominate over activation choice |
+| Discovery loop closed | Manual proof-of-concept works | OPEN — automate and test convergence |
+| L11/L12 with v2 | **Tested 2026-03-19** | **RESOLVED** — PASS. v2 model correctly learns indifference as true opposite of love |
 
 ---
 
@@ -260,29 +262,34 @@ Apply final model architecture to GPT-2 Medium:
 | 5.1 | Scaling study | 4-point (1.3M-40M), phase transition | READY |
 | 5.2 | Bits sweep | k=8-128, optimal k=32-64 | READY |
 | 5.3 | Ablation | Run 18 (no head), D-A15 (grad decoupling FAIL) | READY |
-| 5.4 | Subsumption | 98.3% test (v2), 100% holdout (355M) | READY (L2 pending) |
+| 5.4 | Subsumption | 98.3% test (v2). 355M: 88% bit acc but sub=9-20%, analogy=0% | **NEEDS REVISION** |
 | 5.5 | Analogy | 98% verification (51 quads), exact king:queen bitwise | READY |
 | 5.6 | Composition | R3 98.1% round-trip, p<0.001 | READY |
 | 5.7 | Domain separation | 1.21 sentence-level (+19%) | READY |
 | 5.8 | Discovery | 68 triadic 3-way, 7 duals, 635 deps | READY |
-| 5.9 | iFSQ activation | 0.924 loss, 87.1% sub (pending: +v2) | **PENDING Phase 1** |
+| 5.9 | iFSQ activation | D-A10: 0.924 loss, 87.1% sub. D-A16: iFSQ+v2 = 93.2%, R3=0.842 | **READY** |
 | 5.10 | Convergence | ~42% sparsity, three paths | READY |
-| 6 | Discussion | Ternary vs binary at scale | **PENDING L2** |
+| 6 | Discussion | 355M: bits accurate but algebra degrades. Zeros 6.2%. Collisions. | **NEEDS REVISION** |
 | 7 | Future work | Discovery loop, scaling, cross-linguistic | READY |
 
-**Status: 11/13 sections READY. 2 pending experiments (iFSQ+v2, L2).**
+**Status: 11/13 sections READY. 2 need revision (5.4 subsumption @ 355M, 6 discussion).**
+**L2 formal eval DONE — 355M v1 has good bits (88%) but algebraic ops fail. BUT: D-A13 never had v2 anchors (158). The v2 anchor set was the breakthrough at 40M. Fair comparison requires 355M+v2 training (~4.5h GPU).**
 
 ---
 
 ## IMMEDIATE NEXT ACTIONS (Priority Order)
 
-1. **Run L11/L12 with v2 checkpoint** — 30 min, CPU, can do now
-2. **Run L15 + L19** — 30 min each, CPU, scripts exist
-3. **Create iFSQ+v2 training script** — combine best activation + best anchors
-4. **Run iFSQ+v2 training** — 2h GPU, the decisive experiment
-5. **Switch to BitwiseValidator default** — 1 day, no GPU
-6. **Run L2 D-A13 eval** — 1h GPU
-7. **Update paper with final results** — 1 day
+1. ~~Run L11/L12 with v2 checkpoint~~ — **DONE: PASS** (2026-03-19)
+2. ~~Run L15 + L19~~ — **DONE: both FAIL** (2026-03-19)
+3. ~~iFSQ+v2 decisive experiment~~ — **DONE: D-A16** (2026-03-19, 93.2% test, R3=0.842)
+4. ~~Create iFSQ+v2 training script~~ — **DONE: added `--activation ifsq` to danza_63bit.py**
+5. ~~Run iFSQ+v2 training~~ — **DONE: see step 3**
+6. **Switch to BitwiseValidator default** — 1 day, no GPU
+7. ~~Run L2 D-A13 eval~~ — **DONE: 88% bits, sub 9-20%, analogy 0% (but only v1 anchors!)**
+8. **Train D-A17: GPT-2 Medium (355M) + v2 anchors** — ~4.5h GPU. Fair scaling comparison.
+9. **Run L2 formal eval on D-A17** — compare with D-A13 (v1) and D-A14 (40M v2)
+10. **Revise paper Sections 5.4 and 6** with honest scaling results
+11. **Update paper with all final results** — 1 day
 
-**Minimum for submission: Steps 1-4 (test what's missing + one decisive experiment)**
-**Complete: Steps 1-7**
+**Minimum for submission: Steps 1-5 DONE. Remaining: L2 eval (GPU) + paper update.**
+**Final model: v2 tanh (D-A14) — confirmed by D-A16 ablation.**

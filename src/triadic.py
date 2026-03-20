@@ -476,6 +476,15 @@ class BitwiseValidator:
 
 
 # ============================================================
+# Default aliases — BitwiseMapper/BitwiseValidator are O(1)
+# isomorphic to PrimeMapper/TriadicValidator. Use as default.
+# ============================================================
+
+DefaultMapper = BitwiseMapper
+DefaultValidator = BitwiseValidator
+
+
+# ============================================================
 # Triadic Loss — Differentiable loss for prime alignment
 # ============================================================
 

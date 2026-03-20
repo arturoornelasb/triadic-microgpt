@@ -24,7 +24,10 @@ sys.path.insert(0, _PROJECT)
 sys.path.insert(0, _PLAYGROUND)
 
 from src.torch_transformer import TriadicGPTConfig
-from src.triadic import PrimeMapper, TriadicValidator, prime_factors
+from src.triadic import (
+    PrimeMapper, TriadicValidator, BitwiseMapper, BitwiseValidator,
+    DefaultMapper, DefaultValidator, prime_factors,
+)
 
 try:
     from src.fast_tokenizer import FastBPETokenizer as BPETokenizer
@@ -40,6 +43,10 @@ from danza_63bit import (
 RUN15_CKPT_DIR = os.path.join(_PROJECT, 'checkpoints', 'danza_bootstrap_xl')
 RUN15_CKPT = os.path.join(RUN15_CKPT_DIR, 'model_best.pt')
 RUN15_TOK = os.path.join(RUN15_CKPT_DIR, 'tokenizer.json')
+
+V2_CKPT_DIR = os.path.join(_PROJECT, 'checkpoints', 'danza_63bit_xl_v2')
+V2_CKPT = os.path.join(V2_CKPT_DIR, 'model_best.pt')
+V2_TOK = os.path.join(V2_CKPT_DIR, 'tokenizer.json')
 
 DA13_CKPT_DIR = os.path.join(_PROJECT, 'checkpoints', 'danza_gpt2medium_ternary')
 DA13_CKPT = os.path.join(DA13_CKPT_DIR, 'model_best.pt')
@@ -67,6 +74,24 @@ def load_run15(device='cpu'):
     model.eval()
 
     tokenizer = BPETokenizer.load(RUN15_TOK)
+    return model, tokenizer
+
+
+def load_v2(device='cpu'):
+    """Load Danza v2 (40M, 158 anchors) with custom BPE tokenizer."""
+    ckpt = torch.load(V2_CKPT, map_location=device, weights_only=True)
+    cfg = ckpt['config']
+
+    config = TriadicGPTConfig(
+        vocab_size=cfg['vocab_size'], block_size=cfg['block_size'],
+        n_layer=cfg['n_layer'], n_embd=cfg['n_embd'],
+        n_head=cfg['n_head'], n_triadic_bits=cfg['n_triadic_bits'],
+    )
+    model = DanzaTriadicGPT(config).to(device)
+    model.load_state_dict(ckpt['model_state_dict'])
+    model.eval()
+
+    tokenizer = BPETokenizer.load(V2_TOK)
     return model, tokenizer
 
 
@@ -171,6 +196,16 @@ def bits_shared(a, b):
 def proj_to_prime(proj, mapper):
     """Convert projection to composite prime integer."""
     return mapper.map(proj.tolist())
+
+
+def proj_to_bitmask(proj, bw_mapper=None):
+    """Convert projection to bitmask integer (O(1) bitwise ops).
+
+    If bw_mapper is None, creates a DefaultMapper(N_BITS).
+    """
+    if bw_mapper is None:
+        bw_mapper = DefaultMapper(N_BITS)
+    return bw_mapper.map(proj.tolist())
 
 
 # ============================================================

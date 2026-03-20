@@ -18,16 +18,38 @@ Analogy:    factor transfer   king:queen :: man:woman
 | Finding | Result |
 |---------|--------|
 | Language cost of triadic head | **Zero** (PPL 7.69 vs 7.56 ablation, within noise) |
-| Semantic ordering emergence | Phase transition at **~20M params** (gap: -0.076 -> +0.020) |
+| Semantic ordering emergence | Gradual crossover at **~20M params** (gap: -0.076 -> +0.020) |
 | Optimal bit width | **k=32-64** (shifted from k=6-12 post-hoc) |
 | Analogy verification (v2, 158 anchors) | **93%** test acc, **exact** king:queen via bitwise |
 | Subsumption (v2, 158 anchors) | **98.3%** test (train 99.4%) |
 | Triadic 3-way interactions | **68** discovered by reptimeline |
 | Signature uniqueness | **100%** across all evaluated concepts |
 | BitwiseValidator | **O(1)** isomorphic to primes, **5-78x** faster, scales to 1024+ bits |
-| GPT-2 transfer (InfoNCE) | Gap **+0.099**, closing **72%** of gap to Engine PCA (+0.136) |
+| GPT-2 transfer (InfoNCE) | Gap **+0.076**, closing **48%** of gap to Engine PCA (+0.136) |
 | Domain separation (sentence-level) | **1.21** mean across 12 domains (+19% vs token-level) |
-| Convergence | Trits (philosophy), BitNet (engineering), Bitwise (math) -> same ternary {+1,0,-1} |
+| iFSQ + v2 anchors (D-A16) | **93.2%** test, R3 **0.842**, king:queen **100%** bitwise |
+| ~42% sparsity convergence | Trits (philosophy), BitNet (engineering), Bitwise (math) -> same ternary {+1,0,-1} |
+
+## Danza Cósmica: 63-Bit Supervised System (Best Model)
+
+Training TriadicGPT with 158 hand-factorized anchor concepts from *La Danza Cósmica de los Opuestos* (63 semantic primitives) produces the strongest results across all metrics:
+
+| Model | Test Acc | Subsumption | Dead Bits | R3 Round-Trip | king:queen |
+|-------|----------|-------------|-----------|---------------|------------|
+| **D-A14 v2 tanh** | **93.0%** | **98.3%** | 26/63 | 90.7% | exact |
+| D-A16 iFSQ+v2 | 93.2% | 98.3% | — | 84.2% | 100% bitwise |
+| D-A5 v1 (54 anchors) | 79.4% | 87.2% | 27/63 | 90.7% | — |
+| Run 15 (self-supervised) | — | 86.5% | 15/64 | — | — |
+
+**Optimal model: D-A14 v2 tanh** — confirmed by D-A16 ablation (v2 anchors dominate over activation choice).
+
+```bash
+# Train v2 model (158 anchors, ~76 min GPU)
+python playground/danza_63bit.py --scale xl --steps 50000 --v2 --dtype bfloat16
+
+# Train iFSQ variant
+python playground/danza_63bit.py --scale xl --steps 50000 --v2 --activation ifsq --dtype bfloat16
+```
 
 ## Phase 5: Transfer Learning & Alignment Loss Ablation (Experiment 10)
 
@@ -38,7 +60,7 @@ formulations reveals a **loss-embedding interaction**: the optimal loss depends 
 |----------------|-------------|---------------|-------|
 | MSE | +0.011 | 75.0% | Weak — absolute value matching wastes capacity |
 | Rank | +0.047 | **83.3%** | Best analogies; ordering-based |
-| **InfoNCE** | **+0.099** | 66.7% | **Closes 72% of gap to Engine PCA** |
+| **InfoNCE** | **+0.076** | 100% | **Closes 48% of gap to Engine PCA** |
 | From-scratch (MSE) | +0.020 | 66.7% | Baseline |
 | Engine PCA | +0.136 | 91.7% | Upper bound (post-hoc, MiniLM) |
 
@@ -84,8 +106,8 @@ Text -> BPE Tokenizer (4096 vocab) -> Token IDs -> TriadicGPT (12L/512D/8H)
                                               Next-Token   tanh(Wx) -> bits
                                               Prediction   [+, -, +, +, ...]
                                                     |           |
-                                              L_lang       PrimeMapper
-                                              (CE)         Phi = 2 x 5 x 7
+                                              L_lang       PrimeMapper / BitwiseValidator
+                                              (CE)         Phi = 2 x 5 x 7  (O(1) bitwise)
                                                     |           |
                                                     +-----+-----+
                                                           |
@@ -203,8 +225,9 @@ ui/
   workers/                 # Async QThread workers for inference
   resources/style.qss      # Dark theme (Catppuccin Mocha)
 
-experiment_log.md          # Complete record of all 29 runs + 11 experiments
-EVOLUTION_PLAN.md          # Research roadmap and phase tracking
+experiment_log.md          # Detailed data store — raw logs for all training runs
+EXPERIMENT_REFERENCE.md    # Master consolidated reference (all experiments by research line)
+archive/                   # Archived docs (detailed tables, methodology, designs)
 ```
 
 ## Reproducing Results

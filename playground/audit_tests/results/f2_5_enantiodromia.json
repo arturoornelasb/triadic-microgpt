@@ -1,0 +1,151 @@
+{
+  "test": "EXP-F2.5",
+  "model": "Danza v2 (40M, 158 anchors)",
+  "core_results": [
+    {
+      "extreme": "tyranny",
+      "opposite": "freedom",
+      "moderate": "authority",
+      "h_extreme_opposite": 4,
+      "h_moderate_opposite": 6,
+      "delta": -2,
+      "pass": true,
+      "shared_extreme": 0.81,
+      "shared_moderate": 0.739,
+      "gcd_extreme": 749821475572634279252553339765,
+      "gcd_moderate": 749821475572634279252553339765
+    },
+    {
+      "extreme": "fanaticism",
+      "opposite": "tolerance",
+      "moderate": "dedication",
+      "h_extreme_opposite": 13,
+      "h_moderate_opposite": 6,
+      "delta": 7,
+      "pass": false,
+      "shared_extreme": 0.567,
+      "shared_moderate": 0.739,
+      "gcd_extreme": 749821475572634279252553339765,
+      "gcd_moderate": 749821475572634279252553339765
+    },
+    {
+      "extreme": "obsession",
+      "opposite": "indifference",
+      "moderate": "interest",
+      "h_extreme_opposite": 7,
+      "h_moderate_opposite": 3,
+      "delta": 4,
+      "pass": false,
+      "shared_extreme": 0.72,
+      "shared_moderate": 0.864,
+      "gcd_extreme": 75731969032836062204507887316265,
+      "gcd_moderate": 244441801036678775036332388763390
+    },
+    {
+      "extreme": "perfectionism",
+      "opposite": "acceptance",
+      "moderate": "diligence",
+      "h_extreme_opposite": 6,
+      "h_moderate_opposite": 3,
+      "delta": 3,
+      "pass": false,
+      "shared_extreme": 0.739,
+      "shared_moderate": 0.85,
+      "gcd_extreme": 749821475572634279252553339765,
+      "gcd_moderate": 749821475572634279252553339765
+    },
+    {
+      "extreme": "recklessness",
+      "opposite": "caution",
+      "moderate": "boldness",
+      "h_extreme_opposite": 16,
+      "h_moderate_opposite": 8,
+      "delta": 8,
+      "pass": false,
+      "shared_extreme": 0.385,
+      "shared_moderate": 0.68,
+      "gcd_extreme": 71822708558437845,
+      "gcd_moderate": 749821475572634279252553339765
+    },
+    {
+      "extreme": "greed",
+      "opposite": "generosity",
+      "moderate": "ambition",
+      "h_extreme_opposite": 11,
+      "h_moderate_opposite": 7,
+      "delta": 4,
+      "pass": false,
+      "shared_extreme": 0.593,
+      "shared_moderate": 0.682,
+      "gcd_extreme": 19881209321211899864643319185,
+      "gcd_moderate": 111068208498390502037113515
+    },
+    {
+      "extreme": "pride",
+      "opposite": "humility",
+      "moderate": "confidence",
+      "h_extreme_opposite": 3,
+      "h_moderate_opposite": 6,
+      "delta": -3,
+      "pass": true,
+      "shared_extreme": 0.87,
+      "shared_moderate": 0.739,
+      "gcd_extreme": 104824292463578699605227704345807235,
+      "gcd_moderate": 749821475572634279252553339765
+    },
+    {
+      "extreme": "rage",
+      "opposite": "calm",
+      "moderate": "irritation",
+      "h_extreme_opposite": 6,
+      "h_moderate_opposite": 6,
+      "delta": 0,
+      "pass": false,
+      "shared_extreme": 0.75,
+      "shared_moderate": 0.75,
+      "gcd_extreme": 53237324765657033826931287123315,
+      "gcd_moderate": 53237324765657033826931287123315
+    }
+  ],
+  "extra_results": [
+    {
+      "extreme": "starvation",
+      "opposite": "abundance",
+      "moderate": "hunger",
+      "h_extreme_opposite": 9,
+      "h_moderate_opposite": 7,
+      "delta": 2,
+      "pass": false
+    },
+    {
+      "extreme": "isolation",
+      "opposite": "connection",
+      "moderate": "solitude",
+      "h_extreme_opposite": 8,
+      "h_moderate_opposite": 2,
+      "delta": 6,
+      "pass": false
+    },
+    {
+      "extreme": "chaos",
+      "opposite": "order",
+      "moderate": "spontaneity",
+      "h_extreme_opposite": 13,
+      "h_moderate_opposite": 11,
+      "delta": 2,
+      "pass": false
+    },
+    {
+      "extreme": "worship",
+      "opposite": "contempt",
+      "moderate": "admiration",
+      "h_extreme_opposite": 8,
+      "h_moderate_opposite": 6,
+      "delta": 2,
+      "pass": false
+    }
+  ],
+  "n_pass": 2,
+  "n_total": 8,
+  "overall_pass": false
+}

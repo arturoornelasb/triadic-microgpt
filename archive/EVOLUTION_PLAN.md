@@ -1,3 +1,5 @@
+> **⚠ ARCHIVED — High-level content migrated to [`EXPERIMENT_REFERENCE.md`](../EXPERIMENT_REFERENCE.md).** This file preserved in `archive/` for detailed benchmark tables, phase metrics, Engine comparison, and 18-row version history.
+
 # Triadic MicroGPT — Evolution Plan & Research Roadmap
 
 > **Goal**: Produce a publishable research paper demonstrating that end-to-end triadic training yields interpretable, algebraically verifiable semantic representations in a generative language model — with rigorous, industry-standard benchmarks at every phase.

@@ -1,0 +1,73 @@
+{
+  "test": "EXP-F4.4",
+  "model": "D-A13 (GPT-2 Medium 355M)",
+  "checkpoint": "C:\\Github\\triadic-microgpt\\checkpoints\\danza_gpt2medium_ternary\\model_best.pt",
+  "n_bits": 63,
+  "bit_accuracy": {
+    "train": {
+      "mean_accuracy": 1.0,
+      "n_concepts": 28,
+      "worst_3": [
+        {
+          "word": "cold",
+          "accuracy": 1.0
+        },
+        {
+          "word": "hot",
+          "accuracy": 1.0
+        },
+        {
+          "word": "love",
+          "accuracy": 1.0
+        }
+      ]
+    },
+    "holdout": {
+      "mean_accuracy": 0.8797,
+      "n_concepts": 26,
+      "worst_3": [
+        {
+          "word": "darkness",
+          "accuracy": 0.778
+        },
+        {
+          "word": "dead",
+          "accuracy": 0.794
+        },
+        {
+          "word": "gas",
+          "accuracy": 0.794
+        }
+      ]
+    }
+  },
+  "subsumption": {
+    "train": {
+      "correct": 4,
+      "total": 43,
+      "rate": 0.093
+    },
+    "test": {
+      "correct": 2,
+      "total": 10,
+      "rate": 0.2
+    }
+  },
+  "ternary_distribution": {
+    "neg": 0.7058,
+    "zero": 0.062,
+    "pos": 0.2322,
+    "collapsed_to_binary": false
+  },
+  "signature_uniqueness": {
+    "n_concepts": 54,
+    "n_unique": 44,
+    "n_duplicates": 7,
+    "uniqueness_rate": 0.8148
+  },
+  "analogy": {
+    "correct": 0,
+    "total": 15,
+    "rate": 0.0
+  }
+}

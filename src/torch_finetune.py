@@ -86,11 +86,20 @@ class InstructionDataset(Dataset):
 
 def finetune(args):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    amp_dtype = {'float32': torch.float32, 'float16': torch.float16,
+                 'bfloat16': torch.bfloat16}[args.dtype]
+    use_scaler = (device.type == 'cuda' and amp_dtype == torch.float16)
+
+    if device.type == 'cuda':
+        torch.set_float32_matmul_precision('high')
+        torch.backends.cudnn.benchmark = True
+
     print()
     print("=" * 64)
     print("  TRIADIC MICROGPT — PyTorch Fine-Tuning (Chat)")
     print("=" * 64)
     print(f"  Device: {device}")
+    print(f"  Precision: {args.dtype}")
     print()
 
     checkpoint_dir = args.checkpoint_dir or os.path.join(
@@ -169,7 +178,7 @@ def finetune(args):
     print("-" * 64)
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=0.01)
-    scaler = torch.amp.GradScaler('cuda', enabled=(device.type == 'cuda'))
+    scaler = torch.amp.GradScaler('cuda', enabled=use_scaler)
 
     # CSV logging
     csv_path = os.path.join(checkpoint_dir, 'finetune_log.csv')
@@ -208,7 +217,7 @@ def finetune(args):
             pg['lr'] = lr_t
 
         # Forward
-        with torch.amp.autocast('cuda', enabled=(device.type == 'cuda')):
+        with torch.amp.autocast('cuda', dtype=amp_dtype, enabled=(device.type == 'cuda')):
             logits, triadic_proj, lang_loss = model(x, targets=y)
             tri_loss = model.triadic_loss(triadic_proj)
             total_loss = lang_loss + args.alpha * tri_loss
@@ -267,7 +276,7 @@ def finetune(args):
             msg += f" | step {step+1}/{args.steps}"
             msg += f" | loss {lang_loss.item():.4f}"
             msg += f" | tri {tri_loss_val:.4f}"
-            if distill_target_tensor is not None:
+            if gold_sequences:
                 msg += f" | dist {dist_loss_val:.4f}"
             msg += f" | {sps:.1f} stp/s"
             msg += f" | ETA {eta}"
@@ -343,6 +352,7 @@ if __name__ == '__main__':
     parser.add_argument('--print-every', type=int, default=50, help='Print frequency')
     parser.add_argument('--save-every', type=int, default=500, help='Save frequency')
     parser.add_argument('--checkpoint-dir', type=str, default=None, help='Output dir')
+    parser.add_argument('--dtype', type=str, default='bfloat16', choices=['float32', 'float16', 'bfloat16'], help='Mixed precision dtype (default: bfloat16)')
     args = parser.parse_args()
 
     finetune(args)

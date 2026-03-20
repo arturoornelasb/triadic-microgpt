@@ -110,11 +110,11 @@ HOLDOUT_INFO = {
 # A, B, C must map to TRAIN concepts; D must map to HOLDOUT.
 BOOTSTRAP_QUADS = [
     # --- Exact axis matches ---
-    ('man', 'woman', 'king', 'queen'),          # tierra<->agua
-    ('happy', 'sad', 'love', 'hate'),            # placer<->dolor + union<->separacion
-    ('open', 'close', 'free', 'prisoner'),       # libertad<->control + sep<->union
-    ('man', 'woman', 'solid', 'liquid'),          # tierra<->agua (same as gender)
-    ('hot', 'cold', 'creative', 'logical'),       # fuego<->tierra + caos<->orden
+    ('man', 'woman', 'king', 'queen'),          # tierra<->agua (earth<->water)
+    ('happy', 'sad', 'love', 'hate'),            # placer<->dolor (pleasure<->pain) + union<->separacion (union<->separation)
+    ('open', 'close', 'free', 'prisoner'),       # libertad<->control (freedom<->control) + sep<->union (separation<->union)
+    ('man', 'woman', 'solid', 'liquid'),          # tierra<->agua (earth<->water, same as gender)
+    ('hot', 'cold', 'creative', 'logical'),       # fuego<->tierra (fire<->earth) + caos<->orden (chaos<->order)
 
     # --- Partial axis (share primary component) ---
     ('hot', 'cold', 'loud', 'quiet'),             # partial: includes orden<->caos

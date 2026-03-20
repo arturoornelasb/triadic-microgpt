@@ -311,12 +311,12 @@ def build_subsumption_pairs(anchors, prim_data):
 # Hand-picked regla de tres quads from the anchors
 REGLA_DE_TRES_QUADS = [
     # A:B = C:D — the transformation from A→B applied to C should yield D
-    ('man', 'woman', 'king', 'queen'),      # tierra→agua
-    ('cold', 'hot', 'quiet', 'loud'),        # tierra→fuego, orden→caos, control→libertad
-    ('happy', 'sad', 'love', 'hate'),        # placer→dolor, unión→separación
-    ('open', 'close', 'free', 'prisoner'),   # libertad→control, separación→unión
-    ('bright', 'dark', 'loud', 'quiet'),     # más→menos (approx)
-    ('teach', 'learn', 'king', 'queen'),     # creador_obs→receptivo (NOT exact, but testable)
+    ('man', 'woman', 'king', 'queen'),      # tierra->agua (earth->water)
+    ('cold', 'hot', 'quiet', 'loud'),        # tierra->fuego (earth->fire), orden->caos (order->chaos), control->libertad (control->freedom)
+    ('happy', 'sad', 'love', 'hate'),        # placer->dolor (pleasure->pain), union->separacion (union->separation)
+    ('open', 'close', 'free', 'prisoner'),   # libertad->control (freedom->control), separacion->union (separation->union)
+    ('bright', 'dark', 'loud', 'quiet'),     # mas->menos (more->less, approx)
+    ('teach', 'learn', 'king', 'queen'),     # creador_obs->receptivo (creator_obs->receptive, NOT exact, but testable)
 ]
 
 
@@ -398,6 +398,45 @@ class DanzaTriadicGPT(TriadicGPT):
 
         logits = self.lm_head(x)
         triadic_proj = torch.tanh(self.triadic_head(x))
+
+        loss = None
+        if targets is not None:
+            loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
+
+        return logits, triadic_proj, loss
+
+
+class iFSQDanzaGPT(TriadicGPT):
+    """DanzaTriadicGPT with iFSQ activation: 2*sigmoid(1.6*x) - 1.
+
+    iFSQ (Tencent, 2025) showed tanh concentrates activations near 0,
+    causing dead bits. sigmoid(1.6*x) distributes activations more
+    uniformly across [-1, +1], preserving gradient flow.
+
+    D-A10 result: loss 0.924 (best), 87.1% subsumption (iFSQ + binary).
+    """
+
+    def gradient_checkpointing_enable(self):
+        self._grad_checkpoint = True
+
+    def forward(self, input_ids, targets=None):
+        B, T = input_ids.shape
+        assert T <= self.config.block_size
+
+        pos = torch.arange(0, T, dtype=torch.long, device=input_ids.device)
+        tok_emb = self.wte(input_ids)
+        pos_emb = self.wpe(pos)
+        x = self.drop(tok_emb + pos_emb)
+
+        for block in self.blocks:
+            if getattr(self, '_grad_checkpoint', False) and self.training:
+                x = torch.utils.checkpoint.checkpoint(block, x, use_reentrant=False)
+            else:
+                x = block(x)
+        x = self.ln_f(x)
+
+        logits = self.lm_head(x)
+        triadic_proj = 2 * torch.sigmoid(1.6 * self.triadic_head(x)) - 1
 
         loss = None
         if targets is not None:
@@ -617,6 +656,8 @@ def main():
     parser.add_argument('--eval-every', type=int, default=1000)
     parser.add_argument('--v2', action='store_true',
                         help='Use expanded anchors (anclas.json + anclas_v2.json = 158 concepts)')
+    parser.add_argument('--activation', choices=['tanh', 'ifsq'], default='tanh',
+                        help='Triadic head activation: tanh (default) or ifsq (2*sigmoid(1.6x)-1)')
     args = parser.parse_args()
 
     SCALES = {
@@ -630,7 +671,12 @@ def main():
     if device.type == 'cuda':
         torch.set_float32_matmul_precision('high')   # TF32 for residual float32 ops
         torch.backends.cudnn.benchmark = True         # kernel autotuning
-    suffix = f'{args.scale}_v2' if args.v2 else args.scale
+    parts = [args.scale]
+    if args.v2:
+        parts.append('v2')
+    if args.activation == 'ifsq':
+        parts.append('ifsq')
+    suffix = '_'.join(parts)
     ckpt_dir = os.path.join(PROJECT_ROOT, 'checkpoints', f'danza_63bit_{suffix}')
     os.makedirs(ckpt_dir, exist_ok=True)
 
@@ -670,7 +716,7 @@ def main():
     train_sub, test_sub = build_subsumption_pairs(anchors, prim_data)
     print(f"  Subsumption pairs: train={len(train_sub)}, test={len(test_sub)}")
     for h_w, y_w, _, _ in train_sub[:3]:
-        print(f"    {h_w} ⊆ {y_w}")
+        print(f"    {h_w} <= {y_w}")
 
     # --- 2. Tokenizer ---
     data_path = os.path.join(PROJECT_ROOT, 'data', 'TinyStories-train.txt')
@@ -711,7 +757,9 @@ def main():
     print(f"  Total: {len(all_tokens):,} tokens")
 
     # --- 4. Model ---
-    print(f"\n[4/6] Initializing DanzaTriadicGPT ({N_BITS} bits)...")
+    ModelClass = iFSQDanzaGPT if args.activation == 'ifsq' else DanzaTriadicGPT
+    act_label = 'iFSQ (2*sigmoid(1.6x)-1)' if args.activation == 'ifsq' else 'tanh'
+    print(f"\n[4/6] Initializing {ModelClass.__name__} ({N_BITS} bits, activation={act_label})...")
     config = TriadicGPTConfig(
         vocab_size=tokenizer.vocab_size,
         block_size=args.block,
@@ -721,10 +769,11 @@ def main():
         n_triadic_bits=N_BITS,
         dropout=args.dropout,
     )
-    model = DanzaTriadicGPT(config).to(device)
+    model = ModelClass(config).to(device)
     total_params = model.num_params()
     print(f"  Scale: {args.scale} ({preset['layers']}L/{preset['dim']}D/{preset['heads']}H)")
     print(f"  Parameters: {total_params:,} ({total_params/1e6:.1f}M)")
+    print(f"  Activation: {act_label}")
 
     # Gradient checkpointing (saves VRAM for xxl/huge)
     if args.grad_checkpoint:
@@ -968,6 +1017,7 @@ def main():
                         'n_layer': config.n_layer, 'n_embd': config.n_embd,
                         'n_head': config.n_head, 'n_triadic_bits': config.n_triadic_bits,
                     },
+                    'activation': args.activation,
                     'bit_accuracy_test': test_acc,
                     'sub_rate_test': sub_rate_test,
                 }, best_path)
@@ -1024,6 +1074,8 @@ def main():
     results = {
         'experiment': 'danza_63bit',
         'scale': args.scale,
+        'activation': args.activation,
+        'v2_anchors': args.v2,
         'steps': args.steps,
         'n_bits': N_BITS,
         'n_anchors_train': len(sup_train_words),

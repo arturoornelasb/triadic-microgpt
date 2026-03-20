@@ -30,7 +30,7 @@ try:
     from src.fast_tokenizer import FastBPETokenizer as BPETokenizer
 except ImportError:
     from src.tokenizer import BPETokenizer
-from src.triadic import PrimeMapper, TriadicValidator
+from src.triadic import PrimeMapper, TriadicValidator, BitwiseMapper, BitwiseValidator
 
 
 # ============================================================
@@ -118,42 +118,54 @@ def generate_samples(model, tokenizer, device, n=5, max_tokens=60, temperature=0
     return samples
 
 
+def _bitmask_to_bits(mask, n_bits=64):
+    """Convert bitmask integer to list of active bit indices."""
+    return [i for i in range(n_bits) if mask & (1 << i)]
+
+
 def analyze_triadic(model, tokenizer, device, mapper, validator, concept_pairs):
-    """Analyze triadic signatures for concept pairs."""
+    """Analyze triadic signatures for concept pairs.
+
+    Works with both PrimeMapper/TriadicValidator and BitwiseMapper/BitwiseValidator.
+    """
     results = []
+    n_bits = getattr(mapper, 'n_bits', 64)
 
     for word_a, word_b in concept_pairs:
-        def get_prime(word):
+        def get_sig(word):
             ids = tokenizer.encode(word, add_special=False)
             if not ids:
-                return 1, None
+                return 0, None
             x = torch.tensor([ids], dtype=torch.long, device=device)
             with torch.no_grad():
                 _, triadic_proj, _ = model(x)
-            # Mean triadic projection over tokens
             proj = triadic_proj[0].mean(dim=0).cpu().numpy()
-            prime = mapper.map(proj)
-            return prime, proj
+            sig = mapper.map(proj)
+            return sig, proj
 
-        prime_a, proj_a = get_prime(word_a)
-        prime_b, proj_b = get_prime(word_b)
+        sig_a, proj_a = get_sig(word_a)
+        sig_b, proj_b = get_sig(word_b)
 
-        if prime_a and prime_b:
-            sim = validator.similarity(prime_a, prime_b)
-            gap = validator.explain_gap(prime_a, prime_b)
+        if sig_a and sig_b:
+            sim = validator.similarity(sig_a, sig_b)
+            gap = validator.explain_gap(sig_a, sig_b)
+            # Normalize shared/only_a/only_b to bit index lists
+            shared = gap.get('shared_factors') or _bitmask_to_bits(gap.get('shared', 0), n_bits)
+            only_a = gap.get('only_in_a_factors') or _bitmask_to_bits(gap.get('only_in_a', 0), n_bits)
+            only_b = gap.get('only_in_b_factors') or _bitmask_to_bits(gap.get('only_in_b', 0), n_bits)
         else:
             sim = 0.0
-            gap = {'shared_factors': [], 'only_in_a_factors': [], 'only_in_b_factors': []}
+            shared, only_a, only_b = [], [], []
 
         results.append({
             'word_a': word_a,
             'word_b': word_b,
-            'prime_a': prime_a,
-            'prime_b': prime_b,
+            'sig_a': sig_a,
+            'sig_b': sig_b,
             'similarity': sim,
-            'shared': gap['shared_factors'],
-            'only_a': gap['only_in_a_factors'],
-            'only_b': gap['only_in_b_factors'],
+            'shared': shared,
+            'only_a': only_a,
+            'only_b': only_b,
         })
 
     return results
@@ -263,8 +275,8 @@ def evaluate(args):
     # Triadic analysis
     print()
     print("[4/4] Triadic signature analysis...")
-    mapper = PrimeMapper(config.n_triadic_bits)
-    validator = TriadicValidator()
+    mapper = BitwiseMapper(config.n_triadic_bits)
+    validator = BitwiseValidator()
 
     concept_pairs = [
         ("King", "Queen"),

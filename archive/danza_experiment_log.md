@@ -1,3 +1,5 @@
+> **⚠ ARCHIVED — High-level content migrated to [`EXPERIMENT_REFERENCE.md`](../EXPERIMENT_REFERENCE.md) Sections 4.0–4.15.** This file preserved in `archive/` for detailed D-A1 test designs (hypotheses, methods), D-A5/D-A6 methodology, source data description, and research question framing.
+
 # Danza Cósmica — Experiment Log
 
 Expansion experiments connecting TriadicGPT with the 63-primitive system from

@@ -1,3 +1,5 @@
+> **⚠ ARCHIVED — Summary migrated to [`EXPERIMENT_REFERENCE.md`](../EXPERIMENT_REFERENCE.md) Section 12.** This file preserved in `archive/` for the complete 34-row match table, categorized primitive lists, and dual representation explanation.
+
 # Reconciliation of Primitive Systems: 49 vs 63 vs 64 bits
 
 ## Three Systems

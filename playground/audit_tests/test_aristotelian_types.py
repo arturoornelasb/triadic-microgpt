@@ -25,7 +25,7 @@ _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, _THIS_DIR)
 
 from common import (
-    load_run15, get_projections_batch, hamming, bits_shared,
+    load_run15, load_v2, get_projections_batch, hamming, bits_shared,
     proj_to_prime, to_binary, save_results, print_header, print_section,
     N_BITS,
 )
@@ -113,14 +113,24 @@ def analyze_pair(w1, w2, projections, mapper, validator):
 
 
 def main():
-    print_header("EXP-F2.2: ARISTOTELIAN OPPOSITION TYPES")
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--v2', action='store_true', help='Use Danza v2 (158 anchors) instead of Run 15')
+    args = parser.parse_args()
+
+    model_name = 'Danza v2 (40M, 158 anchors)' if args.v2 else 'Run 15 (40M)'
+    print_header(f"EXP-F2.2: ARISTOTELIAN OPPOSITION TYPES [{model_name}]")
 
     import torch
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"  Device: {device}")
 
-    print(f"  Loading Run 15...")
-    model, tokenizer = load_run15(str(device))
+    if args.v2:
+        print(f"  Loading Danza v2 (40M, 158 anchors)...")
+        model, tokenizer = load_v2(str(device))
+    else:
+        print(f"  Loading Run 15...")
+        model, tokenizer = load_run15(str(device))
 
     mapper = PrimeMapper(N_BITS)
     validator = TriadicValidator()
@@ -254,7 +264,7 @@ def main():
 
     save_results({
         'test': 'EXP-F2.2',
-        'model': 'Run 15 (40M)',
+        'model': model_name,
         'type_metrics': type_metrics,
         'kruskal_wallis': stat_results,
         'hypothesis_checks': [{'check': c, 'pass': p} for c, p in checks],

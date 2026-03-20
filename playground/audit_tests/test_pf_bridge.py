@@ -33,8 +33,9 @@ sys.path.insert(0, _THIS_DIR)
 
 from common import (
     load_run15, get_projection, get_projections_batch,
-    hamming, cosine_sim, bits_shared, proj_to_prime, to_binary,
+    hamming, cosine_sim, bits_shared, proj_to_prime, proj_to_bitmask, to_binary,
     save_results, print_header, print_section, N_BITS,
+    DefaultMapper, DefaultValidator,
 )
 from src.triadic import PrimeMapper, TriadicValidator
 
@@ -42,11 +43,8 @@ from src.triadic import PrimeMapper, TriadicValidator
 # Data
 # ============================================================
 
-# 7x7 category structure from the book (Sistema 7x7 = 49 primitives + extras = 63)
-# Category 5 has dual pairs that should be mutually exclusive
-DUAL_PAIRS_CAT5 = [
-    (0, 1), (2, 3), (4, 5), (6, 7),  # bit indices within Cat 5
-]
+# Dual pairs and categories are loaded dynamically from primitivos.json
+# (see load_primitives_config). Do NOT hardcode bit indices.
 
 # For Q1/Q2: use gold_primes_64.json concepts
 GOLD_PRIMES_PATH = os.path.join(
@@ -155,19 +153,20 @@ def test_pf_q2(projections, mapper, validator):
 
     for i, j in pairs:
         p1, p2 = projections[words[i]], projections[words[j]]
-        pr1 = proj_to_prime(p1, mapper)
-        pr2 = proj_to_prime(p2, mapper)
-        gcd = validator.intersect(pr1, pr2)
+        sig1 = proj_to_bitmask(p1, mapper)
+        sig2 = proj_to_bitmask(p2, mapper)
+        shared = validator.intersect(sig1, sig2)
         cos = cosine_sim(p1, p2)
 
-        if gcd == 1:
+        # No shared features: bitmask intersection == 0
+        if shared == 0:
             gcd1_cosines.append(cos)
         else:
             other_cosines.append(cos)
 
     if not gcd1_cosines:
-        print(f"  No GCD=1 pairs found among {sample_size} samples. SKIP.")
-        return {'skip': True, 'reason': 'no GCD=1 pairs'}
+        print(f"  No disjoint pairs found among {sample_size} samples. SKIP.")
+        return {'skip': True, 'reason': 'no disjoint pairs'}
 
     mean_gcd1 = np.mean(gcd1_cosines)
     mean_other = np.mean(other_cosines)
@@ -209,46 +208,63 @@ def load_primitives_config():
 
 
 def test_pf_q4_q5_q6(projections, prim_data):
-    """PF-Q4, Q5, Q6: Category-level tests using the 7x7 system."""
+    """PF-Q4, Q5, Q6: Category-level tests using the 7x7 system.
+
+    Uses actual bit indices from primitivos.json — NOT sequential assumptions.
+    """
     print_section("PF-Q4/Q5/Q6: CATEGORY-BASED TESTS")
 
-    # Load category structure
     name_to_bit = prim_data['name_to_bit']
     bit_to_name = prim_data['bit_to_name']
+    dual_axes = prim_data['dual_axes']  # 12 dual pairs from ejes_duales
 
-    # Group bits by category (7 categories of ~7-9 bits each)
-    # Categories from the book's Sistema 7x7
+    # Build categories from actual 'capa' field (NOT bit_idx // 7)
     categories = defaultdict(list)
-    for bit_idx in range(N_BITS):
-        cat_idx = bit_idx // 7  # Approximate category grouping
-        categories[cat_idx].append(bit_idx)
+    for p in prim_data['primitives']:
+        categories[p['capa']].append(p['bit'])
 
+    print(f"  Capas: {dict((k, len(v)) for k, v in sorted(categories.items()))}")
+
+    # ------------------------------------------------------------------
     # PF-Q4: Dual pairs never simultaneously active
+    # ------------------------------------------------------------------
     print(f"\n  PF-Q4: Dual pairs never simultaneously active")
-    print(f"  (Using category 5 dual pairs: bits should not both be +1)")
 
-    # Cat 5 starts at bit 28 (4*7) approximately
-    cat5_start = 28
+    # Resolve dual_axes names to actual bit pairs
+    dual_bit_pairs = []
+    for name_a, name_b in dual_axes:
+        if name_a in name_to_bit and name_b in name_to_bit:
+            dual_bit_pairs.append((name_to_bit[name_a], name_to_bit[name_b],
+                                   name_a, name_b))
+    print(f"  Dual pairs resolved: {len(dual_bit_pairs)}/12")
+    for ba, bb, na, nb in dual_bit_pairs:
+        print(f"    {na}(bit {ba}) <-> {nb}(bit {bb})")
+
     violations = 0
     total_checks = 0
+    violation_details = []
 
     for word, proj in projections.items():
         bits = to_binary(proj)
-        for b1_offset, b2_offset in DUAL_PAIRS_CAT5:
-            b1 = cat5_start + b1_offset
-            b2 = cat5_start + b2_offset
-            if b1 < N_BITS and b2 < N_BITS:
-                if bits[b1] == 1 and bits[b2] == 1:
+        for ba, bb, na, nb in dual_bit_pairs:
+            if ba < N_BITS and bb < N_BITS:
+                if bits[ba] == 1 and bits[bb] == 1:
                     violations += 1
+                    if len(violation_details) < 10:
+                        violation_details.append(f"{word}: {na}+{nb}")
                 total_checks += 1
 
     violation_rate = violations / max(total_checks, 1)
     q4_pass = violation_rate < 0.05
     print(f"  Violations: {violations}/{total_checks} = {violation_rate:.1%}")
+    if violation_details:
+        print(f"  Examples: {', '.join(violation_details[:5])}")
     print(f"  PASS (< 5%): {'PASS' if q4_pass else 'FAIL'}")
 
-    # PF-Q5: Minimum 2 categories per concept
-    print(f"\n  PF-Q5: Minimum 2 categories per concept")
+    # ------------------------------------------------------------------
+    # PF-Q5: Minimum 2 capas per concept
+    # ------------------------------------------------------------------
+    print(f"\n  PF-Q5: Minimum 2 capas per concept")
 
     concepts_with_2plus = 0
     total_concepts = 0
@@ -257,9 +273,9 @@ def test_pf_q4_q5_q6(projections, prim_data):
     for word, proj in projections.items():
         bits = to_binary(proj)
         active_cats = set()
-        for cat_idx, cat_bits in categories.items():
-            if any(bits[b] == 1 for b in cat_bits if b < N_BITS):
-                active_cats.add(cat_idx)
+        for capa, capa_bits in categories.items():
+            if any(bits[b] == 1 for b in capa_bits if b < N_BITS):
+                active_cats.add(capa)
         n_cats = len(active_cats)
         per_concept_cats.append(n_cats)
         if n_cats >= 2:
@@ -268,11 +284,13 @@ def test_pf_q4_q5_q6(projections, prim_data):
 
     pct_2plus = concepts_with_2plus / max(total_concepts, 1)
     q5_pass = pct_2plus >= 0.95
-    print(f"  Concepts with >=2 categories: {concepts_with_2plus}/{total_concepts} = {pct_2plus:.1%}")
-    print(f"  Mean categories per concept: {np.mean(per_concept_cats):.1f}")
+    print(f"  Concepts with >=2 capas: {concepts_with_2plus}/{total_concepts} = {pct_2plus:.1%}")
+    print(f"  Mean capas per concept: {np.mean(per_concept_cats):.1f}")
     print(f"  PASS (>= 95%): {'PASS' if q5_pass else 'FAIL'}")
 
-    # PF-Q6: Observer category in experiential concepts
+    # ------------------------------------------------------------------
+    # PF-Q6: Observer/consciousness bits in experiential concepts
+    # ------------------------------------------------------------------
     print(f"\n  PF-Q6: Observer bit active in experiential concepts")
 
     # Experiential concepts (subjective experiences that require an observer)
@@ -284,8 +302,13 @@ def test_pf_q4_q5_q6(projections, prim_data):
                         'velocity', 'mass', 'distance', 'volume', 'density',
                         'carbon', 'iron', 'oxygen', 'nitrogen', 'hydrogen']
 
-    # Use last category (cat 8, bits 56-62) as proxy for "observer/subjectivity"
-    observer_bits = list(range(56, min(63, N_BITS)))
+    # Actual observer/consciousness bits from primitivos.json:
+    #   capa 5: consciente (36), ausente (37)
+    #   capa 6: temporal_obs (38), eterno_obs (39), receptivo (42), creador_obs (43)
+    observer_names = ['consciente', 'ausente', 'temporal_obs', 'eterno_obs',
+                      'receptivo', 'creador_obs']
+    observer_bits = [name_to_bit[n] for n in observer_names if n in name_to_bit]
+    print(f"  Observer bits: {[(n, name_to_bit[n]) for n in observer_names]}")
 
     exp_scores = []
     non_exp_scores = []
@@ -320,6 +343,7 @@ def test_pf_q4_q5_q6(projections, prim_data):
         'q4': {
             'violations': violations, 'total': total_checks,
             'rate': round(violation_rate, 4), 'pass': q4_pass,
+            'n_dual_pairs': len(dual_bit_pairs),
         },
         'q5': {
             'concepts_2plus': concepts_with_2plus, 'total': total_concepts,
@@ -327,6 +351,7 @@ def test_pf_q4_q5_q6(projections, prim_data):
             'pass': q5_pass,
         },
         'q6': {
+            'observer_bits': observer_bits,
             'mean_experiential': round(mean_exp, 3),
             'mean_non_experiential': round(mean_non, 3),
             'n_experiential': len(exp_scores),
@@ -351,8 +376,8 @@ def main():
     print(f"  Loading Run 15...")
     model, tokenizer = load_run15(str(device))
 
-    mapper = PrimeMapper(N_BITS)
-    validator = TriadicValidator()
+    mapper = DefaultMapper(N_BITS)
+    validator = DefaultValidator()
 
     # Load gold concepts for Q1/Q2
     print(f"  Loading gold concepts...")

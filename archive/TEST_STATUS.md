@@ -1,3 +1,5 @@
+> **⚠ ARCHIVED — High-level content migrated to [`EXPERIMENT_REFERENCE.md`](../EXPERIMENT_REFERENCE.md) Section 10.** This file preserved in `archive/` for script paths, playground results inventory (46 files), data file locations, and coverage summary.
+
 # Test & Research Line Status
 
 > Last updated: 2026-03-19
@@ -43,18 +45,22 @@
 | L1 | Bridge PFs (Q1,Q4,Q5,Q6) | `playground/audit_tests/test_pf_bridge.py` | 3/4 PASS (Q6 FAIL) | 03-19 |
 | L3 | Blind prime assignment | `playground/audit_tests/test_blind_prime_assignment.py` | PASS (vacuous) | 03-19 |
 | F0 | Data + model validation | `playground/audit_tests/test_data_validation.py` | PASS (93.7% bit acc) | 03-19 |
-| L11 | Indifference (Cap. 5) | `playground/audit_tests/test_indifference_and_false_opposites.py` | GOLD PASS, MODEL FAIL | 03-19 |
-| L12 | False opposites | (included in L11 script) | GOLD PASS, MODEL FAIL | 03-19 |
+| L11 | Indifference (Cap. 5) — Run 15 | `test_indifference_and_false_opposites.py` | GOLD PASS, MODEL FAIL | 03-19 |
+| **L11** | **Indifference (Cap. 5) — v2** | `test_indifference_and_false_opposites.py --v2` | **GOLD PASS, MODEL PASS** | 03-19 |
+| L12 | False opposites — Run 15 | (included in L11 script) | GOLD PASS, MODEL FAIL | 03-19 |
+| **L12** | **False opposites — v2** | (included in L11 --v2) | **GOLD PASS, MODEL PASS** | 03-19 |
+| **L15** | **Aristotelian types — v2** | `test_aristotelian_types.py --v2` | **FAIL (0/4 sig, 2/4 hyp)** | 03-19 |
+| **L19** | **Enantiodromia — v2** | `test_enantiodromia.py --v2` | **FAIL (2/8 confirmed)** | 03-19 |
 | — | reptimeline hybrid analysis | `playground/audit_tests/analyze_hybrid.py` | 17 triadic, 50 active | 03-19 |
 | — | reptimeline v2 analysis | `playground/audit_tests/analyze_v2.py` | 68 triadic, 48 active | 03-19 |
+| **D-A16** | **iFSQ+v2 decisive experiment** | `danza_63bit.py --v2 --activation ifsq` | **93.2% test, 98.3% sub, R3=0.842** | 03-19 |
+| **L2** | **D-A13 (355M) formal eval** | `test_d_a13_eval.py` | **88% bit acc, sub 9-20%, analogy 0%** | 03-19 |
 
 ### Pending — Critical (before publication)
 
 | Line | Test | Script exists? | What's needed | Blocking |
 |------|------|---------------|---------------|----------|
-| L2 | D-A13 (355M) formal eval | `playground/audit_tests/test_d_a13_eval.py` | GPU time | Paper claim |
-| L11 | Re-run with v2 model | Modify test_indifference_and_false_opposites.py | v2 checkpoint (DONE) | Paper claim |
-| L12 | Re-run with v2 model | Same as L11 | v2 checkpoint (DONE) | Paper claim |
+| ~~L2~~ | ~~D-A13 (355M) formal eval~~ | ~~`test_d_a13_eval.py`~~ | **DONE** | **Bit acc 88%, sub 9-20%, analogy 0%. Paper claim needs revision** |
 
 ### Pending — Book Corrections (no experiments needed)
 
@@ -74,10 +80,10 @@
 |------|------|---------------|--------|-------|
 | L13 | 1000 adversarial concepts | NO | 4h | Stress test |
 | L14 | PCA for real primitive count | NO | 3h | How many real dims? |
-| L15 | Aristotelian types (Cap. 11) | `playground/audit_tests/test_aristotelian_types.py` | 1h | Script created, not run |
+| L15 | Aristotelian types (Cap. 11) | `playground/audit_tests/test_aristotelian_types.py` | Done | **FAIL** — trends visible but p>0.05. Not blocking |
 | L16 | Polisemia contextual | NO | 1h | Same word, different context |
 | L17 | Categorical Bits Architecture | NO | 6h GPU | Could be its own paper |
-| L19 | Enantiodromia detection | `playground/audit_tests/test_enantiodromia.py` | 1h | Script created, not run |
+| L19 | Enantiodromia detection | `playground/audit_tests/test_enantiodromia.py` | Done | **FAIL** — 2/8 only. Not blocking |
 
 ### Future Work (after publication)
 
@@ -113,6 +119,7 @@
 | D-A9 (hybrid) | `danza_hybrid_adv_xl/` | 6 dead bits, free bits learn, 17 triadic |
 | D-A13 (GPT-2 355M) | `danza_gpt2medium_ternary/` | 100% sub holdout |
 | **D-A14 (v2 158 anc)** | `danza_63bit_xl_v2/` | **93% test, 98.3% sub, 68 triadic** |
+| **D-A16 (iFSQ+v2)** | `danza_63bit_xl_v2_ifsq/` | **93.2% test, 98.3% sub, R3=0.842, king:queen 100%** |
 | BitwiseValidator | `src/triadic.py` | 1000/1000 equiv, 5-78x speedup |
 
 ### Failed
@@ -125,13 +132,13 @@
 | Bootstrap D-A6 | `danza_bootstrap_xl/` | Cycle 0 converged | Confidence gate too strict |
 | E10-v2 (GPT-2 InfoNCE) | — | tri_loss=NaN from step 300 | Numerical instability in InfoNCE |
 
-### Not Yet Evaluated
+### Previously Listed as Not Evaluated (Resolved)
 
-| Checkpoint | Notes |
-|-----------|-------|
-| `danza_bootstrap_v2_xl/` | 3 cycles complete, needs formal eval |
-| `gpt2_medium_infonce/` | Experiment 10 transfer model |
-| `torch_run29_staged/` | Staged MSE->InfoNCE |
+| Checkpoint | Status |
+|-----------|--------|
+| `danza_bootstrap_v2_xl/` | 3 cycles complete. Results in `bootstrap_results.json`: C0=21/26 accepted, C1=2/4, C2=0/2. Converged. |
+| `gpt2_medium_infonce/` | Empty dir — E10-v2 crashed (tri_loss=NaN). No checkpoint to evaluate. |
+| `torch_run29_staged/` | Already documented in experiment_log.md as Run 29 (negative result, COMPLETE). |
 
 ---
 
@@ -184,12 +191,16 @@
 ```
 Unit tests:          ~80 (ALL PASS)
 Benchmarks:          12/12 COMPLETE
-Audit tests:         7 executed, 3 pending (L2 GPU, L11/L12 re-run)
-Audit scripts:       9 total (7 executed, 2 not run: aristotelian, enantiodromia)
+Audit tests:         13 executed, 0 pending
+  - L11/L12 v2:     PASS (was FAIL with Run 15)
+  - L15 Aristotelian: FAIL (trends but p>0.05)
+  - L19 Enantiodromia: FAIL (2/8)
+  - D-A16 iFSQ+v2:  93.2% test, 98.3% sub (decisive experiment)
+Audit scripts:       9 total (ALL executed)
 Book corrections:    0/7 done
-Experiments:         8 successful, 5 failed (documented), 3 not evaluated
-Playground results:  46 files across 16 experiments
-Research lines:      4 executed, 3 critical pending, 6 valuable pending, 14 future
+Experiments:         9 successful, 5 failed (documented), 3 not evaluated
+Playground results:  46+ files across 17 experiments
+Research lines:      8 executed, 0 critical pending, 4 valuable pending, 14 future
 Data files:          10 in data/, 3 in danza_data/
 Reports:             3 files
 ```

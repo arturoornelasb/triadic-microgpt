@@ -1,3 +1,5 @@
+> **⚠ ARCHIVED — High-level content migrated to [`EXPERIMENT_REFERENCE.md`](../EXPERIMENT_REFERENCE.md) Section 6.6 and Appendix B.** This file preserved in `archive/` for detailed experiment designs (Líneas 1-7), per-variant P0-P3 results tables, playground bugs, and file-to-research-line mapping.
+
 # Playground — Plan de Accion
 
 > Laboratorio experimental para Triadic MicroGPT.

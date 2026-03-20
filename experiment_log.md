@@ -1,3 +1,5 @@
+> **⚠ DEPRECATED — Preserved as detailed data store.** For the consolidated reference with all experiments organized by research line, see [`EXPERIMENT_REFERENCE.md`](EXPERIMENT_REFERENCE.md). This file contains the raw, detailed logs referenced by line number from the master document.
+
 # Triadic MicroGPT — Experiment Log
 
 ## Run 1: Baseline (concepts.txt, CPU/NumPy)
@@ -3084,7 +3086,179 @@ Sub-linear degradation across chained steps.
 | Ternary zeros | 73.3% | 0.0% | Collapsed to binary |
 | Training time | ~4h | 4.5h | Similar |
 
-**Experiment D-A13 Status: COMPLETE. Scaling hypothesis CONFIRMED. 100% subsumption holdout validates the ternary triadic head at 355M scale.**
+**Experiment D-A13 Status: COMPLETE (training). Formal eval below reveals subsumption/analogy issues.**
+
+### L2 Formal Evaluation (2026-03-19)
+
+**Script**: `playground/audit_tests/test_d_a13_eval.py`
+**Device**: CUDA (RTX 5060 Ti)
+
+| Test | Result | Notes |
+|------|--------|-------|
+| Bit accuracy (train) | **100.0%** (1764/1764) | All 28 train anchors perfect |
+| Bit accuracy (holdout) | **88.0%** (1441/1638) | Worst: darkness=78%, dead=79%, gas=79% |
+| Subsumption (train) | **9.3%** (4/43) | MUCH lower than training log's "100%" |
+| Subsumption (test) | **20.0%** (2/10) | Training log reported 100% on 13 pairs |
+| Ternary distribution | -1: 70.6%, 0: 6.2%, +1: 23.2% | Zeros nearly collapsed but not fully (6.2% vs 0% in log) |
+| Signature uniqueness | **81.5%** (44/54 unique) | 7 collisions (e.g. fast/quick, bright/shiny/sun) |
+| Analogy (R3) | **0.0%** (0/15) | Prime-algebra analogies fail completely |
+
+### Discrepancy Analysis
+
+The training log showed "100% subsumption holdout" but the formal eval shows 9.3%/20.0%. Why:
+
+1. **Different evaluation methods**: Training eval used the model's internal `evaluate_subsumption()` function which operates on the continuous projections with a soft threshold. The formal eval uses `proj_to_prime()` → exact integer divisibility, which is much stricter.
+2. **The 355M model learns accurate bits but not algebraic structure**: 88% bit accuracy means individual bits are correct, but the COMBINATIONS of bits don't preserve subsumption/analogy relationships in prime space.
+3. **Collisions**: 7 collision groups (e.g. fast=quick, bright=shiny=sun) mean the model maps synonyms to identical signatures — reasonable for semantics but reduces algebraic diversity.
+4. **0% analogy**: The prime-algebra approach `D = analogy(A, B, C)` fails completely at 355M. The model doesn't preserve the bit-level structure needed for exact algebraic operations.
+
+### Implications for Paper
+
+- **Bit accuracy claim STANDS**: 88% holdout bit accuracy at 355M confirms scaling.
+- **Subsumption claim NEEDS REVISION**: Cannot claim "100% subsumption at 355M" — the training metric was measuring something softer than the formal prime-algebra test.
+- **Ternary collapse CONFIRMED**: Zeros drop from ~25% to 6.2% — near-binary at scale.
+- **Analogy at scale DOES NOT WORK**: 0/15 via prime algebra. The 40M model's analogy success does not transfer to 355M.
+- **Honest reporting**: Document 355M as "high bit accuracy but degraded algebraic operations" — not a failure, but a finding about scale effects on structured representations.
+
+**D-A13 Formal Eval Status: COMPLETE. Results show v1 anchors (54) insufficient for algebraic structure at any scale.**
+
+### Critical Context: D-A13 Never Had v2 Anchors
+
+D-A13 was trained with `load_anchors()` (54 v1 anchors), NOT `load_all_anchors()` (158 v2). The v2 anchor set with triadic chains and 3-way dependencies was the breakthrough that took 40M from 79.4% to 93% accuracy and 98.3% subsumption.
+
+**We cannot conclude "algebra degrades at 355M" because 355M was never tested with v2.**
+
+Comparison showing v1 was always weak:
+
+| Metric | 40M v1 (D-A5) | 40M v2 (D-A14) | 355M v1 (D-A13) | 355M v2 (TODO) |
+|--------|--------------|----------------|-----------------|----------------|
+| Anchors | 54 | **158** | 54 | 158 |
+| Bit acc test | 79.4% | **93.0%** | 88.0% | ? |
+| Subsumption | 86.5% | **98.3%** | 9-20% | ? |
+| Analogy | 69.2% | **98%** | 0% | ? |
+| Triadic 3-way | 17 | **68** | — | ? |
+
+**Next experiment needed: GPT-2 Medium (355M) + v2 anchors (158). ~4.5h GPU.**
+
+---
+
+## D-A16: iFSQ + v2 Anchors (The Decisive Experiment)
+
+**Date**: 2026-03-19
+**Script**: `playground/danza_63bit.py --scale xl --steps 50000 --v2 --activation ifsq --dtype bfloat16`
+**Scale**: XL (12L/512D/8H, ~40M params)
+**Training time**: 110.8 min
+**GPU**: RTX 5060 Ti 16GB, bfloat16
+**Checkpoint**: `checkpoints/danza_63bit_xl_v2_ifsq/`
+
+### Goal
+
+Combine the two best-performing components that were never tested together:
+- **iFSQ activation** (D-A10): best LM loss 0.924, 87.1% subsumption
+- **v2 anchors** (D-A14): best accuracy 93%, 98.3% subsumption, 68 triadic 3-way
+
+### Configuration
+
+| Key | Value |
+|-----|-------|
+| **Activation** | iFSQ: `2 * sigmoid(1.6 * x) - 1` |
+| **Anchors** | 158 (v1+v2 merged), train=127, test=31 |
+| **Subsumption pairs** | train=716, test=179 |
+| **Tokenizer** | BPE 4096 (9 single-token, 149 multi-token anchors) |
+| **VRAM** | 1.6 GB / 15.9 GB (model 0.5 + activations 1.0) |
+
+### Results
+
+| Metric | v2 tanh (D-A14) | iFSQ+v2 (D-A16) | iFSQ v1 (D-A10) |
+|--------|-----------------|------------------|------------------|
+| Lang loss | 0.946 | 0.993 | **0.924** |
+| Bit acc (train) | 100% | 100% | 100% |
+| Bit acc (test) | 93.0% | **93.2%** | 87.1% |
+| Subsumption train | 99.7% | 99.7% | 100% |
+| Subsumption test | 98.3% | 98.3% | 87.1% |
+| Dead bits | 26/63 | 26/63 | **6/63** |
+| Entropy | 0.369 | 0.369 | — |
+| R3 king:queen | cos=0.913 | **cos=0.959, 100% bits** | — |
+| R3 mean cosine | +0.810 | **+0.842** | — |
+| R3 mean bit acc | 85.3% | **90.5%** | — |
+| Training time | 129.2 min | 110.8 min | — |
+
+### Regla de Tres (Analogy) Detail
+
+| Quad | Cosine | Bit Accuracy |
+|------|--------|-------------|
+| man:woman=king:queen | +0.959 | 100.0% |
+| cold:hot=quiet:loud | +0.749 | 79.4% |
+| happy:sad=love:hate | +0.913 | 92.1% |
+| open:close=free:prisoner | +0.848 | 87.3% |
+| bright:dark=loud:quiet | +0.739 | 90.5% |
+| teach:learn=king:queen | +0.845 | 93.7% |
+
+### Key Findings
+
+1. **iFSQ+v2 matches v2 tanh on accuracy/subsumption** (93%/98.3%) — the activation doesn't hurt.
+2. **iFSQ+v2 improves analogies**: R3 mean cosine +0.032, king:queen reaches perfect 100% bit accuracy.
+3. **Language loss slightly worse** (0.993 vs 0.946) — more anchors = more supervision pressure on LM head.
+4. **Dead bits unchanged** (26/63) — with 158 anchors, supervision dominates over activation choice. The iFSQ dead-bit fix only helps with fewer anchors (D-A10: 6 dead with 54 anchors).
+5. **The v2 anchor set is the dominant factor**, not the activation function. Both tanh and iFSQ converge to the same triadic quality with enough supervision.
+
+### Decision for Paper
+
+**v2 tanh (D-A14) remains the primary model** — better LM loss (0.946 vs 0.993) with identical triadic metrics. iFSQ+v2 is reported as ablation showing activation robustness.
+
+**Experiment D-A16 Status: COMPLETE. iFSQ+v2 confirms v2 anchors as dominant factor. Analogies improve but LM loss slightly worse. v2 tanh is the final model.**
+
+---
+
+## Audit Test Results (2026-03-19) — v2 Model
+
+### L11/L12: Indifference + False Opposites (v2) — PASS
+
+**Script**: `playground/audit_tests/test_indifference_and_false_opposites.py --v2`
+**Previous result (Run 15)**: GOLD PASS, MODEL FAIL
+**New result (v2)**: **GOLD PASS, MODEL PASS**
+
+Key metrics:
+- H(love, indifference)=9 > H(love, hate)=4: **PASS**
+- GCD(love, hate) > GCD(love, indifference): **PASS**
+- False opposites mean Hamming: 4.8 vs genuine opposites: 12.2
+- Cohen's d (Hamming): 2.20
+- Classification accuracy: 75%
+- Extended pairs: 3/6 confirmed (partial — passion/apathy PASS, joy/boredom FAIL)
+
+**Impact: Unblocks the paper's indifference claim (Cap. 5). The v2 model with 158 anchors correctly learns that indifference is the true opposite of love, not hate.**
+
+### L15: Aristotelian Opposition Types (v2) — FAIL
+
+**Script**: `playground/audit_tests/test_aristotelian_types.py --v2`
+**Result**: FAIL (0/4 significant metrics, 2/4 hypothesis checks)
+
+Statistical results (Kruskal-Wallis):
+- Hamming: H=6.36, p=0.0952 (not significant)
+- Inverted: H=6.36, p=0.0952 (not significant)
+- Shared: H=7.71, p=0.0524 (marginal, not significant)
+- Asymmetry: H=5.87, p=0.1183 (not significant)
+
+Hypothesis checks:
+- Contraries > Contradictories (inverted bits): PASS (7.3 > 4.8)
+- Privatives most asymmetric: FAIL (0.097 < 0.258 contraries)
+- Relatives share most bits: PASS (0.815 > 0.752)
+- Contradictories highest Hamming: FAIL (4.8 < 7.3 contraries)
+
+**Assessment**: Trends visible but not statistically significant with 10 pairs per type. The model captures some Aristotelian patterns (contraries vs relatives) but doesn't fully separate all 4 types. Not blocking for paper — Cap. 11 claim is aspirational.
+
+### L19: Enantiodromia (v2) — FAIL
+
+**Script**: `playground/audit_tests/test_enantiodromia.py --v2`
+**Result**: FAIL (2/8 core confirmed, 0/4 extra)
+
+Confirmed pairs:
+- tyranny→freedom (vs authority): H=4 < 6, PASS
+- pride→humility (vs confidence): H=3 < 6, PASS
+
+Failed pairs: fanaticism, obsession, perfectionism, recklessness, greed, rage — extremes were FURTHER from their opposite than moderates.
+
+**Assessment**: The enantiodromia hypothesis ("extremes contain the seed of their opposite") is not supported by the 63-bit signatures. Extremes tend to have MORE active bits (more complex representations) rather than converging toward their opposite. Future work — not blocking for paper.
 
 ---
 

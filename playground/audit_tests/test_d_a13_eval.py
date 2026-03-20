@@ -32,9 +32,12 @@ import sys
 import json
 import math
 import numpy as np
+import torch
 
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, _THIS_DIR)
+
+import argparse
 
 from common import (
     to_binary, to_ternary, hamming, cosine_sim, proj_to_prime,
@@ -43,25 +46,32 @@ from common import (
 )
 from src.triadic import PrimeMapper, TriadicValidator
 
+# D-A17 (v2) checkpoint path
+DA17_CKPT_DIR = os.path.join(os.path.dirname(os.path.dirname(_THIS_DIR)),
+                              'checkpoints', 'danza_gpt2medium_ternary_v2')
+DA17_CKPT = os.path.join(DA17_CKPT_DIR, 'model_best.pt')
+
 
 # ============================================================
 # Model loading (D-A13 specific)
 # ============================================================
 
-def load_da13_model(device='cpu'):
+def load_da13_model(device='cpu', ckpt_path=None):
     """Load D-A13 correctly: GPT2MediumTernary + GPT2Tokenizer."""
-    import torch
     from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
     sys.path.insert(0, os.path.join(os.path.dirname(_THIS_DIR)))
     from gpt2_medium_ternary import GPT2MediumTernary
 
+    if ckpt_path is None:
+        ckpt_path = DA13_CKPT
+
     print(f"  Loading GPT-2 Medium from HuggingFace...")
     gpt2 = GPT2LMHeadModel.from_pretrained('gpt2-medium')
     model = GPT2MediumTernary(gpt2, n_triadic_bits=N_BITS, quantize_mode='fsq')
 
-    print(f"  Loading checkpoint: {os.path.basename(DA13_CKPT)}")
-    ckpt = torch.load(DA13_CKPT, map_location=device, weights_only=True)
+    print(f"  Loading checkpoint: {os.path.basename(ckpt_path)}")
+    ckpt = torch.load(ckpt_path, map_location=device, weights_only=True)
     model.load_state_dict(ckpt['model_state_dict'])
     model.to(device)
     model.eval()
@@ -120,8 +130,10 @@ def test_bit_accuracy(model, tokenizer, train_anchors, holdout_anchors, device):
 
         print(f"  {split_name}: {mean_acc:.1%} ({correct_total}/{bits_total} bits)")
         if per_word:
-            print(f"    Worst 3: {[f\"{w['word']}={w['accuracy']:.0%}\" for w in per_word[:3]]}")
-            print(f"    Best 3:  {[f\"{w['word']}={w['accuracy']:.0%}\" for w in per_word[-3:]]}")
+            worst = [f"{w['word']}={w['accuracy']:.0%}" for w in per_word[:3]]
+            best = [f"{w['word']}={w['accuracy']:.0%}" for w in per_word[-3:]]
+            print(f"    Worst 3: {worst}")
+            print(f"    Best 3:  {best}")
 
         results[split_name] = {
             'mean_accuracy': round(mean_acc, 4),
@@ -133,40 +145,38 @@ def test_bit_accuracy(model, tokenizer, train_anchors, holdout_anchors, device):
 
 
 def test_subsumption(model, tokenizer, train_anchors, holdout_anchors, device, mapper):
-    """Test 2: Subsumption rate."""
+    """Test 2: Subsumption rate using gold anchor bit structure."""
     print_section("TEST 2: SUBSUMPTION")
 
-    from danza_bootstrap import HOLDOUT_INFO
-    from danza_63bit import load_primitives
+    from danza_63bit import load_primitives, build_subsumption_pairs
 
     prim_data = load_primitives()
     all_anchors = {**train_anchors, **holdout_anchors}
 
-    # Build subsumption pairs from holdout info
-    correct = 0
-    total = 0
+    # Build subsumption pairs from anchor bit overlap
+    train_sub, test_sub = build_subsumption_pairs(all_anchors, prim_data)
+    print(f"  Subsumption pairs: train={len(train_sub)}, test={len(test_sub)}")
 
-    for h_word, info in HOLDOUT_INFO.items():
-        h_proj = get_proj_da13(model, tokenizer, h_word, device)
-        if h_proj is None:
-            continue
-
-        h_prime = proj_to_prime(h_proj, mapper)
-
-        for y_word in info.get('parents', []):
-            y_proj = get_proj_da13(model, tokenizer, y_word, device)
-            if y_proj is None:
+    results = {}
+    for split_name, pairs in [('train', train_sub), ('test', test_sub)]:
+        correct = 0
+        total = 0
+        for h_w, y_w, h_d, y_d in pairs:
+            h_proj = get_proj_da13(model, tokenizer, h_w, device)
+            y_proj = get_proj_da13(model, tokenizer, y_w, device)
+            if h_proj is None or y_proj is None:
                 continue
+            h_prime = proj_to_prime(h_proj, mapper)
             y_prime = proj_to_prime(y_proj, mapper)
             if h_prime > 1 and y_prime > 1:
-                if h_prime % y_prime == 0:  # h subsumes y
+                if h_prime % y_prime == 0:
                     correct += 1
                 total += 1
+        rate = correct / max(total, 1)
+        results[split_name] = {'correct': correct, 'total': total, 'rate': round(rate, 4)}
+        print(f"  {split_name}: {correct}/{total} = {rate:.1%}")
 
-    rate = correct / max(total, 1)
-    print(f"  Holdout subsumption: {correct}/{total} = {rate:.1%}")
-
-    return {'correct': correct, 'total': total, 'rate': round(rate, 4)}
+    return results
 
 
 def test_ternary_distribution(model, tokenizer, anchors, device):
@@ -281,42 +291,53 @@ def test_analogy(model, tokenizer, quads, device, mapper, validator):
 # ============================================================
 
 def main():
-    print_header("EXP-F4.4: D-A13 (GPT-2 MEDIUM 355M) EVALUATION")
+    parser = argparse.ArgumentParser(description='D-A13/D-A17 formal evaluation')
+    parser.add_argument('--v2', action='store_true',
+                        help='Evaluate D-A17 (355M + v2 anchors) instead of D-A13')
+    args = parser.parse_args()
 
-    import torch
+    use_v2 = args.v2
+    model_name = 'D-A17 (GPT-2 Medium 355M + v2)' if use_v2 else 'D-A13 (GPT-2 Medium 355M)'
+    print_header(f"FORMAL EVAL: {model_name}")
+
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"  Device: {device}")
 
     # Verify checkpoint exists
-    if not os.path.exists(DA13_CKPT):
-        print(f"\n  ERROR: Checkpoint not found: {DA13_CKPT}")
-        print(f"  D-A13 training may not have saved model_best.pt")
-        # Try step checkpoint
-        alt = os.path.join(DA13_CKPT_DIR, 'model_step50000.pt')
+    base_dir = DA17_CKPT_DIR if use_v2 else DA13_CKPT_DIR
+    ckpt_path = DA17_CKPT if use_v2 else DA13_CKPT
+    if not os.path.exists(ckpt_path):
+        print(f"\n  ERROR: Checkpoint not found: {ckpt_path}")
+        alt = os.path.join(base_dir, 'model_step50000.pt')
         if os.path.exists(alt):
             print(f"  Found alternative: {alt}")
-            globals()['DA13_CKPT'] = alt
+            ckpt_path = alt
         else:
             print(f"  No checkpoints found. Exiting.")
             return
 
-    model, tokenizer = load_da13_model(str(device))
+    model, tokenizer = load_da13_model(str(device), ckpt_path=ckpt_path)
 
     mapper = PrimeMapper(N_BITS)
     validator = TriadicValidator()
 
-    # Load anchors
-    from danza_63bit import load_primitives, load_anchors
+    # Load anchors — v2 uses all 158, v1 uses 54 with bootstrap split
+    from danza_63bit import load_primitives, load_anchors, load_all_anchors
     from danza_bootstrap import BOOTSTRAP_QUADS
 
     prim_data = load_primitives()
-    all_anchors, _ = load_anchors(prim_data)
 
-    # Split into train/holdout
-    from danza_bootstrap import get_split
-    train_words, holdout_words = get_split()
-    train_anchors = {w: all_anchors[w] for w in train_words if w in all_anchors}
-    holdout_anchors = {w: all_anchors[w] for w in holdout_words if w in all_anchors}
+    if use_v2:
+        all_anchors, _ = load_all_anchors(prim_data)
+        # Split 70/30 for train/holdout
+        anchor_names = sorted(all_anchors.keys())
+        n_train = int(len(anchor_names) * 0.7)
+        train_anchors = {k: all_anchors[k] for k in anchor_names[:n_train]}
+        holdout_anchors = {k: all_anchors[k] for k in anchor_names[n_train:]}
+    else:
+        all_anchors, _ = load_anchors(prim_data)
+        from danza_bootstrap import get_split
+        train_anchors, holdout_anchors = get_split(all_anchors)
     print(f"  Train anchors: {len(train_anchors)}, Holdout: {len(holdout_anchors)}")
 
     # Run all tests
@@ -326,36 +347,49 @@ def main():
     uniqueness = test_signature_uniqueness(model, tokenizer, {**train_anchors, **holdout_anchors}, str(device), mapper)
     analogy = test_analogy(model, tokenizer, BOOTSTRAP_QUADS, str(device), mapper, validator)
 
-    # Comparison with Run 15 (40M)
-    print_section("COMPARISON: 40M vs 355M")
-    print(f"  {'Metric':<30} {'40M (Run 15)':>15} {'355M (D-A13)':>15}")
+    # Comparison with 40M baseline
+    ref_model = '40M (D-A14 v2)' if use_v2 else '40M (Run 15)'
+    ref_bit = '~93%' if use_v2 else '~89%'
+    ref_sub = '98.3%' if use_v2 else '87.1%'
+    ref_zeros = '41.3%' if use_v2 else '25.3%'
+
+    print_section(f"COMPARISON: {ref_model} vs 355M")
+    print(f"  {'Metric':<30} {ref_model:>15} {'355M':>15}")
     print(f"  {'-'*30} {'-'*15} {'-'*15}")
-    print(f"  {'Bit accuracy (holdout)':<30} {'~89%':>15} {bit_acc.get('holdout', {}).get('mean_accuracy', 0):.1%}".rjust(15))
-    print(f"  {'Subsumption (holdout)':<30} {'87.1%':>15} {sub_rate['rate']:.1%}".rjust(15))
-    print(f"  {'Ternary zeros':<30} {'25.3%':>15} {ternary.get('zero', 0):.1%}".rjust(15))
-    print(f"  {'Unique signatures':<30} {'100%':>15} {uniqueness.get('uniqueness_rate', 0):.1%}".rjust(15))
+    print(f"  {'Bit accuracy (holdout)':<30} {ref_bit:>15} {bit_acc.get('holdout', {}).get('mean_accuracy', 0):>14.1%}")
+    sub_test_rate = sub_rate.get('test', {}).get('rate', 0)
+    sub_train_rate = sub_rate.get('train', {}).get('rate', 0)
+    print(f"  {'Subsumption (test)':<30} {ref_sub:>15} {sub_test_rate:>14.1%}")
+    print(f"  {'Ternary zeros':<30} {ref_zeros:>15} {ternary.get('zero', 0):>14.1%}")
+    print(f"  {'Unique signatures':<30} {'100%':>15} {uniqueness.get('uniqueness_rate', 0):>14.1%}")
 
     # Summary
     print_section("SUMMARY")
+    print(f"  Model: {model_name}")
+    print(f"  Anchors: {'158 (v2)' if use_v2 else '54 (v1)'}")
+    print(f"  Train: {len(train_anchors)}, Holdout: {len(holdout_anchors)}")
     print(f"  Bit accuracy (holdout): {bit_acc.get('holdout', {}).get('mean_accuracy', 0):.1%}")
-    print(f"  Subsumption: {sub_rate['rate']:.1%}")
+    print(f"  Subsumption: train={sub_train_rate:.1%}, test={sub_test_rate:.1%}")
     print(f"  Zeros collapsed: {'YES' if ternary.get('collapsed_to_binary') else 'NO'}")
     print(f"  Unique signatures: {uniqueness.get('uniqueness_rate', 0):.1%}")
     print(f"  Analogy (R3): {analogy['rate']:.1%}")
 
+    result_file = 'f4_4_d_a17_eval.json' if use_v2 else 'f4_4_d_a13_eval.json'
     save_results({
         'test': 'EXP-F4.4',
-        'model': 'D-A13 (GPT-2 Medium 355M)',
-        'checkpoint': DA13_CKPT,
+        'model': model_name,
+        'checkpoint': ckpt_path,
+        'anchors': 'v2 (158)' if use_v2 else 'v1 (54)',
+        'n_train': len(train_anchors),
+        'n_holdout': len(holdout_anchors),
         'n_bits': N_BITS,
         'bit_accuracy': bit_acc,
         'subsumption': sub_rate,
         'ternary_distribution': ternary,
         'signature_uniqueness': uniqueness,
         'analogy': analogy,
-    }, 'f4_4_d_a13_eval.json')
+    }, result_file)
 
 
 if __name__ == '__main__':
-    import torch
     main()
