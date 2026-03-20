@@ -63,6 +63,14 @@ def compute_perplexity(model, tokenizer, data_path, device, max_samples=200, blo
     """Compute perplexity on a held-out dataset."""
     STORY_SEP = '<' + '|endoftext|' + '>'
 
+    # Try validation file first (separate from training data)
+    val_path = data_path.replace('-train.txt', '-valid.txt').replace('_train.txt', '_valid.txt')
+    if os.path.exists(val_path) and val_path != data_path:
+        print(f"  Using validation file: {os.path.basename(val_path)}")
+        data_path = val_path
+    else:
+        print(f"  WARNING: No separate validation file found. Using tail of training data.")
+
     with open(data_path, 'r', encoding='utf-8', errors='ignore') as f:
         raw = f.read()
 

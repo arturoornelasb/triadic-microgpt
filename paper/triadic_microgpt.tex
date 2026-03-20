@@ -103,7 +103,7 @@ Our contributions are:
 
     \item \textbf{Direct comparison with post-hoc projection.} We benchmark \microgpt{} against the Triadic Engine on identical concept sets, showing that while the Engine achieves higher raw metrics (leveraging pre-trained MiniLM), \microgpt{} is self-contained, requires a single forward pass, and demonstrates emergent rather than injected semantics (Section~\ref{sec:comparison}).
 
-    \item \textbf{Transfer learning and alignment loss ablation.} Attaching the triadic head to pre-trained GPT-2 and testing three alignment losses (MSE, margin ranking, InfoNCE), we discover a \emph{loss--embedding interaction}: InfoNCE is optimal for rich pre-trained embeddings (closing 70\% of the gap to Engine PCA), while MSE is optimal for weak from-scratch embeddings. This identifies the alignment loss formulation---not embedding quality---as the primary bottleneck (Section~\ref{sec:transfer}).
+    \item \textbf{Transfer learning and alignment loss ablation.} Attaching the triadic head to pre-trained GPT-2 and testing three alignment losses (MSE, margin ranking, InfoNCE), we discover a \emph{loss--embedding interaction}: InfoNCE is optimal for rich pre-trained embeddings (closing 48\% of the gap to Engine PCA), while MSE is optimal for weak from-scratch embeddings. This identifies the alignment loss formulation---not embedding quality---as the primary bottleneck (Section~\ref{sec:transfer}).
 
     \item \textbf{Subsumption recovery via auxiliary loss.} A differentiable subsumption loss recovers exact algebraic subsumption ($\Phi(A) \mid \Phi(B)$) at $k=64$---previously reported as impractical at high bit counts by both \microgpt{} and the Engine. The model achieves 100\% held-out subsumption and autonomously discovers an emergent information hierarchy where abstract concepts use fewer active bits (Section~\ref{sec:subsumption}).
 
@@ -248,7 +248,7 @@ The combined triadic loss is:
     \loss{triadic} = \loss{div} + \loss{ctr} + \lambda_{\text{ent}} \cdot \loss{ent} + \lambda_{\text{align}} \cdot \loss{align}
 \end{equation}
 
-\paragraph{Triadic warmup.} The triadic loss is activated after 25\% of training steps. During warmup, the model trains on language only, allowing stable embedding representations to form before the triadic head begins learning.
+\paragraph{Triadic warmup.} The triadic loss is activated after 30\% of training steps. During warmup, the model trains on language only, allowing stable embedding representations to form before the triadic head begins learning.
 
 \paragraph{Hyperparameter sensitivity.} Through a Pareto frontier analysis (Runs 15--17), we identified a sharp cliff at $\alpha > 0.05$: models trained with $\alpha = 0.10$ or $\alpha = 0.20$ lose semantic ordering despite maintaining high entropy. The optimal configuration is $\alpha = 0.05$, $\lambda_{\text{ent}} = 1.0$, $\lambda_{\text{align}} = 5.0$.
 
@@ -278,7 +278,7 @@ All operations require only integer arithmetic (GCD, LCM, trial division), avoid
 
 \paragraph{Hardware.} All training is performed on a single NVIDIA RTX 5060 Ti (16 GB VRAM).
 
-\paragraph{Optimization.} AdamW optimizer ($\beta_1 = 0.9$, $\beta_2 = 0.999$, weight decay $= 0.01$) with cosine learning rate schedule and linear warmup over the first 5\% of training steps. Peak learning rate is $3 \times 10^{-4}$. Mixed precision via \texttt{torch.amp}: float16 for initial experiments (Runs 1--21), bfloat16 for all Danza bootstrap and ternary experiments (D-A5, D-A8, D-A10, E4 sweep). Batch size 32 for Runs 1--21; batch size 64 for Danza experiments. Sequence length 256 for all runs.
+\paragraph{Optimization.} AdamW optimizer ($\beta_1 = 0.9$, $\beta_2 = 0.95$, weight decay $= 0.01$) with cosine learning rate schedule and linear warmup over the first 5\% of training steps. Peak learning rate is $3 \times 10^{-4}$. Mixed precision via \texttt{torch.amp}: float16 for initial experiments (Runs 1--21), bfloat16 for all Danza bootstrap and ternary experiments (D-A5, D-A8, D-A10, E4 sweep). Batch size 32 for Runs 1--21; batch size 64 for Danza experiments. Sequence length 256 for all runs.
 
 \paragraph{Evaluation concepts.} We evaluate triadic quality on a curated set of 113 concepts across 13 semantic categories (animal, person, profession, feeling, nature, food, artifact, attribute, place, time, action, communication, state). We use 12 semantically related pairs (e.g., king--queen, dog--cat), 12 unrelated pairs (e.g., king--dog, happy--table), and 13 analogy quadruples (e.g., king:queen::man:woman). An expanded evaluation uses 51 diverse analogy quadruples covering family, size, temperature, emotion, animal, and royalty relationships (Section~\ref{sec:benchmarks}).
 
