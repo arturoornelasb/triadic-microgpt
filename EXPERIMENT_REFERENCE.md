@@ -195,12 +195,12 @@ Every experiment in ONE table, newest to oldest.
 | 5.1 | Scaling | 4-point study, crossover ~20M | READY |
 | 5.2 | Bits sweep | k=8-128, optimal k=32-64 | READY |
 | 5.3 | Ablation | Run 18 (no head), D-A15 (FAIL) | READY |
-| 5.4 | Subsumption | 98.3% (v2), 355M: sub 9-20% | **NEEDS REVISION** |
+| 5.4 | Subsumption | 98.3% (v2), 355M: 1.7% (algebra destroyed) | **UPDATED** |
 | 5.5 | Analogy | 98% verification, exact king:queen | READY |
 | 5.6 | Composition | R3 98.1% round-trip | READY |
 | 5.7 | Domain separation | 1.21 sentence-level | READY |
-| 5.8 | Discovery | 68 triadic 3-way, 7 duals | READY |
-| 6 | Discussion | 355M bits OK but algebra fails | **NEEDS REVISION** |
+| 5.8 | Discovery | 68 triadic 3-way, 9 duals (coherence 0.57-1.00) | **UPDATED** |
+| 6 | Discussion | 355M destroys algebra, ~42% sparsity structurally necessary | **UPDATED** |
 
 ---
 
@@ -316,6 +316,53 @@ This is NOT "training a bigger model" or "using more data". It's testing whether
 
 > Full details: experiment_log.md, lines 3365-3469
 
+#### reptimeline Analysis (2026-03-20)
+
+**Command**: `python -m reptimeline --checkpoint-dir checkpoints/danza_63bit_xl_v2/ --primitives --overlay --max-checkpoints 5`
+
+**Results**: `reptimeline/results/d_a14_v2_discovery.json` + 4 plots in `reptimeline/results/d_a14_v2_plots/`
+
+**Timeline Summary** (5 checkpoints: 2.5K → 50K steps):
+
+| Metric | Value |
+|---|---|
+| Concepts tracked | 53 (primitives) |
+| Bit births | 2,725 |
+| Bit deaths | 1,825 |
+| Connections formed | 1,378 |
+| Code churn | 0.000 → 0.245 |
+| Code utilization | 0.981 → 0.717 |
+| Mean entropy | 0.536 → 0.212 |
+| Phase transitions | 0 (gradual, no sharp jumps) |
+
+**Dual Axis Coherence** (learned oppositions):
+
+| Dual Pair | Coherence | Exclusive activations |
+|-----------|-----------|----------------------|
+| placer ↔ dolor | **1.00** | 113 excl, 0 shared |
+| libertad ↔ control | **0.98** | 47 excl, 1 shared |
+| receptivo ↔ creador_obs | **0.94** | 62 excl, 4 shared |
+| vida ↔ muerte | **0.91** | 158 excl, 15 shared |
+| consciente ↔ ausente | **0.88** | 191 excl, 25 shared |
+| bien ↔ mal | **0.85** | 100 excl, 17 shared |
+| temporal_obs ↔ eterno_obs | 0.57 | 85 excl, 63 shared |
+| verdad ↔ mentira | 0.57 | 92 excl, 70 shared |
+| individual ↔ colectivo | 0.56 | 84 excl, 65 shared |
+
+**Key Finding**: 6/9 dual axes have coherence > 0.85 — the model learns genuine semantic opposition without explicit dual supervision. The top 3 (placer/dolor, libertad/control, receptivo/creador) are near-perfect. The bottom 3 (temporal/eterno, verdad/mentira, individual/colectivo) have high shared activations, suggesting these concepts share more structure than they oppose.
+
+**Layer Emergence**: All 6 ontological layers (L1 Punto → L6 Meta) activate by step 2,500 — the model learns the full ontological structure almost immediately. L6 Meta (consciousness/observer primitives) is the last to fully activate (median step 12,500).
+
+**Bit Stability**:
+- Most stable: bits 52, 42, 27, 35, 19 (locked in early, never change)
+- Most unstable: bits 43, 54, 23, 62, 12 (high churn, candidates for dead bits)
+
+**Visualizations** (in `reptimeline/results/d_a14_v2_plots/`):
+- `swimlane.png` — concept × bit activation heatmap over training
+- `phase_dashboard.png` — entropy, churn, utilization curves
+- `churn_heatmap.png` — per-bit flip frequency across steps
+- `layer_emergence.png` — when each ontological layer stabilizes
+
 ### 4.4 D-A15: Gradient Decoupling — FAILED (2026-03-19)
 
 **Status**: FAILED | **GPU**: ~50m (killed early at step 500) | **Checkpoint**: `danza_grad_decoupling_xl/`
@@ -343,6 +390,31 @@ This is NOT "training a bigger model" or "using more data". It's testing whether
 **Finding**: 355M learns accurate bits but NOT algebraic structure. Ternary collapses to binary (zeros→0%). **v1 anchors (54) are insufficient at any scale** — fair comparison needs 355M + v2.
 
 > Full details: experiment_log.md, lines 3049-3139
+
+### 4.5b D-A17: GPT-2 Medium 355M + v2 Anchors (2026-03-20)
+
+**Status**: COMPLETE | **GPU**: 289.7m | **Checkpoint**: `danza_gpt2medium_ternary_v2/`
+
+| Metric | D-A17 (355M, v2) | D-A14 (40M, v2) | D-A13 (355M, v1) |
+|---|---|---|---|
+| Bit accuracy (holdout) | **97.7%** | 93.0% | 88.0% |
+| Subsumption (test) | **1.7%** | **98.3%** | 9.3% |
+| Dead bits | 26/63 | 26/63 | 26/63 |
+| Ternary zeros | **3.4%** | **41.3%** | 0% |
+| Unique signatures | 84.2% (133/158) | 100% | — |
+| Analogy (R3) | 6.7% | ~100% | 0% |
+| Training time | 289.7 min | 129.2 min | 4.5h |
+
+**Eval results**: `playground/audit_tests/results/f4_4_d_a17_eval.json`
+
+**Key Finding**: **Scaling the backbone from 40M to 355M DESTROYS algebraic structure** while improving bit accuracy. The mechanism:
+
+1. **Ternary zeros collapse** (41.3% → 3.4%) — the larger backbone provides enough signal that the model doesn't need the "irrelevant" state
+2. **Without zeros, subsumption fails** — `(A & B) == B` is combinatorially unsatisfiable when all bits are ±1
+3. **Signature collisions appear** — 20 concepts share identical signatures (bad/evil, absence/apathy/indifference, etc.)
+4. **Analogy breaks** — 6.7% vs ~100% at 40M
+
+**Conclusion**: ~42% ternary sparsity is **structurally necessary** for algebraic operations. More parameters ≠ better algebra. The 40M model (D-A14) IS the optimal architecture for the triadic system. This is evidence for the paper: the triadic head's value is algebraic composability, not bit accuracy.
 
 ### 4.6 D-A11: Negative Baselines (2026-03-18)
 
