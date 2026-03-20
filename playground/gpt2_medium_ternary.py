@@ -227,6 +227,7 @@ def gpt2_subsumption_loss(model, h_tensors, y_tensors):
 def run_training(args, train_anchors, holdout_anchors, prim_data, ckpt_dir):
     """Train GPT-2 Medium + Ternary Triadic Head."""
     from transformers import GPT2LMHeadModel, GPT2Tokenizer
+    import glob as _glob
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     if device.type == 'cuda':
@@ -256,7 +257,22 @@ def run_training(args, train_anchors, holdout_anchors, prim_data, ckpt_dir):
     print(f"  Model: GPT2MediumTernary ({total_params/1e6:.1f}M total, "
           f"{triadic_params/1e3:.1f}K triadic head, {N_BITS} ternary trits)")
 
-    # Phase 1: freeze backbone
+    # --- Resume from checkpoint ---
+    resume_step = 0
+    if args.resume:
+        ckpt_files = sorted(
+            _glob.glob(os.path.join(ckpt_dir, 'model_step*.pt')),
+            key=lambda f: int(os.path.basename(f).replace('model_step', '').replace('.pt', '')))
+        if ckpt_files:
+            latest_ckpt = ckpt_files[-1]
+            ckpt = torch.load(latest_ckpt, map_location=device, weights_only=False)
+            model.load_state_dict(ckpt['model_state_dict'])
+            resume_step = ckpt['step']
+            print(f"  RESUMED from {os.path.basename(latest_ckpt)} (step {resume_step})")
+        else:
+            print(f"  --resume: no checkpoints found in {ckpt_dir}, starting fresh")
+
+    # Phase 1: freeze backbone (will unfreeze later if past unfreeze_step)
     model.freeze_backbone()
     trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"  Phase 1: backbone frozen, {trainable/1e3:.1f}K trainable params")
@@ -351,24 +367,47 @@ def run_training(args, train_anchors, holdout_anchors, prim_data, ckpt_dir):
     unfreeze_step = int(args.steps * args.triadic_warmup_pct)
 
     csv_path = os.path.join(ckpt_dir, 'training_log.csv')
-    csv_file = open(csv_path, 'w', newline='')
+    if resume_step > 0:
+        csv_file = open(csv_path, 'a', newline='')
+    else:
+        csv_file = open(csv_path, 'w', newline='')
     csv_writer = csv.writer(csv_file)
-    csv_writer.writerow([
-        'step', 'loss', 'lang_loss', 'tri_loss', 'sup_loss', 'sub_loss',
-        'bit_acc_train', 'bit_acc_holdout', 'dead_bits',
-        'zero_rate', 'ternary_neg', 'ternary_zero', 'ternary_pos',
-    ])
+    if resume_step == 0:
+        csv_writer.writerow([
+            'step', 'loss', 'lang_loss', 'tri_loss', 'sup_loss', 'sub_loss',
+            'bit_acc_train', 'bit_acc_holdout', 'dead_bits',
+            'zero_rate', 'ternary_neg', 'ternary_zero', 'ternary_pos',
+        ])
 
     data_iter = iter(loader)
     t0 = time.time()
     best_hold_acc = 0.0
     unfrozen = False
 
-    print(f"\n  Training ({args.steps} steps)...")
+    # If resuming past unfreeze point, unfreeze immediately
+    if resume_step >= unfreeze_step:
+        model.unfreeze_last_n(args.unfreeze_layers)
+        unfrozen = True
+        optimizer = torch.optim.AdamW(
+            filter(lambda p: p.requires_grad, model.parameters()),
+            lr=args.lr, betas=(0.9, 0.999), weight_decay=0.01)
+        print(f"  Resume: already past unfreeze point, Phase 2 active")
+    # Load best holdout acc from best checkpoint for resume
+    if resume_step > 0:
+        best_path = os.path.join(ckpt_dir, 'model_best.pt')
+        if os.path.exists(best_path):
+            best_ckpt = torch.load(best_path, map_location='cpu', weights_only=False)
+            best_hold_acc = best_ckpt.get('bit_accuracy_holdout', 0)
+            print(f"  Resume: best holdout acc so far = {best_hold_acc:.1%}")
+            del best_ckpt
+
+    start_step = resume_step + 1
+    remaining = args.steps - resume_step
+    print(f"\n  Training ({remaining} steps remaining, {start_step}-{args.steps})...")
     print(f"  Phase 1: steps 1-{unfreeze_step} (backbone frozen, triadic head trains)")
     print(f"  Phase 2: steps {unfreeze_step}-{args.steps} (unfreeze last {args.unfreeze_layers} layers)")
 
-    for step in range(1, args.steps + 1):
+    for step in range(start_step, args.steps + 1):
         try:
             x, y = next(data_iter)
         except StopIteration:
@@ -536,6 +575,8 @@ def main():
     parser.add_argument('--print-every', type=int, default=50)
     parser.add_argument('--save-every', type=int, default=10000)
     parser.add_argument('--eval-every', type=int, default=2500)
+    parser.add_argument('--resume', action='store_true',
+                        help='Resume from latest checkpoint in ckpt_dir')
     args = parser.parse_args()
 
     # Load primitives and anchors

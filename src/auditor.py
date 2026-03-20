@@ -2,24 +2,25 @@ import os
 import sys
 import json
 import random
+import argparse
 import torch
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.evaluate import load_model
-from src.triadic import PrimeMapper, TriadicValidator
+from src.triadic import BitwiseMapper, BitwiseValidator
 
-def evaluate_relational_bias(ckpt_path, gold_path, num_pairs=5000):
+def evaluate_relational_bias(ckpt_path, tokenizer_path, gold_path, num_pairs=5000):
     print("\n" + "="*85)
     print("  STEP C: QUANTITATIVE RELATIONAL BIAS AUDIT (EXP 8)")
     print("="*85)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model, tokenizer, config = load_model(ckpt_path, "checkpoints/torch/tokenizer.json", device)
-    
-    mapper = PrimeMapper(config.n_triadic_bits)
-    validator = TriadicValidator()
+    model, tokenizer, config = load_model(ckpt_path, tokenizer_path, device)
+
+    mapper = BitwiseMapper(config.n_triadic_bits)
+    validator = BitwiseValidator()
 
     if not os.path.exists(gold_path):
         print(f"Error: Could not find ground truth dataset at {gold_path}")
@@ -62,11 +63,11 @@ def evaluate_relational_bias(ckpt_path, gold_path, num_pairs=5000):
             c1, c2 = subset_concepts[i], subset_concepts[j]
             p1, p2 = true_primes[c1], true_primes[c2]
             
-            # Don't use pairs that are identical primes
+            # Don't use pairs that are identical bitmasks
             if p1 != p2:
-                if p1 % p2 == 0:
+                if (p1 & p2) == p2:
                     positive_pairs.append((c1, c2))
-                elif p2 % p1 == 0:
+                elif (p2 & p1) == p1:
                     positive_pairs.append((c2, c1))
             
             if len(positive_pairs) >= num_pairs // 2:
@@ -79,7 +80,7 @@ def evaluate_relational_bias(ckpt_path, gold_path, num_pairs=5000):
     while len(negative_pairs) < (num_pairs - len(positive_pairs)):
         c1, c2 = random.sample(concepts, 2)
         p1, p2 = true_primes[c1], true_primes[c2]
-        if p1 % p2 != 0:
+        if (p1 & p2) != p2 and (p2 & p1) != p1:
             negative_pairs.append((c1, c2))
 
     test_pairs = [(A, B, True) for A, B in positive_pairs] + [(A, B, False) for A, B in negative_pairs]
@@ -107,7 +108,7 @@ def evaluate_relational_bias(ckpt_path, gold_path, num_pairs=5000):
         pred_pA = get_model_prime(c_A)
         pred_pB = get_model_prime(c_B)
         
-        pred_subsumes = (pred_pA % pred_pB == 0)
+        pred_subsumes = (pred_pA & pred_pB) == pred_pB
         
         if gt_subsumes and pred_subsumes:
             TP += 1
@@ -153,10 +154,19 @@ def evaluate_relational_bias(ckpt_path, gold_path, num_pairs=5000):
 
 
 if __name__ == "__main__":
-    # We use the 64-bit XL model that we just trained
-    ckpt = "checkpoints/torch/model_L12_D512_B64_step500.pt"
-    gold = "data/gold_primes_64.json"
-    if os.path.exists(ckpt):
-        evaluate_relational_bias(ckpt, gold, num_pairs=2000)
+    parser = argparse.ArgumentParser(description='Relational Bias Audit (Experiment 8)')
+    parser.add_argument('--model', type=str,
+                        default='checkpoints/torch_run15_strongalign/model_L12_D512_B64_best.pt',
+                        help='Path to model checkpoint')
+    parser.add_argument('--tokenizer', type=str, default=None,
+                        help='Path to tokenizer.json (default: same dir as model)')
+    parser.add_argument('--gold', type=str, default='data/gold_primes_64.json',
+                        help='Path to gold primes JSON')
+    parser.add_argument('--num-pairs', type=int, default=2000)
+    args = parser.parse_args()
+
+    tok = args.tokenizer or os.path.join(os.path.dirname(args.model), 'tokenizer.json')
+    if os.path.exists(args.model):
+        evaluate_relational_bias(args.model, tok, args.gold, num_pairs=args.num_pairs)
     else:
-        print(f"Checkpoint not found: {ckpt}")
+        print(f"Checkpoint not found: {args.model}")

@@ -1,19 +1,20 @@
 import os
 import sys
+import argparse
 import torch
 import json
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.evaluate import load_model
-from src.triadic import PrimeMapper, TriadicValidator
+from src.triadic import BitwiseMapper, BitwiseValidator
 
-def test_generalization(ckpt_path):
+def test_generalization(ckpt_path, tokenizer_path):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model, tokenizer, config = load_model(ckpt_path, "checkpoints/torch/tokenizer.json", device)
-    
-    mapper = PrimeMapper(config.n_triadic_bits)
-    validator = TriadicValidator()
+    model, tokenizer, config = load_model(ckpt_path, tokenizer_path, device)
+
+    mapper = BitwiseMapper(config.n_triadic_bits)
+    validator = BitwiseValidator()
 
     gold_path = "data/gold_primes.json"
     seen_concepts = set()
@@ -61,8 +62,16 @@ def test_generalization(ckpt_path):
             print(f"  {word:<12s} | {seen_str:<5s} | {str(prime):<30s} | {sim:>6.1%}")
 
 if __name__ == "__main__":
-    ckpt = "checkpoints/torch/model_L12_D512_B64_step500.pt"
-    if os.path.exists(ckpt):
-        test_generalization(ckpt)
+    parser = argparse.ArgumentParser(description='Held-out Semantic Generalization Test')
+    parser.add_argument('--model', type=str,
+                        default='checkpoints/torch_run15_strongalign/model_L12_D512_B64_best.pt',
+                        help='Path to model checkpoint')
+    parser.add_argument('--tokenizer', type=str, default=None,
+                        help='Path to tokenizer.json (default: same dir as model)')
+    args = parser.parse_args()
+
+    tok = args.tokenizer or os.path.join(os.path.dirname(args.model), 'tokenizer.json')
+    if os.path.exists(args.model):
+        test_generalization(args.model, tok)
     else:
-        print(f"Checkpoint not found: {ckpt}\nIf you used fine-tuning, you might want to point this to the chat checkpoint.")
+        print(f"Checkpoint not found: {args.model}")

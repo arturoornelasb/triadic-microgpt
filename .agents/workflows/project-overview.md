@@ -1,53 +1,67 @@
 ---
-description: Overview of the Triadic MicroGPT project and its neurosymbolic architecture
+description: Overview of the Triadic MicroGPT project — bitwise neurosymbolic architecture
 ---
 
 # Triadic MicroGPT — Project Overview
 
 ## What This Is
 
-A neurosymbolic language model that combines standard GPT text generation with a **triadic prime-factor semantic encoding system**. Every token gets both:
+A neurosymbolic language model that combines standard GPT text generation with a **triadic bitwise semantic encoding system**. Every token gets both:
 1. A **language prediction** (standard next-token)
-2. A **prime signature** (semantic fingerprint using prime number products)
+2. A **bit signature** (63-bit semantic fingerprint, verified via O(1) bitwise algebra)
 
-## The Triadic System
+The paper demonstrates that this system scales knowledge through a human-in-the-loop discovery cycle: train → discover bit semantics → correct → expand anchors → retrain.
+
+## The Bitwise System
 
 ```
-Hidden State → Triadic Head → tanh(Wx) → bits [-1, +1, +1, -1, ...]
+Hidden State → Triadic Head → iFSQ(Wx) → 63 bits [-1, 0, +1]
                                             │
-                                    Positive bits activate primes:
-                                    bit 0 → 2, bit 1 → 3, bit 2 → 5, ...
+                                   Bitmask = semantic signature
+                                   "King"  → 0b...101101  (bits 0,2,3,5 active)
+                                   "Queen" → 0b...101011  (bits 0,1,3,5 active)
+                                   King & Queen = shared meaning
+                                   King ^ Queen = what differs
                                             │
-                                    Product = semantic signature
-                                    "King" → 2 × 3 × 5 × 11 = 330
-                                    "Queen" → 2 × 5 × 7 × 11 = 770
-                                    GCD(330, 770) = shared meaning
+                                   BitwiseValidator: O(1) algebra
+                                   - subsumes:  (A & B) == B
+                                   - compose:   A | B
+                                   - analogy:   (C & ~only_a) | only_b
+                                   - similarity: popcount(A&B) / popcount(A|B)
 ```
+
+The mathematical theory uses prime factorization (PrimeMapper). The implementation uses bitwise ops (BitwiseValidator). They are **isomorphic** — same algebra, O(1) vs O(n).
 
 ## Key Concepts
 
-- **PrimeMapper** (`src/triadic.py`): converts tanh projections → prime products
-- **TriadicValidator**: computes GCD-based similarity between prime signatures
-- **Triadic Loss**: 3 objectives — coherence (adjacent agree), diversity (use all bits), contrastive (different docs differ)
-- **Experiment Log** (`experiment_log.md`): tracks all training runs with metrics
+- **BitwiseMapper/BitwiseValidator** (`src/triadic.py`): O(1) bitwise algebra on bit signatures
+- **PrimeMapper/TriadicValidator** (`src/triadic.py`): prime-factor algebra (paper theory, same results)
+- **Triadic Loss**: diversity + contrastive + entropy + embedding alignment (**NEVER coherence — causes collapse**)
+- **iFSQ activation**: `2 * sigmoid(1.6x) - 1` — better gradients than tanh
+- **Anchors**: hand-factorized gold concepts (50 v1, 158 v2) from "La Danza Cósmica de los Opuestos"
+- **reptimeline**: discovers bit semantics, duals, 3-way interactions from trained model
+- **Discovery Loop**: train → discover → human corrects → expand anchors → retrain (core paper thesis)
 
-## Current State (as of Run 7)
+## Current State (2026-03-19)
 
-- **Model**: 8L / 384D / 8H / 48 triadic bits / ~16M params
-- **Training**: 50K TinyStories, 20K steps, RTX 5060 Ti
-- **Loss**: 1.65 (pretrain), 0.78 (fine-tune for chat)
-- **Tokenizer**: HuggingFace `tokenizers` (Rust, 1000× faster than Python BPE)
-- **Pipeline**: Full train+eval cycle in <15 min
+- **Production**: D-A14 v2 tanh — 40M params, 93% test, 98.3% subsumption, 158 anchors
+- **Alternative**: D-A16 iFSQ+v2 — 93.2% test, R3=0.842, best LM loss
+- **From-scratch**: Run 15 — PPL 7.69, gap +0.020 (no supervised anchors)
+- **Scaling**: D-A17 GPT-2 355M (training), D-A18 unified (script ready)
+- **Paper**: 16 pages compiled, all experiments included
+- **Validation**: E1-E7 complete, 80 unit tests pass, 12 benchmarks done
+- **Key evidence**: 50→158 anchors improved 87%→93% (discovery loop works)
 
 ## Repos in the Ecosystem
 
-| Repo | Purpose |
-|------|---------|
-| `triadic-microgpt` | This repo: the model, training, evaluation |
-| `Triadic-Neurosymbolic-Engine` | Core neurosymbolic engine library |
-| `neurosym-client` | Client/SDK for the engine |
-| `triadic-cloud` | Cloud deployment infrastructure |
+| Repo | Purpose | Status |
+|------|---------|--------|
+| `triadic-microgpt` | This repo: model, training, paper | Active |
+| `Triadic-Neurosymbolic-Engine` | Parent library + paper (neurosym on PyPI) | Published |
+| `neurosym-client` | Python SDK (neurosym-cloud on PyPI) | Published |
+| `triadic-cloud` | Commercial SaaS API (PRIVATE) | Active |
+| `triadic-head` | Standalone PyPI package from microgpt | Built, not published |
 
 ## Workflow
 
-See `.agents/workflows/training.md` for the step-by-step training workflow.
+See `.agents/workflows/training.md` for the full training cycle (train → evaluate → discover → correct → retrain).

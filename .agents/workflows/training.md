@@ -1,155 +1,178 @@
 ---
-description: How to train, evaluate, and fine-tune the Triadic MicroGPT model
+description: How to train, evaluate, discover, and retrain the Triadic MicroGPT model — full bitwise pipeline
 ---
 
 # Triadic MicroGPT — Training Workflow
 
+## Core Thesis
+
+The triadic head produces **bits** — binary semantic fingerprints verified through O(1) bitwise algebra. The training cycle is:
+
+```
+Train → Evaluate → Discover (reptimeline) → Human Corrects → Expand Anchors → Retrain
+  50 anchors → 87%     158 anchors → 93%      300+? → ...
+```
+
+This loop IS the paper's evidence: bits scale knowledge through human-in-the-loop discovery.
+
 ## Environment
 
 ```powershell
-# Conda env with Python 3.10, PyTorch + CUDA, HuggingFace tokenizers
 conda activate triadic-microgpt
+# Python 3.10 | PyTorch 2.12+ (CUDA 12.8) | HuggingFace tokenizers | numpy | matplotlib
+# GPU: RTX 5060 Ti 16GB (Blackwell, bfloat16 mandatory)
 ```
-
-**Key packages**: `torch` (2.12 nightly, CUDA 12.8), `tokenizers` (HuggingFace Rust), `numpy`, `matplotlib`
 
 ## Architecture Overview
 
 ```
 Text → FastBPETokenizer → Token IDs → TriadicGPT → Two Heads:
-  1. LM Head → next token prediction (cross-entropy)
-  2. Triadic Head → tanh → bits → PrimeMapper → prime product (semantic fingerprint)
+  1. LM Head → next-token prediction (cross-entropy)
+  2. Triadic Head → iFSQ(Linear(h)) → 63 bits → BitwiseValidator (O(1))
+       - subsumes:   (A & B) == B
+       - compose:    A | B
+       - analogy:    (C & ~only_a) | only_b
+       - gap:        A & ~B, B & ~A
+       - similarity: popcount(A & B) / popcount(A | B)
 ```
 
-The model has **two losses** combined: `total = lang_loss + α × triadic_loss`
+Total loss = `L_lang + α × L_triadic`
 
-Triadic loss has 3 components (to prevent collapse):
-- **Coherence**: adjacent tokens should agree (share primes)
+Triadic loss components (to prevent collapse):
 - **Diversity**: bits should be ~50% active across batch
-- **Contrastive**: different sequences should have different projections
+- **Contrastive**: different sequences → different projections
+- **Entropy**: per-bit entropy regularization (prevents dead bits)
+- **Embedding alignment**: backbone wte → triadic head (THE driver of quality)
+
+**NEVER use coherence loss** — adjacent-token agreement drives all projections to identical. Proven to collapse in every experiment.
 
 ## File Map
 
 | File | Purpose |
 |------|---------|
+| `src/torch_transformer.py` | TriadicGPT model (nn.Module) — core architecture |
+| `src/triadic.py` | BitwiseMapper, BitwiseValidator (+ PrimeMapper for paper theory) |
+| `src/evaluate.py` | Perplexity, generation, triadic analysis, loss curves |
+| `src/torch_train.py` | GPU pretraining (from-scratch, TinyStories) |
+| `src/torch_finetune.py` | Chat fine-tuning on Alpaca |
 | `src/fast_tokenizer.py` | HuggingFace BPE tokenizer (Rust, 1000× faster) |
-| `src/tokenizer.py` | Legacy Python BPE tokenizer (fallback) |
-| `src/torch_transformer.py` | PyTorch model: `TriadicGPT` (nn.Module) |
-| `src/torch_train.py` | GPU pretraining script |
-| `src/torch_finetune.py` | GPU fine-tuning for chat |
-| `src/evaluate.py` | Evaluation: perplexity, triadic, loss curves |
-| `src/pre_tokenize.py` | Pre-encode corpus to `.npy` cache |
-| `src/triadic.py` | PrimeMapper, TriadicValidator |
-| `experiment_log.md` | All training runs with metrics |
+| `playground/danza_63bit.py` | Danza 63-bit training (supervised anchors) |
+| `playground/unified_final.py` | D-A18: iFSQ + hybrid 30+33 bits + v2 anchors + adversarial |
+| `playground/audit_tests/common.py` | Shared evaluation utilities (bitwise) |
+| `playground/audit_tests/test_d_a13_eval.py` | Formal model evaluation (--v2 for 158 anchors) |
+| `EXPERIMENT_REFERENCE.md` | Master experiment reference (all results) |
+| `experiment_log.md` | Detailed data store (raw logs) |
 
-## Step 1: Pre-train
+## The Training Cycle
 
-// turbo
+### Step 1: Train
+
+**Danza 63-bit** (supervised anchors, primary path):
 ```powershell
-# Full pipeline: train tokenizer + encode + GPU train (~15 min for 50K stories)
+conda run -n triadic-microgpt python playground/danza_63bit.py `
+  --scale xl --steps 50000 --dtype bfloat16 `
+  --v2 `
+  --checkpoint-dir checkpoints/danza_63bit_xl_vN
+```
+
+**Unified model** (iFSQ + hybrid + adversarial, experimental):
+```powershell
+conda run -n triadic-microgpt python playground/unified_final.py `
+  --scale xl --steps 50000 --dtype bfloat16
+```
+
+**From-scratch** (no supervised anchors, baseline):
+```powershell
 conda run -n triadic-microgpt python src/torch_train.py `
-  --data data/TinyStories-train.txt `
-  --stories 50000 `
-  --vocab 4096 `
-  --steps 20000 `
-  --batch-size 32 `
-  --lr 3e-4 `
-  --layers 8 --dim 384 --heads 8 --bits 48 `
-  --block 256 `
-  --dropout 0.1 `
-  --alpha 0.15 `
-  --triadic-warmup-pct 0.3 `
-  --print-every 200 --save-every 5000 `
+  --scale xl --steps 50000 --dtype bfloat16 `
   --checkpoint-dir checkpoints/torch_runN
 ```
 
-**To skip tokenizer training** (saves minutes):
-```powershell
---tokenizer checkpoints/torch_runN/tokenizer.json
-```
+### Step 2: Evaluate
 
-**To skip encoding** (saves hours with old tokenizer):
 ```powershell
---tokens data/tokens_50k.npy
-```
+# Formal eval with v2 anchors (158)
+conda run -n triadic-microgpt python playground/audit_tests/test_d_a13_eval.py --v2
 
-## Step 2: Evaluate
-
-// turbo
-```powershell
+# Standard eval (perplexity, generation, triadic analysis)
 conda run -n triadic-microgpt python src/evaluate.py `
-  --model checkpoints/torch_runN/model_best.pt `
-  --tokenizer checkpoints/torch_runN/tokenizer.json `
-  --data data/TinyStories-train.txt `
-  --csv checkpoints/torch_runN/training_log.csv
+  --model checkpoints/danza_63bit_xl_vN/model_best.pt `
+  --tokenizer checkpoints/danza_63bit_xl_vN/tokenizer.json
 ```
 
-This produces:
-- **Perplexity** (lower = better, target < 5.0)
-- **Sample generations** (qualitative check)
-- **Triadic signature analysis** (concept pair similarity)
-- **Loss curve graph** → `reports/loss_curve.png`
-- **JSON report** → `reports/eval_report.json`
+Key metrics:
+- **Test bit accuracy**: target > 90%
+- **Subsumption**: target > 95%
+- **Dead bits**: target < 30/63
+- **Perplexity**: lower = better (Run 15 baseline: 7.69)
 
-## Step 3: Document in experiment_log.md
+### Step 3: Discover (reptimeline)
 
-After each run, add an entry to `experiment_log.md` with:
-- Date, script, data, architecture, params
-- Steps, final loss, perplexity, triadic loss
-- Speed (stp/s), total time
-- Sample generations
-- Key observations and conclusion
-- What to try next
-
-## Step 4: Fine-tune for Chat
-
-// turbo
 ```powershell
-conda run -n triadic-microgpt python src/torch_finetune.py `
-  --model checkpoints/torch_runN/model_best.pt `
-  --tokenizer checkpoints/torch_runN/tokenizer.json `
-  --data data/alpaca_data_cleaned.json `
-  --steps 2000 `
-  --batch-size 16 `
-  --lr 5e-5 `
-  --alpha 0.05 `
-  --max-examples 2000 `
-  --checkpoint-dir checkpoints/chat_runN
+# Analyze what the bits learned — discover semantics, duals, 3-way interactions
+conda run -n triadic-microgpt python playground/danza_63bit.py `
+  --checkpoint checkpoints/danza_63bit_xl_vN/model_best.pt --analyze-only
 ```
 
-## Step 5: Run Tests
+reptimeline discovers:
+- **Bit semantics**: what each bit encodes (e.g., bit 5 = "vida")
+- **Dual detection**: anti-correlated pairs (e.g., bien↔mal)
+- **3-way interactions**: compositional structure (bit_i + bit_j → bit_r)
+- **Dependency chains**: which bits predict others
 
-// turbo
+### Step 4: Human Corrects
+
+Review reptimeline output. For each discovery:
+- Is "bit 23 = vida" correct or noise?
+- Are the detected duals real semantic oppositions?
+- Do 3-way interactions reflect genuine composition?
+
+Valid discoveries become new anchors in `playground/danza_data/anclas_v3.json`.
+
+### Step 5: Retrain with Expanded Anchors
+
 ```powershell
-conda run -n triadic-microgpt python tests/test_all.py
+# Train with v3 anchors (300+?)
+conda run -n triadic-microgpt python playground/danza_63bit.py `
+  --scale xl --steps 50000 --dtype bfloat16 `
+  --v2 `  # or --v3 when anchors expand
+  --checkpoint-dir checkpoints/danza_63bit_xl_v3
 ```
 
-All 37 tests should pass.
+This closes the loop. Evidence so far:
+- v1 (50 anchors) → 87% test accuracy
+- v2 (158 anchors) → 93% test accuracy
+- v3 (300+?) → ?
+
+### Step 6: Document
+
+After each run, update `EXPERIMENT_REFERENCE.md` with:
+- ID, date, config, key metrics
+- What changed from previous cycle
+- Discovery results that informed the changes
 
 ## Mixed Precision (MANDATORY)
 
 **All training MUST use bfloat16** on the RTX 5060 Ti (Blackwell, 4th gen Tensor Cores).
 
-### Optimization stack (all mandatory for new scripts)
+### Optimization stack
 
 | Optimization | Speedup | What it does |
 |---|---|---|
 | **bfloat16** | 2-8x vs float32 | Tensor Core peak throughput, no GradScaler needed |
-| **torch.compile** | 10-30% | Fuses CUDA kernels, eliminates Python overhead |
-| **TF32 matmul** | 5-15% | Uses TensorFloat-32 for residual float32 operations |
-| **cudnn.benchmark** | ~5% | Kernel autotuning for optimal algorithm selection |
-| **Gradient checkpointing** | Saves VRAM | Trade recompute for memory (enables larger batches) |
-| **Flash Attention** | Already active | `F.scaled_dot_product_attention(is_causal=True)` in model |
+| **torch.compile** | 10-30% | Fuses CUDA kernels (Linux/Triton only) |
+| **TF32 matmul** | 5-15% | TensorFloat-32 for residual float32 ops |
+| **cudnn.benchmark** | ~5% | Kernel autotuning |
+| **Gradient checkpointing** | Saves VRAM | Trade recompute for memory |
+| **Flash Attention** | Already active | `F.scaled_dot_product_attention(is_causal=True)` |
 
 ### Boilerplate
 
 ```python
-# Args
 parser.add_argument('--dtype', default='bfloat16', choices=['float32','float16','bfloat16'])
 parser.add_argument('--grad-checkpoint', action='store_true')
 parser.add_argument('--no-compile', action='store_true')
 
-# Device + global settings
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 amp_dtype = {'float32': torch.float32, 'float16': torch.float16,
              'bfloat16': torch.bfloat16}[args.dtype]
@@ -158,47 +181,64 @@ if device.type == 'cuda':
     torch.set_float32_matmul_precision('high')
     torch.backends.cudnn.benchmark = True
 
-# Model
 model = TriadicGPT(config).to(device)
 if args.grad_checkpoint:
     model.gradient_checkpointing_enable()
-if device.type == 'cuda' and not args.no_compile:
-    model = torch.compile(model)
 scaler = torch.amp.GradScaler('cuda', enabled=use_scaler)
 
-# Training loop
 with torch.amp.autocast('cuda', dtype=amp_dtype, enabled=(device.type == 'cuda')):
     logits, proj, loss = model(x, targets=y)
 ```
 
-**Fully optimized:** `danza_bootstrap.py`, `sub_weight_sweep.py`
-**bfloat16 only:** `danza_63bit.py`
-**Legacy (float16):** ~15 older playground scripts (completed experiments)
-
 ## Key Hyperparameters
 
-| Param | Pretrain | Fine-tune | Notes |
-|-------|----------|-----------|-------|
-| `lr` | 3e-4 | 5e-5 | Lower for fine-tune to preserve pretrained weights |
-| `alpha` | 0.15 | 0.05 | Triadic weight (too high → hurts language quality) |
-| `triadic-warmup-pct` | 0.3 | 0 | Start triadic loss after 30% of pretrain steps |
-| `dropout` | 0.1 | 0.1 | Regularization |
-| `batch-size` | 32 | 16 | Smaller for fine-tune (less data) |
-| `dtype` | bfloat16 | bfloat16 | Blackwell Tensor Core peak throughput |
-| `no-compile` | False | False | Only set True for debugging |
-| `grad-checkpoint` | False | False | Enable if VRAM-constrained |
+| Param | Danza 63-bit | From-scratch | Notes |
+|-------|-------------|-------------|-------|
+| `lr` | 3e-4 | 3e-4 | |
+| `alpha` | 0.05 | 0.15 | Lower for supervised (anchors do the work) |
+| `triadic-warmup-pct` | 0.3 | 0.3 | Start triadic loss after 30% of steps |
+| `dropout` | 0.1 | 0.1 | |
+| `batch-size` | 32 | 32 | |
+| `dtype` | bfloat16 | bfloat16 | Always |
+| `--v2` | Yes | N/A | Use 158 anchors (default: 50) |
+
+## Bitwise Algebra (Implementation)
+
+PrimeMapper exists for the paper's mathematical theory. BitwiseValidator is the runtime implementation. They are **isomorphic** (1000/1000 tests, proven):
+
+| Operation | PrimeMapper O(n) | BitwiseValidator O(1) | Speedup |
+|-----------|-------------------|----------------------|---------|
+| Subsumption | `GCD(A,B) == B` | `(A & B) == B` | 1.3x |
+| Composition | `LCM(A,B)` | `A \| B` | 5x |
+| Similarity | Set intersection | `popcount(A&B)/popcount(A\|B)` | 78x |
+| Analogy | GCD + LCM | `(C & ~only_a) \| only_b` | 5x |
+
+**All new code MUST use BitwiseMapper/BitwiseValidator** (aliased as DefaultMapper/DefaultValidator in `src/triadic.py`).
+
+## Production Models
+
+| Model | Params | Accuracy | Subsumption | Checkpoint |
+|-------|--------|----------|-------------|------------|
+| **D-A14 v2 tanh** | 40M | 93.0% | 98.3% | `checkpoints/danza_63bit_xl_v2/` |
+| D-A16 iFSQ+v2 | 40M | 93.2% | R3=0.842 | `checkpoints/danza_ifsq_v2/` |
+| Run 15 (from-scratch) | 40M | N/A | PPL 7.69 | `checkpoints/torch_run15_strongalign/` |
+| D-A17 GPT-2 355M | 355M | TBD | TBD | `checkpoints/danza_gpt2medium_ternary/` |
 
 ## Known Issues
 
-1. **ByteLevel encoding**: FastBPETokenizer uses ByteLevel pre-tokenization which adds `Ä` prefix to tokens in decoded text. This is cosmetic.
-2. **Triadic differentiation**: Single-word concepts may still map to similar primes — the head needs sentence-level context to differentiate.
-3. **Tokenizer compatibility**: Old checkpoints (runs 1-6) use the Python BPE tokenizer (`src/tokenizer.py`). New checkpoints (run 7+) use HuggingFace tokenizer. They are NOT interchangeable.
+1. **Coherence loss = COLLAPSE**: NEVER re-enable. Drives all projections to identical.
+2. **Dead bits**: ~26/63 bits have low entropy (~42% sparsity). This appears structural, not a bug.
+3. **Tokenizer compatibility**: Each checkpoint has its OWN tokenizer.json. Always use the one in the same directory.
+4. **Bootstrap (D-A6) failed**: Fully automated discover→retrain doesn't work. Human-in-the-loop is required.
+5. **iFSQ vs tanh**: iFSQ has better LM loss (0.924 vs 0.946) but slightly lower subsumption. Both valid.
+6. **Pareto cliff at alpha > 0.05**: alpha=0.1+ kills semantic ordering. Stay at 0.05.
 
 ## Scaling Guidelines
 
-| Size | Layers | Dim | Heads | Params | GPU Time (20K steps) |
+| Size | Layers | Dim | Heads | Params | GPU Time (50K steps) |
 |------|--------|-----|-------|--------|---------------------|
-| Small | 4 | 128 | 4 | ~1M | ~2 min |
-| Medium | 6 | 256 | 8 | ~6M | ~4 min |
-| Large | 8 | 384 | 8 | ~16M | ~15 min |
-| XL | 12 | 512 | 8 | ~45M | ~45 min (est.) |
+| Small | 4 | 128 | 4 | ~1M | ~5 min |
+| Base | 6 | 256 | 8 | ~6M | ~10 min |
+| Large | 8 | 384 | 8 | ~16M | ~30 min |
+| XL | 12 | 512 | 8 | ~40M | ~76 min |
+| XXL | 24 | 1024 | 16 | ~307M | ~4h (est.) |
