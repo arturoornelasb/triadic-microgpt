@@ -1,23 +1,44 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
+*.egg-info/
+dist/
+
 .env
 .venv
 env/
 venv/
 ENV/
-*.ckpt
-*.ckpt.vocab
+
 .idea/
 .vscode/
 .DS_Store
+Thumbs.db
+
+# Large binary files
+*.ckpt
+*.ckpt.vocab
 data/
 checkpoints/
-# reports/ — tracked selectively (eval_report.json, loss_curve.png are committed)
-bits_sweep_log.txt
+
+# Legacy files (superseded by PyTorch path)
+model_fast.npz
+model_fast.vocab
+verify_training.py
+tokenizer.json
+
+# Experiment checkpoints (large)
 experiment10/checkpoints/
 experiment10/checkpoints_rank/
 experiment10/checkpoints_infonce/
+playground/checkpoints_*/
+
+# Training results (generated, large)
+triadic-head/results/
+bits_sweep_log.txt
+
+# Private strategy docs
 newplan.md
 masterplan.md
 
@@ -28,12 +49,9 @@ paper/*.out
 paper/*.synctex.gz
 paper/*.fdb_latexmk
 paper/*.fls
+paper/*.bbl
+paper/*.blg
+paper/*.toc
 
 # Claude local settings
 .claude/settings.local.json
-
-# Training results (generated, large)
-triadic-head/results/
-
-# Playground checkpoints (large model files)
-playground/checkpoints_*/
