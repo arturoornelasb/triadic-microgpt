@@ -4,7 +4,7 @@
 End-to-End Prime Factorization in a Generative Language Model: Emergent Algebraic Semantics from Joint Training
 
 ## Authors
-- **Arturo Ornelas Brand** — arturoornelas62@gmail.com
+- **J. Arturo Ornelas Brand** — arturoornelas62@gmail.com
 
 ## Upload Type
 Publication / Preprint
@@ -79,7 +79,7 @@ English
 ```bibtex
 @article{ornelas2026endtoend,
   title={End-to-End Prime Factorization in a Generative Language Model: Emergent Algebraic Semantics from Joint Training},
-  author={Ornelas Brand, Arturo},
+  author={Ornelas Brand, J. Arturo},
   year={2026},
   note={Preprint. Available at Zenodo.}
 }
