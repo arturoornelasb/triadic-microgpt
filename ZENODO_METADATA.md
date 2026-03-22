@@ -39,7 +39,12 @@ TriadicGPT achieves 98% analogy verification (50/51 analogies), 100% signature u
 - GPT
 
 ## License
-Creative Commons Attribution 4.0 International (CC-BY-4.0)
+All Rights Reserved (Proprietary)
+
+> The **paper** (PDF/TeX) may be shared freely for academic purposes.
+> The **source code and model weights** are proprietary — see LICENSE in the repository.
+> The `triadic-head/` subdirectory is MIT-licensed separately.
+> For commercial licensing: support@fuaflow.com
 
 ## Language
 English
