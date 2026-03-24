@@ -355,12 +355,12 @@ ui/                                # PySide6 desktop application
   workers/                         # Async QThread workers for inference
   resources/style.qss              # Dark theme (Catppuccin Mocha)
 
-triadic-head/                      # Standalone PyPI package (v0.1.0, BUSL-1.1)
+triadic-head/                      # PyPI package: pip install triadic-head (v0.1.0, BUSL-1.1)
   triadic_head/algebra.py          # PrimeMapper, TriadicValidator (pure Python, zero deps)
   triadic_head/wrapper.py          # TriadicWrapper for HuggingFace models
   examples/train_gpt2.py           # Full training pipeline example
   tests/                           # 33 unit tests
-  results/                         # Validated training outputs (smoke test, 50K, InfoNCE)
+  pyproject.toml                   # Package metadata
 
 reptimeline/                       # Representation timeline discovery module
   core.py, tracker.py              # Timeline tracking (births, deaths, phase transitions)
@@ -424,9 +424,6 @@ experiment10/                      # GPT-2 transfer learning (self-contained)
   src/model.py                     # GPT2TriadicModel (freeze/unfreeze, 3 alignment modes)
   src/train.py                     # Two-phase training (frozen -> partial unfreeze)
   src/evaluate.py                  # Evaluation vs baselines (111 concepts, 10 categories)
-  checkpoints/                     # MSE alignment (950 MB)
-  checkpoints_infonce/             # InfoNCE alignment (950 MB)
-  checkpoints_rank/                # Rank alignment (950 MB)
   results/                         # experiment10_results.json
 
 paper/                             # Academic publication
@@ -460,11 +457,6 @@ scripts/                           # Utilities (7 scripts)
   _find_tokenizer.py               # Find compatible tokenizer for checkpoint
   _smoke_test.py                   # Quick model sanity check
 
-triadic-head/                      # PyPI package: pip install triadic-head
-  triadic_head/                    # Python package (algebra.py, wrapper.py)
-  tests/                           # 33 unit tests
-  pyproject.toml                   # Package metadata (v0.1.0)
-
 data/                              # Datasets (gitignored except concepts.txt)
   concepts.txt                     # 31 semantic categories for debugging
 
@@ -478,6 +470,9 @@ experiments/                       # Speculative experiments (quaternion_probe.p
 
 EXPERIMENT_REFERENCE.md            # Master consolidated reference (1,271 lines, 15 sections, 60+ experiments)
 experiment_log.md                  # Detailed raw logs for all 29 training runs (194 KB, deprecated data store)
+ROADMAP.md                         # Future improvements and cleanup tasks
+COMMERCIAL.md                      # Commercial licensing terms (participation model)
+TERMS.md                           # Contribution terms
 environment.yml                    # Conda environment specification
 requirements.txt                   # pip dependencies
 ```
