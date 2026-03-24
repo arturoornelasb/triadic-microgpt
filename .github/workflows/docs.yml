@@ -27,7 +27,7 @@ jobs:
       - run: pip install pdoc torch transformers
       - run: pip install -e triadic-head/
       - run: pdoc triadic_head -o docs/ --docformat google
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: docs/
 
