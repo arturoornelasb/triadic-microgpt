@@ -264,7 +264,7 @@ Results in `reptimeline/results/` (timeline JSON, discovery reports, autolabel o
 
 ## triadic-head (Standalone Package)
 
-A drop-in triadic projection head for any HuggingFace transformer. MIT-licensed, publishable independently. v0.1.0 built and validated.
+A drop-in triadic projection head for any HuggingFace transformer. BUSL-1.1 licensed. v0.1.0 built and validated.
 
 ```python
 from triadic_head import TriadicWrapper
@@ -346,7 +346,7 @@ ui/                                # PySide6 desktop application
   workers/                         # Async QThread workers for inference
   resources/style.qss              # Dark theme (Catppuccin Mocha)
 
-triadic-head/                      # Standalone PyPI package (v0.1.0, MIT)
+triadic-head/                      # Standalone PyPI package (v0.1.0, BUSL-1.1)
   triadic_head/algebra.py          # PrimeMapper, TriadicValidator (pure Python, zero deps)
   triadic_head/wrapper.py          # TriadicWrapper for HuggingFace models
   examples/train_gpt2.py           # Full training pipeline example
@@ -524,6 +524,9 @@ cd paper && pdflatex triadic_microgpt.tex && pdflatex triadic_microgpt.tex
 
 ## License
 
-Proprietary — see [LICENSE](./LICENSE). The `triadic-head/` subpackage is licensed separately under MIT.
+**Business Source License 1.1 (BUSL-1.1)** — see [LICENSE](./LICENSE), [TERMS.md](./TERMS.md), and [COMMERCIAL.md](./COMMERCIAL.md).
 
-For commercial licensing inquiries: support@fuaflow.com
+Individuals, academics, and non-profits: free. Companies: participation agreement required.
+**Change Date:** 2030-03-22 — auto-converts to AGPL-3.0.
+
+Contact: arturoornelas62@gmail.com

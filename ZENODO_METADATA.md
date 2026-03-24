@@ -43,9 +43,9 @@ Business Source License 1.1 (BUSL-1.1)
 
 - **Change Date**: 2030-03-22
 - **Change License**: AGPL-3.0
-- **Exception**: `triadic-head/` is MIT
+- **Scope**: All code including `triadic-head/`
 - **Paper (PDF)**: CC-BY-4.0 (for academic sharing on Zenodo)
-- **Commercial licensing**: support@fuaflow.com
+- **Commercial licensing**: arturoornelas62@gmail.com
 
 ## Language
 English

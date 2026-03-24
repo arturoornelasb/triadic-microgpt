@@ -199,4 +199,4 @@ Works with any HuggingFace `AutoModelForCausalLM`:
 
 ## License
 
-MIT
+Business Source License 1.1 (BUSL-1.1). Free for individuals, academics, and non-profits. See [LICENSE](./LICENSE).

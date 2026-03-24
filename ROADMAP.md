@@ -53,8 +53,8 @@ Status snapshot as of 2026-03-22. All items are derived from the actual repo sta
 
 ### Activos Listos
 
-- **triadic-head** (MIT) — Paquete standalone para cualquier modelo HF. API: wrap, train, encode, compare, validate, explore. Soporta GPT-2, LLaMA, Mistral, Phi, Qwen, OPT, Falcon.
-- **neurosym-client** (MIT, v0.1.0 en PyPI) — SDK Python para triadic-cloud API.
+- **triadic-head** (BUSL-1.1) — Paquete standalone para cualquier modelo HF. API: wrap, train, encode, compare, validate, explore. Soporta GPT-2, LLaMA, Mistral, Phi, Qwen, OPT, Falcon.
+- **neurosym-client** (Proprietary, v0.1.0 en PyPI) — SDK Python para triadic-cloud API.
 - **triadic-cloud** (Proprietary, repo privado) — FastAPI + Stripe ($29-299/mo), desplegado en Railway. Usa neurosym (post-hoc).
 - **Paper** — 27 paginas compilado, listo para Zenodo. 11 experimentos, 29 runs, resultados reproducibles.
 - **Desktop UI** — Aplicacion funcional para demos presenciales o screencasts.
@@ -66,18 +66,18 @@ Status snapshot as of 2026-03-22. All items are derived from the actual repo sta
 - [ ] **Publicar triadic-head en PyPI** — Secuencia: paper DOI primero -> luego PyPI con DOI en metadata.
 - [ ] **Documentacion publica** — No hay site de docs (readthedocs, GitHub Pages). El README es extenso (529 lineas) pero no reemplaza docs interactivas. Minimo: un tutorial "attach triadic head to GPT-2 in 20 lines".
 - [ ] **Demo hosted** — No hay playground web. Opciones: (a) Gradio/Streamlit en HuggingFace Spaces (gratis), (b) pagina en fuaflow.com. La UI de escritorio no sirve como demo remota.
-- [ ] **Licencia dual** — Codigo fuente es Proprietary excepto triadic-head (MIT). Para adopcion academica, considerar BUSL-1.1 (como Triadic Engine) que permite uso academico y convierte a Apache en 4 anos.
+- [x] **Licencia** — BUSL-1.1 con modelo de consorcio. Individuos/academia/nonprofits gratis, empresas participan. Change Date 2030-03-22 → AGPL-3.0.
 
 ### Estrategia de Ecosistema (Definida)
 
 | Componente | Licencia | Estado | Rol |
 |------------|----------|--------|-----|
-| triadic-head | MIT | Built, no publicado | Hook publico — adopcion, integraciones |
-| triadic-microgpt | Proprietary | Completo | Referencia de investigacion + paper |
-| triadic-cloud | Proprietary | Desplegado | Revenue ($29-299/mo) |
-| neurosym-client | MIT | v0.1.0 en PyPI | SDK para cloud API |
+| triadic-head | BUSL-1.1 | Built, no publicado | Paquete standalone |
+| triadic-microgpt | BUSL-1.1 | Completo | Referencia de investigacion + paper |
+| triadic-cloud | Proprietary | Desplegado | Revenue |
+| neurosym-client | Proprietary | v0.1.0 en PyPI | SDK para cloud API |
 | Triadic Engine | BUSL-1.1 | v0.2.0 en PyPI | Libreria post-hoc (parent) |
-| Paper | CC (Zenodo) | PDF listo, sin DOI | Credibilidad academica |
+| Paper | CC-BY-4.0 (Zenodo) | PDF listo | Credibilidad academica |
 
 ---
 
