@@ -662,8 +662,8 @@ Across the 14 R3-reachable concepts, direct accuracy and algebraic improvement a
 
 \paragraph{Statistical significance.} The $+0.5$~pp margin over the trivial baseline is small in absolute terms but highly significant. A permutation test ($n=1000$, shuffling concept-to-gold-bits assignments) yields $p < 0.001$: zero of 1000 random permutations achieve algebraic accuracy $\geq 90.7\%$. Cohen's $d = 6.64$ (random mean 50.0\%, $\sigma = 6.1$~pp). Additionally, a shuffled-label baseline achieves only 81.4\% (vs.\ 90.7\% real), confirming that the gold bit assignments carry real semantic structure. A multi-quad ensemble (majority vote across all quads reaching each concept) yields 90.6\%, with individual concepts reaching up to 96.8\% (reina). The signal is real, not an artifact of evaluation methodology.
 
-The star case is \textbf{reina} (\emph{queen}): direct encoding reaches only 77.8\%, but the analogy \mbox{\texttt{man:woman::king:?}} recovers all 63 bits perfectly---\textbf{100\% algebraic accuracy}.
-The XL model learned a gender-direction vector clean enough that prime-factor arithmetic in tanh space is exact, even though the concept was never a supervised target. This result provides the strongest single-concept evidence that the triadic head supports genuine compositional generalization, not merely memorization.
+The star case is \textbf{reina} (\emph{queen}), where direct encoding reaches only~77.8\%.
+The analogy \emph{man{:}woman{::}king{:}?} recovers all 63~bits perfectly---\textbf{100\% algebraic accuracy}. The XL model learned a gender-direction vector clean enough that prime-factor arithmetic in tanh space is exact, even though the concept was never a supervised target. This result provides the strongest single-concept evidence that the triadic head supports genuine compositional generalization, not merely memorization.
 
 
 % ============================================================
@@ -1001,7 +1001,7 @@ Aaron van~den Oord, Yazhe Li, and Oriol Vinyals.
 J.~Arturo Ornelas~Brand.
 \newblock Prime factorization as a neurosymbolic bridge: Projecting continuous embeddings into discrete algebraic space for deterministic verification.
 \newblock 2026.
-\newblock \doi{10.5281/zenodo.19205805}.
+\newblock \href{https://doi.org/10.5281/zenodo.19205805}{doi:10.5281/zenodo.19205805}.
 
 \bibitem[Radford et~al.(2019)]{radford2019gpt2}
 Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, and Ilya Sutskever.

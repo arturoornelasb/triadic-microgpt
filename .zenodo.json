@@ -25,9 +25,21 @@
     ],
     "related_identifiers": [
         {
+            "identifier": "10.5281/zenodo.19206545",
+            "relation": "isSupplementTo",
+            "resource_type": "publication-preprint",
+            "scheme": "doi"
+        },
+        {
             "identifier": "https://github.com/arturoornelasb/triadic-microgpt",
             "relation": "isSupplementTo",
             "resource_type": "software"
+        },
+        {
+            "identifier": "10.5281/zenodo.19205805",
+            "relation": "references",
+            "resource_type": "publication-preprint",
+            "scheme": "doi"
         },
         {
             "identifier": "https://github.com/arturoornelasb/Triadic-Neurosymbolic-Engine",

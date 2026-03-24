@@ -1,5 +1,7 @@
 # TriadicGPT
 
+[![DOI Paper](https://zenodo.org/badge/DOI/10.5281/zenodo.19206545.svg)](https://doi.org/10.5281/zenodo.19206545)
+
 **End-to-end prime factorization in a generative language model.**
 
 TriadicGPT is a 40M-parameter GPT that learns discrete prime-factor signatures alongside standard next-token prediction. A lightweight *triadic projection head* maps each token's hidden state to a binary vector, which encodes as a prime composite &Phi;(x) = &prod; p&#x1D62;. The result: algebraically verifiable semantic representations that emerge as a side effect of language modeling, at zero cost to language quality.
