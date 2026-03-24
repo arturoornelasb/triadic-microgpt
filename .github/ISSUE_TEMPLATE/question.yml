@@ -1,0 +1,15 @@
+name: Question
+description: Ask a question about the project or research
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For general questions and discussions, consider using [GitHub Discussions](https://github.com/arturoornelasb/triadic-microgpt/discussions) instead.
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What would you like to know?
+    validations:
+      required: true
