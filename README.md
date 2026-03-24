@@ -91,9 +91,25 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 pip install -r requirements.txt
 ```
 
-**Git LFS**: Model checkpoints (`.pt` files) are tracked with Git LFS. Run `git lfs install && git lfs pull` after cloning to download them.
+**Git LFS**: Model checkpoints (`.pt` files) are tracked with Git LFS. After cloning:
 
-**Data**: Download [TinyStories](https://huggingface.co/datasets/roneneldan/TinyStories) and place `TinyStories-train.txt` in `data/`.
+```bash
+git lfs install
+git lfs pull
+```
+
+**Data**: Download TinyStories (~1.8 GB) before training. See [`data/README.md`](data/README.md) for instructions.
+
+```bash
+pip install datasets
+python -c "
+from datasets import load_dataset
+ds = load_dataset('roneneldan/TinyStories')
+with open('data/TinyStories-train.txt', 'w', encoding='utf-8') as f:
+    for story in ds['train']:
+        f.write(story['text'] + '\n')
+"
+```
 
 ## Usage
 

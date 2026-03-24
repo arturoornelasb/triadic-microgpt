@@ -22,7 +22,16 @@ Thumbs.db
 # Large binary files
 *.ckpt
 *.ckpt.vocab
-data/
+data/*
+!data/README.md
+!data/concepts.txt
+!data/core_concepts.txt
+!data/gold_primes.json
+!data/gold_primes_32.json
+!data/gold_primes_64.json
+!data/alpaca_data_cleaned.json
+!data/wikitext2_test_cache.json
+!data/lambada_test_cache.json
 checkpoints/
 
 # Legacy files (superseded by PyTorch path)
