@@ -33,6 +33,8 @@ experiment10/checkpoints/
 experiment10/checkpoints_rank/
 experiment10/checkpoints_infonce/
 playground/checkpoints_*/
+playground/results/**/*.pt
+conceptual_tokenizer/results/**/*.pt
 
 # Training results (generated, large)
 triadic-head/results/

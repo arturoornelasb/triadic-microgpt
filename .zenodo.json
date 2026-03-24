@@ -1,0 +1,39 @@
+{
+    "title": "TriadicGPT: End-to-End Prime Factorization in a Generative Language Model",
+    "version": "0.1.0",
+    "description": "A 40M-parameter GPT language model augmented with a triadic projection head that produces discrete prime-factor signatures alongside standard next-token predictions. Learns triadic representations end-to-end through a dual-objective training loss. Includes triadic-head (standalone PyPI package), desktop UI (PySide6), and full training/evaluation pipeline.",
+    "creators": [
+        {
+            "name": "Ornelas Brand, J. Arturo",
+            "affiliation": "Independent Researcher",
+            "email": "arturoornelas62@gmail.com"
+        }
+    ],
+    "upload_type": "software",
+    "access_right": "open",
+    "license": "BUSL-1.1",
+    "keywords": [
+        "neurosymbolic AI",
+        "prime factorization",
+        "language model",
+        "algebraic semantics",
+        "discrete representations",
+        "triadic projection",
+        "GPT",
+        "embedding alignment",
+        "iFSQ"
+    ],
+    "related_identifiers": [
+        {
+            "identifier": "https://github.com/arturoornelasb/triadic-microgpt",
+            "relation": "isSupplementTo",
+            "resource_type": "software"
+        },
+        {
+            "identifier": "https://github.com/arturoornelasb/Triadic-Neurosymbolic-Engine",
+            "relation": "isDerivedFrom",
+            "resource_type": "software"
+        }
+    ],
+    "language": "eng"
+}
