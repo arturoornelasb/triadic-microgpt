@@ -4,6 +4,8 @@
 [![PyPI](https://img.shields.io/pypi/v/triadic-head)](https://pypi.org/project/triadic-head/)
 [![Python](https://img.shields.io/pypi/pyversions/triadic-head)](https://pypi.org/project/triadic-head/)
 [![License](https://img.shields.io/badge/license-BUSL--1.1-blue)](LICENSE)
+[![HF Model](https://img.shields.io/badge/%F0%9F%A4%97-triadic--gpt--40m-yellow)](https://huggingface.co/arturoornelasb/triadic-gpt-40m)
+[![HF Model](https://img.shields.io/badge/%F0%9F%A4%97-triadic--gpt2--medium-yellow)](https://huggingface.co/arturoornelasb/triadic-gpt2-medium)
 [![DOI Paper](https://zenodo.org/badge/DOI/10.5281/zenodo.19206545.svg)](https://doi.org/10.5281/zenodo.19206545)
 [![DOI Repo](https://zenodo.org/badge/1172420723.svg)](https://doi.org/10.5281/zenodo.19207240)
 
