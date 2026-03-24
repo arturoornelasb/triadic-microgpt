@@ -1,7 +1,11 @@
 # TriadicGPT
 
+[![CI](https://github.com/arturoornelasb/triadic-microgpt/actions/workflows/ci.yml/badge.svg)](https://github.com/arturoornelasb/triadic-microgpt/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/triadic-head)](https://pypi.org/project/triadic-head/)
+[![Python](https://img.shields.io/pypi/pyversions/triadic-head)](https://pypi.org/project/triadic-head/)
+[![License](https://img.shields.io/badge/license-BUSL--1.1-blue)](LICENSE)
 [![DOI Paper](https://zenodo.org/badge/DOI/10.5281/zenodo.19206545.svg)](https://doi.org/10.5281/zenodo.19206545)
-[![DOI](https://zenodo.org/badge/1172420723.svg)](https://doi.org/10.5281/zenodo.19207240)
+[![DOI Repo](https://zenodo.org/badge/1172420723.svg)](https://doi.org/10.5281/zenodo.19207240)
 
 **End-to-end prime factorization in a generative language model.**
 
