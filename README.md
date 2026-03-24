@@ -509,7 +509,7 @@ python benchmarks/scripts/engine_comparison.py \
 ## Paper
 
 > **End-to-End Prime Factorization in a Generative Language Model: Emergent Algebraic Semantics from Joint Training**
-> Arturo Ornelas Brand, 2026
+> J. Arturo Ornelas Brand, 2026
 
 27-page paper covering 11 experiments across 29 training runs: scaling study, bits sweep, transfer learning, subsumption recovery, compositionality, ternary representations, and domain separation.
 

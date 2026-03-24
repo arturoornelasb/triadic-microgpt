@@ -10,7 +10,7 @@ readme = "README.md"
 license = {text = "BUSL-1.1"}
 requires-python = ">=3.9"
 authors = [
-    {name = "Arturo Ornelas Brand", email = "arturoornelas62@gmail.com"},
+    {name = "José Arturo Ornelas Brand", email = "arturoornelas62@gmail.com"},
 ]
 keywords = ["neurosymbolic", "interpretability", "transformers", "prime-factorization", "triadic"]
 classifiers = [
