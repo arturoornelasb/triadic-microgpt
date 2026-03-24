@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+title: "TriadicGPT: End-to-End Prime Factorization in a Generative Language Model"
+message: "If you use this software, please cite it using the metadata from this file."
+type: software
+authors:
+  - family-names: Ornelas Brand
+    given-names: J. Arturo
+    email: arturoornelas62@gmail.com
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.19207240
+    description: Software archive (Zenodo)
+  - type: doi
+    value: 10.5281/zenodo.19206545
+    description: Research paper (Zenodo)
+repository-code: "https://github.com/arturoornelasb/triadic-microgpt"
+url: "https://pypi.org/project/triadic-head/"
+keywords:
+  - neurosymbolic AI
+  - prime factorization
+  - language model
+  - algebraic semantics
+  - discrete representations
+  - triadic projection
+  - interpretability
+license: BUSL-1.1
+version: 0.1.1
+date-released: "2026-03-24"
