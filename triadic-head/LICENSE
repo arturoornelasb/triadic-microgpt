@@ -1,6 +1,6 @@
 Business Source License 1.1
 
-Licensed Work:     TriadicGPT (triadic-microgpt)
+Licensed Work:     triadic-head
 Licensor:          José Arturo Ornelas Brand <arturoornelas62@gmail.com>
 Change Date:       2030-03-22
 Change License:    GNU Affero General Public License v3.0
@@ -14,7 +14,7 @@ Additional Use Grant:
   government contractors, and commercial entities — requires a
   commercial participation agreement with the Licensor.
 
-  All users are subject to the contribution terms in TERMS.md.
+  All users are subject to the contribution terms in ../TERMS.md.
 
 Terms:
   The Licensor hereby grants you the right to copy, modify, create
