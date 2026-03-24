@@ -1,6 +1,7 @@
 # TriadicGPT
 
 [![DOI Paper](https://zenodo.org/badge/DOI/10.5281/zenodo.19206545.svg)](https://doi.org/10.5281/zenodo.19206545)
+[![DOI](https://zenodo.org/badge/1172420723.svg)](https://doi.org/10.5281/zenodo.19207240)
 
 **End-to-end prime factorization in a generative language model.**
 
