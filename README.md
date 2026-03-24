@@ -460,24 +460,19 @@ scripts/                           # Utilities (7 scripts)
   _find_tokenizer.py               # Find compatible tokenizer for checkpoint
   _smoke_test.py                   # Quick model sanity check
 
-data/                              # Datasets and caches
-  TinyStories-train.txt            # Primary training corpus (1.8 GB, 14.8M lines)
-  alpaca_data_cleaned.json         # Instruction fine-tuning (43 MB, 52K pairs)
-  gold_primes_64.json              # WordNet gold primes (10K concepts, 64-bit signatures)
-  gold_primes_32.json              # 32-bit version (10K concepts)
-  core_concepts.txt                # Alphabetical word list (10K words)
+triadic-head/                      # PyPI package: pip install triadic-head
+  triadic_head/                    # Python package (algebra.py, wrapper.py)
+  tests/                           # 33 unit tests
+  pyproject.toml                   # Package metadata (v0.1.0)
+
+data/                              # Datasets (gitignored except concepts.txt)
   concepts.txt                     # 31 semantic categories for debugging
-  tokens_30k.npy                   # Pre-tokenized corpus cache (46 MB, 11.9M tokens)
-  wikitext2_test_cache.json        # WikiText-2 eval cache (1,788 samples)
-  lambada_test_cache.json          # LAMBADA eval cache (500 samples)
 
 reports/                           # Evaluation outputs
   eval_report.json                 # Run 15 full evaluation (PPL, samples, triadic analysis)
   bias_audit_results.json          # Experiment 8 (98.5% accuracy, 0.96% FPR)
   loss_curve.png                   # Training loss visualization
 
-checkpoints/                       # 45 subdirectories, ~235 GB total
-reports/                           # Evaluation outputs (eval_report.json, bias_audit, loss_curve)
 archive/                           # 7 archived docs (evolution plan, audit tables, reconciliation)
 experiments/                       # Speculative experiments (quaternion_probe.py)
 
