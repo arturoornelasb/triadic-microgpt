@@ -480,7 +480,6 @@ checkpoints/                       # 45 subdirectories, ~235 GB total
 reports/                           # Evaluation outputs (eval_report.json, bias_audit, loss_curve)
 archive/                           # 7 archived docs (evolution plan, audit tables, reconciliation)
 experiments/                       # Speculative experiments (quaternion_probe.py)
-.agents/workflows/                 # Agent workflow guides (training, project overview, next steps)
 
 EXPERIMENT_REFERENCE.md            # Master consolidated reference (1,271 lines, 15 sections, 60+ experiments)
 experiment_log.md                  # Detailed raw logs for all 29 training runs (194 KB, deprecated data store)
