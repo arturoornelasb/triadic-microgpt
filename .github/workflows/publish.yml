@@ -1,0 +1,56 @@
+name: Publish triadic-head to PyPI
+
+on:
+  push:
+    tags: ["v*"]
+
+defaults:
+  run:
+    working-directory: triadic-head
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -e ".[dev]"
+      - run: pytest tests/ -v --tb=short
+
+  build:
+    name: Build wheel & sdist
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build
+      - run: python -m build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-triadic-head
+          path: triadic-head/dist/
+
+  publish:
+    name: Publish to PyPI
+    runs-on: ubuntu-latest
+    needs: build
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-triadic-head
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        # Configure Trusted Publishing at PyPI:
+        # https://pypi.org/manage/project/triadic-head/settings/publishing/
+        # Owner: arturoornelasb  Repo: triadic-microgpt  Branch: master  Env: pypi

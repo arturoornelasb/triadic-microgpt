@@ -10,7 +10,7 @@ readme = "README.md"
 license = {text = "BUSL-1.1"}
 requires-python = ">=3.9"
 authors = [
-    {name = "José Arturo Ornelas Brand", email = "arturoornelas62@gmail.com"},
+    {name = "J. Arturo Ornelas Brand", email = "arturoornelas62@gmail.com"},
 ]
 keywords = ["neurosymbolic", "interpretability", "transformers", "prime-factorization", "triadic"]
 classifiers = [
@@ -25,9 +25,19 @@ dependencies = [
     "transformers>=4.30",
 ]
 
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "ruff>=0.4"]
+
 [project.urls]
 Homepage = "https://github.com/arturoornelasb/triadic-microgpt"
 Repository = "https://github.com/arturoornelasb/triadic-microgpt/tree/master/triadic-head"
 
 [tool.setuptools.packages.find]
 include = ["triadic_head*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"

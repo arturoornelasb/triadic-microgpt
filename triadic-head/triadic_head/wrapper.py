@@ -588,7 +588,6 @@ class TriadicWrapper(nn.Module):
         active_frac = avg_active / self.n_bits
 
         # --- Check 3: Semantic ordering (global + per-group) ---
-        group_names = list(word_groups.keys())
         groups = list(word_groups.values())
         intra_sims, inter_sims = [], []
         group_details = {}
@@ -739,14 +738,14 @@ class TriadicWrapper(nn.Module):
                 print(f"  [{status}] {name}: {check['detail']}")
 
             # Per-group breakdown
-            print(f"\n  PER-GROUP BREAKDOWN:")
+            print("\n  PER-GROUP BREAKDOWN:")
             for gname, gd in group_details.items():
                 status = "PASS" if gd['pass'] else "FAIL"
                 print(f"    [{status}] {gname}: intra {gd['intra_sim']:.0%} vs inter {gd['inter_sim']:.0%} "
                       f"(gap {gd['gap']:+.1%}) — {gd['words']}")
 
             # Per-word active bits
-            print(f"\n  PER-WORD ACTIVE BITS:")
+            print("\n  PER-WORD ACTIVE BITS:")
             for w in all_words:
                 print(f"    {w:>12}: {sigs[w]['n_active']:2d}/{self.n_bits} bits active")
 
@@ -777,7 +776,7 @@ class TriadicWrapper(nn.Module):
 
             # Always show training guidance
             if guidance:
-                print(f"\n  TRAINING GUIDANCE:")
+                print("\n  TRAINING GUIDANCE:")
                 for line in guidance:
                     print(f"    {line}")
 
@@ -810,7 +809,7 @@ class TriadicWrapper(nn.Module):
         if training_steps > 0 and training_steps < RECOMMENDED['minimum_viable']:
             lines.append(f"WARNING: {training_steps:,} steps is a quick smoke test, not a full training run.")
             lines.append(f"Minimum recommended: {RECOMMENDED['minimum_viable']:,} steps for meaningful results.")
-            lines.append(f"")
+            lines.append("")
 
         lines.append("Recommended training steps:")
         lines.append(f"  Smoke test:      {RECOMMENDED['smoke_test']:>8,} steps  (verify pipeline works)")
@@ -819,22 +818,22 @@ class TriadicWrapper(nn.Module):
         lines.append(f"  Production:      {RECOMMENDED['production']:>8,} steps+ (publish-ready signatures)")
 
         if not baseline_pass:
-            lines.append(f"")
+            lines.append("")
             lines.append(f"Your model's semantic gap ({semantic_gap:+.1%}) is close to random noise ({signal_above_random:+.1%} above random).")
-            lines.append(f"This is expected with short training. The model needs more steps to")
-            lines.append(f"learn real word relationships vs statistical coincidence.")
+            lines.append("This is expected with short training. The model needs more steps to")
+            lines.append("learn real word relationships vs statistical coincidence.")
         elif signal_above_random > 0 and signal_above_random < 0.05:
-            lines.append(f"")
+            lines.append("")
             lines.append(f"Your model shows weak signal above random ({signal_above_random:+.1%}).")
-            lines.append(f"More training will strengthen real semantic relationships.")
+            lines.append("More training will strengthen real semantic relationships.")
         elif signal_above_random >= 0.05:
-            lines.append(f"")
+            lines.append("")
             lines.append(f"Good signal above random: {signal_above_random:+.1%}")
 
-        lines.append(f"")
-        lines.append(f"For large models (LLaMA, Mistral, etc.), expect to need more steps.")
-        lines.append(f"Monitor the semantic gap: it should grow steadily during training.")
-        lines.append(f"If gap plateaus, try: increase align_weight or switch align_mode.")
+        lines.append("")
+        lines.append("For large models (LLaMA, Mistral, etc.), expect to need more steps.")
+        lines.append("Monitor the semantic gap: it should grow steadily during training.")
+        lines.append("If gap plateaus, try: increase align_weight or switch align_mode.")
 
         return lines
 
@@ -928,7 +927,6 @@ class TriadicWrapper(nn.Module):
                 print(f"{w[:col_w]:>{col_w}}  {''.join(row_vals)}")
 
             # Pairs listing
-            show_pairs = pairs if top_k == 0 else (pairs[:top_k] + pairs[-top_k:])
             if top_k > 0 and len(pairs) > top_k * 2:
                 print(f"\n  TOP {top_k} most similar:")
                 for p in pairs[:top_k]:
@@ -941,7 +939,7 @@ class TriadicWrapper(nn.Module):
                     line = f"    {p['word_a']} <-> {p['word_b']}: {p['similarity']:.0%}"
                     print(line)
             else:
-                print(f"\n  ALL PAIRS (ranked by similarity):")
+                print("\n  ALL PAIRS (ranked by similarity):")
                 for p in pairs:
                     line = f"    {p['word_a']:>12} <-> {p['word_b']:<12}: {p['similarity']:.0%} ({p['n_shared']} shared, {p['n_only_a']} only-a, {p['n_only_b']} only-b)"
                     if show_factors:
@@ -962,7 +960,7 @@ class TriadicWrapper(nn.Module):
                     print("    (none)")
 
             # Per-word signature card
-            print(f"\n  PER-WORD SIGNATURES:")
+            print("\n  PER-WORD SIGNATURES:")
             for i, w in enumerate(words):
                 sims_for_w = [matrix[i][j] for j in range(n) if i != j]
                 avg = sum(sims_for_w) / len(sims_for_w)
@@ -987,7 +985,7 @@ class TriadicWrapper(nn.Module):
                 sorted_factors = sorted(factor_index.items(),
                                         key=lambda x: len(x[1]), reverse=True)
 
-                print(f"\n  FACTOR INDEX (what each prime means):")
+                print("\n  FACTOR INDEX (what each prime means):")
                 print(f"    {'prime':>8}  {'bit':>3}  {'words':>5}  shared by")
                 print(f"    {'-'*8}  {'-'*3}  {'-'*5}  {'-'*30}")
                 for prime, sharing_words in sorted_factors:
