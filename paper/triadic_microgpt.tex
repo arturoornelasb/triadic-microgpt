@@ -278,7 +278,7 @@ All operations require only integer arithmetic (GCD, LCM, trial division), avoid
 
 \paragraph{Hardware.} All training is performed on a single NVIDIA RTX 5060 Ti (16 GB VRAM).
 
-\paragraph{Optimization.} AdamW optimizer ($\beta_1 = 0.9$, $\beta_2 = 0.95$, weight decay $= 0.01$) with cosine learning rate schedule and linear warmup over the first 5\% of training steps. Peak learning rate is $3 \times 10^{-4}$. Mixed precision via \texttt{torch.amp}: float16 for initial experiments (Runs 1--21), bfloat16 for all Danza bootstrap and ternary experiments (D-A5, D-A8, D-A10, E4 sweep). Batch size 32 for Runs 1--21; batch size 64 for Danza experiments. Sequence length 256 for all runs.
+\paragraph{Optimization.} AdamW optimizer ($\beta_1 = 0.9$, $\beta_2 = 0.95$, weight decay $= 0.01$) with cosine learning rate schedule and linear warmup over the first 1\% of training steps (capped at 500 steps). Peak learning rate is $3 \times 10^{-4}$. Mixed precision via \texttt{torch.amp}: float16 for initial experiments (Runs 1--21), bfloat16 for all Danza bootstrap and ternary experiments (D-A5, D-A8, D-A10, E4 sweep). Batch size 32 for Runs 1--21; batch size 64 for Danza experiments. Sequence length 256 for all runs.
 
 \paragraph{Evaluation concepts.} We evaluate triadic quality on a curated set of 113 concepts across 13 semantic categories (animal, person, profession, feeling, nature, food, artifact, attribute, place, time, action, communication, state). We use 12 semantically related pairs (e.g., king--queen, dog--cat), 12 unrelated pairs (e.g., king--dog, happy--table), and 13 analogy quadruples (e.g., king:queen::man:woman). An expanded evaluation uses 51 diverse analogy quadruples covering family, size, temperature, emotion, animal, and royalty relationships (Section~\ref{sec:benchmarks}).
 
@@ -330,9 +330,11 @@ Scale & Params & Loss & Entropy & Unique\% & Gap & Probe & Verif \\
 Small (4L/128D)  & 1.3M  & 2.536 & 0.489 & 61.1\%  & $-0.076$ & 7.1\% & 61.5\% \\
 Medium (6L/256D) & 5.8M  & 1.863 & 0.688 & 100\%   & $-0.040$ & 4.8\% & 46.2\% \\
 Large (8L/384D)  & 15.9M & 1.512 & 0.652 & 100\%   & $-0.034$ & 6.0\% & 46.2\% \\
-\textbf{XL (12L/512D)} & \textbf{40.0M} & \textbf{0.946} & \textbf{0.679} & \textbf{100\%} & $\mathbf{+0.020}$ & \textbf{10.1\%} & \textbf{69.2\%} \\
+\textbf{XL (12L/512D)} & \textbf{40.0M} & \textbf{0.946} & \textbf{0.679} & \textbf{100\%} & $\mathbf{+0.020}$ & \textbf{10.1\%}$^\dagger$ & \textbf{69.2\%} \\
 \bottomrule
 \end{tabular}
+\vspace{2pt}
+{\footnotesize $^\dagger$XL probe accuracy from dedicated interpretability benchmark (109 concepts, 13 categories). The scaling study's inline probe on 84 concepts yields 8.3\%.}
 \end{table}
 
 The semantic gap---defined as the difference between mean Jaccard similarity for related pairs and mean Jaccard similarity for unrelated pairs---improves \emph{monotonically} with scale: $-0.076 \rightarrow -0.040 \rightarrow -0.034 \rightarrow +0.020$. The gap crosses zero between the Large (15.9M) and XL (40M) scales; an interpolation study places the crossover at approximately 20M parameters, with a smooth gradual transition rather than an abrupt jump.
@@ -407,7 +409,7 @@ We evaluate the XL model (Run~15) on three triadic-specific benchmarks.
 \subsection{Full Projection Comparison (Experiment 9)}
 \label{sec:comparison}
 
-We benchmark \microgpt{} against all four projection modes of the Triadic-Neurosymbolic-Engine on identical concept sets (93 concepts, 12 related/unrelated pairs, 12 analogies). All Engine modes use \texttt{all-MiniLM-L6-v2} (22M parameters, pre-trained on 1B sentence pairs) as the embedding backbone with $k=64$ bits.
+We benchmark \microgpt{} against all four projection modes of the Triadic-Neurosymbolic-Engine on identical concept sets (111 concepts, 12 related/unrelated pairs, 12 analogies). All Engine modes use \texttt{all-MiniLM-L6-v2} (22M parameters, pre-trained on 1B sentence pairs) as the embedding backbone with $k=64$ bits.
 
 \begin{table}[h]
 \centering
@@ -798,9 +800,9 @@ An independent validation comes from comparing the 63 ontological primitives wit
 A negative subsumption test on semantically unrelated concept pairs reveals a false positive rate of 24.1\%: pairs like (\emph{red}, \emph{blue}) pass the bit-subset test despite having no hypernym--hyponym relationship. The root cause is dead bits: with $\sim$30 bits permanently OFF, most concepts share the same inactive bits, making the subset relation trivially satisfied. The ternary representation (Section~\ref{sec:ternary}) addresses this by distinguishing zero (irrelevant) from negative (actively absent), preventing shared zeros from creating spurious subset relationships. Conversely, the D-A17 scaling experiment (Section~\ref{sec:ternary}) demonstrates the opposite pathology: when ternary zeros collapse from $\sim$42\% to 3.4\%, subsumption drops from 98.3\% to 1.7\% because the bit-subset relation becomes unsatisfiable. A follow-up experiment (D-A19) restored the full four-component triadic loss and differentiable subsumption to the 355M model, recovering 76.9\% subsumption and 100\% analogy verification---demonstrating that the D-A17 failure was caused by training bugs (alignment-only loss, non-differentiable subsumption), not an inherent scale limitation. Together, these findings bracket the optimal ternary sparsity: \emph{too many} zeros create false positives; \emph{too few} prevent any subsumption at all. The $\sim$42\% zero rate observed in D-A14 appears to be the structural optimum, though D-A19 shows that algebraic capability can be partially recovered even without matching this rate.
 
 \paragraph{Temporal observability: reptimeline.}
-The discovery loop described above (anchor expansion, bit-semantic analysis, reconciliation) was operationalized through \textbf{reptimeline}, a software tool developed as part of this project to track how discrete representations evolve during training. reptimeline consumes a sequence of model checkpoints, extracts discrete codes for a set of probe concepts at each step, and computes per-code lifecycle events (births, deaths), pairwise connection formation, entropy and churn curves, and automatic phase transition detection via statistical change-point analysis.
+The discovery loop described above (anchor expansion, bit-semantic analysis, reconciliation) was operationalized through \textbf{reptimeline}~\citep{ornelas2026reptimeline}, a software tool developed as part of this project to track how discrete representations evolve during training. reptimeline consumes a sequence of model checkpoints, extracts discrete codes for a set of probe concepts at each step, and computes per-code lifecycle events (births, deaths), pairwise connection formation, entropy and churn curves, and automatic phase transition detection via statistical change-point analysis.
 
-Applied to \microgpt{} (8 checkpoints, 53 concepts, 63 bits), reptimeline revealed a four-phase training dynamic invisible to standard scalar logging: (1)~an \emph{exploration} phase (steps 0--7,500) with high bit churn across all concepts; (2)~a \emph{consolidation} phase (steps 7,500--27,500) where churn remains elevated but entropy stabilizes; (3)~a \emph{crystallization} event at step $\sim$27,500 where entropy drops from 0.50 to 0.23 and bit utilization drops from 0.98 to 0.66 simultaneously; and (4)~a \emph{stabilization} phase (steps 27,500--50,000) where churn collapses to 0.075 and representations freeze. This crystallization event---the moment the model ``commits'' to its semantic assignments---is not visible in loss curves or standard metrics, and to our knowledge has not been reported for discrete representation systems.
+Applied to \microgpt{} (8 checkpoints, 53 concepts, 63 bits), reptimeline revealed a four-phase training dynamic invisible to standard scalar logging: (1)~an \emph{exploration} phase (steps 0--7,500) with high bit churn across all concepts; (2)~a \emph{consolidation} phase (steps 7,500--27,500) where churn remains elevated but entropy stabilizes; (3)~a \emph{crystallization} event at step $\sim$27,500 where entropy drops from 0.50 to 0.23 and bit utilization begins declining from 0.98 (reaching 0.79 at this step, then 0.66 by step 42{,}500); and (4)~a \emph{stabilization} phase (steps 27,500--50,000) where churn collapses to 0.075 and representations freeze. This crystallization event---the moment the model ``commits'' to its semantic assignments---is not visible in loss curves or standard metrics, and to our knowledge has not been reported for discrete representation systems.
 
 Additionally, reptimeline includes three automated analysis modules: \emph{BitDiscovery}, which infers what each bit encodes without prior ontology by analyzing activation patterns, discovering dual pairs (anti-correlated bits), dependency chains, and three-way AND-gate interactions; \emph{AutoLabeler}, which translates discovered bit semantics to human-readable labels via embedding centroids, contrastive analysis, or LLM queries; and \emph{Reconciler}, which compares discovered structure against a theoretical ontology and suggests corrections in \emph{both directions}---to the model's training anchors and to the theory itself. Applied to our checkpoints, the Reconciler achieved 44.4\% agreement between model-discovered and manually-defined ontology, identifying 35 critical mismatches that guided the anchor expansion from 50 to 158 concepts.
 
@@ -811,7 +813,7 @@ reptimeline is backend-agnostic: it operates on any system that produces discret
     \item \textbf{Pythia-70M Sparse Autoencoder} (EleutherAI \texttt{sae-pythia-70m-32k}, layer~3 MLP, 60 concepts across 6 semantic domains, 12 training checkpoints from step~1 to step~143{,}000): reptimeline tracked feature lifecycle across the full Pythia training trajectory, discovering 34 anti-correlated dual pairs and 3 dependency chains. An \emph{SAE causal intervention} experiment tested all 16 active features by zeroing each in the SAE latent space, decoding back to hidden-state space, and injecting the modified state via forward hook. All \textbf{16/16} features showed \textbf{selective causal effects}: 8 were perfectly selective (affecting only their labeled concepts), and 8 showed finite selectivity averaging $26.8\times$ (best: $98.4\times$ for ``fast''; ``teacher'' at $26.6\times$ disproportionately affected \emph{child, dog, wolf, queen}). Figure~\ref{fig:sae_causal} shows the selectivity heatmap.
 \end{itemize}
 
-\noindent These results demonstrate that reptimeline's discovered features are not statistical artifacts but \emph{causally meaningful} primitives: identifiable, labelable, trackable across training, and verifiable via intervention---across architectures ranging from supervised autoencoders to unsupervised language model internals.
+\noindent These results demonstrate that reptimeline's discovered features are not statistical artifacts but \emph{causally meaningful} primitives: identifiable, labelable, trackable across training, and verifiable via intervention---across architectures ranging from supervised autoencoders to unsupervised language model internals. Full MNIST and Pythia-70M result data, including causal intervention logs, are available in the standalone reptimeline repository.\footnote{\url{https://github.com/arturoornelasb/reptimeline}}
 
 \begin{figure}[h]
     \centering
@@ -845,7 +847,7 @@ Our results have several limitations:
         \caption{Entropy distribution across 64 bits. Most bits reach $H \approx 0.7$--$0.9$; $\sim$15 bits remain below $0.3$.}
         \label{fig:entropy_dist}
     \end{subfigure}
-    \caption{Bit entropy analysis for the XL model (Run~15). Mean entropy $\bar{H} = 0.679$; $\sim$15 bits are effectively dead (entropy $< 0.3$). Entropy regularization ($\lambda_{\text{ent}} = 1.0$) mitigates but does not eliminate this.}
+    \caption{Bit entropy analysis for the XL model (Run~15). Mean entropy $\bar{H} = 0.679$ (computed via hard binarization over 84 evaluation concepts). A dedicated per-bit entropy benchmark using continuous probabilities on 112 concepts yields $\bar{H} = 0.749$ with only 2 bits below the 0.3 threshold. The difference reflects the binarization method, not the model. Entropy regularization ($\lambda_{\text{ent}} = 1.0$) mitigates dead bits but does not eliminate them.}
     \label{fig:bit_entropy}
 \end{figure}
 
@@ -997,11 +999,17 @@ Aaron van~den Oord, Yazhe Li, and Oriol Vinyals.
 \newblock Representation learning with contrastive predictive coding.
 \newblock \emph{arXiv preprint arXiv:1807.03748}, 2018.
 
-\bibitem[Ornelas~Brand(2026)]{ornelas2026prime}
+\bibitem[Ornelas~Brand(2026a)]{ornelas2026prime}
 J.~Arturo Ornelas~Brand.
 \newblock Prime factorization as a neurosymbolic bridge: Projecting continuous embeddings into discrete algebraic space for deterministic verification.
 \newblock 2026.
 \newblock \href{https://doi.org/10.5281/zenodo.19205805}{doi:10.5281/zenodo.19205805}.
+
+\bibitem[Ornelas~Brand(2026b)]{ornelas2026reptimeline}
+J.~Arturo Ornelas~Brand.
+\newblock reptimeline: Tracking discrete representation evolution during neural network training.
+\newblock 2026.
+\newblock \href{https://doi.org/10.5281/zenodo.19208672}{doi:10.5281/zenodo.19208672}.
 
 \bibitem[Radford et~al.(2019)]{radford2019gpt2}
 Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, and Ilya Sutskever.

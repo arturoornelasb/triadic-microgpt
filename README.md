@@ -7,7 +7,7 @@
 [![HF Model](https://img.shields.io/badge/%F0%9F%A4%97-triadic--gpt--40m-yellow)](https://huggingface.co/arturoornelasb/triadic-gpt-40m)
 [![HF Model](https://img.shields.io/badge/%F0%9F%A4%97-triadic--gpt2--medium-yellow)](https://huggingface.co/arturoornelasb/triadic-gpt2-medium)
 [![DOI Paper](https://zenodo.org/badge/DOI/10.5281/zenodo.19206545.svg)](https://doi.org/10.5281/zenodo.19206545)
-[![DOI Repo](https://zenodo.org/badge/1172420723.svg)](https://doi.org/10.5281/zenodo.19207240)
+[![DOI Repo](https://zenodo.org/badge/DOI/10.5281/zenodo.19207845.svg)](https://doi.org/10.5281/zenodo.19207845)
 
 **End-to-end prime factorization in a generative language model.**
 
@@ -32,7 +32,7 @@ Analogy:    factor transfer   king:queen :: man:woman
 | Domain separation | **1.21** mean (12 domains, sentence-level) |
 | GPT-2 transfer gap closure | **48%** toward Engine PCA upper bound |
 | Signature uniqueness | **100%** across all evaluated concepts |
-| Algebraic ops | **O(1)** bitwise, 5-78x faster than cosine |
+| Algebraic ops | **O(1)** bitwise, 5-78x faster than prime arithmetic |
 | Scale crossover | Semantic ordering emerges at **~20M params** |
 
 ## Architecture
@@ -123,7 +123,7 @@ python src/torch_train.py --scale xl --steps 50000
 python src/torch_train.py \
   --scale xl --steps 50000 \
   --alpha 0.05 --entropy-weight 1.0 --align-weight 5.0 \
-  --triadic-warmup-pct 0.25 --no-distill \
+  --triadic-warmup-pct 0.3 --no-distill \
   --checkpoint-dir checkpoints/torch_run15_strongalign
 ```
 
@@ -163,7 +163,7 @@ python src/torch_finetune.py --model checkpoints/torch_run15_strongalign/model_b
 ### Tests
 
 ```bash
-python tests/test_all.py   # 37 unit tests (autograd, transformer, triadic, integration)
+python tests/test_all.py   # 42 unit tests (autograd, transformer, triadic, integration)
 ```
 
 ## Desktop UI
@@ -270,7 +270,9 @@ Self-contained code in `experiment10/src/` (model.py, train.py, evaluate.py) wit
 
 ## reptimeline
 
-A discovery module that tracks how discrete representations evolve during training. Backend-agnostic core with a triadic-specific extractor.
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19208628.svg)](https://doi.org/10.5281/zenodo.19208628)
+
+A discovery module that tracks how discrete representations evolve during training. Backend-agnostic core with a triadic-specific extractor. Standalone repo: [github.com/arturoornelasb/reptimeline](https://github.com/arturoornelasb/reptimeline).
 
 **Capabilities:**
 - **Timeline tracking**: bit births, deaths, connections, phase transitions (exploration, consolidation, crystallization, stabilization)
@@ -289,7 +291,7 @@ Results in `reptimeline/results/` (timeline JSON, discovery reports, autolabel o
 
 ## triadic-head (Standalone Package)
 
-A drop-in triadic projection head for any HuggingFace transformer. BUSL-1.1 licensed. v0.1.0 built and validated.
+A drop-in triadic projection head for any HuggingFace transformer. BUSL-1.1 licensed. Published on [PyPI](https://pypi.org/project/triadic-head/) (v0.1.0).
 
 ```python
 from triadic_head import TriadicWrapper
@@ -329,7 +331,7 @@ Modules: config, primitives, states, seed_lexicon (462 curated words), prime_enc
 | `experiment10/checkpoints_infonce/` | GPT-2 transfer — InfoNCE, gap +0.076 | 950 MB |
 | `checkpoints/chat_run8/` | Chat fine-tuned on Alpaca | 61 MB |
 
-45 checkpoint directories total (~235 GB) spanning 29 training runs, scale sweeps, bits sweeps, and ablations.
+48 checkpoint directories total (~235 GB) spanning 29 training runs, scale sweeps, bits sweeps, and ablations.
 
 ## Repository Structure
 
@@ -458,7 +460,7 @@ research/                          # Design documents (9 files)
   experiment_roadmap.md            # D-A8–D-A16 roadmap with paper impact matrix + GPU budget
   trits_vs_bits_63.md              # Decision: keep 63 primitives (ternary handles dimensionality)
 
-tests/test_all.py                  # 37 unit tests
+tests/test_all.py                  # 42 unit tests
   TestAutograd (15)                # Forward, backward, activations, gradients
   TestTransformer (8)              # Shapes, softmax, RMSNorm, triadic projection
   TestTriadic (12)                 # Primes, PrimeMapper, TriadicValidator, R3
@@ -531,6 +533,34 @@ python benchmarks/scripts/engine_comparison.py \
 cd paper && pdflatex triadic_microgpt.tex && pdflatex triadic_microgpt.tex
 ```
 
+### Cite
+
+**Paper:**
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19206545.svg)](https://doi.org/10.5281/zenodo.19206545)
+
+Ornelas Brand, J. A. (2026). *End-to-End Prime Factorization in a Generative Language Model: Emergent Algebraic Semantics from Joint Training*. Zenodo. https://doi.org/10.5281/zenodo.19206545
+
+**Repository:**
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19207845.svg)](https://doi.org/10.5281/zenodo.19207845)
+
+Ornelas Brand, J. A. (2026). *End-to-End Prime Factorization in a Generative Language Model: Emergent Algebraic Semantics from Joint Training (triadic-microgpt)* (Repository) (0.1.0). Zenodo. https://doi.org/10.5281/zenodo.19207845
+
+### Companion Repos
+
+**Triadic Neurosymbolic Engine** (parent library):
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19205805.svg)](https://doi.org/10.5281/zenodo.19205805) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18748671.svg)](https://doi.org/10.5281/zenodo.18748671)
+
+Ornelas Brand, J. A. (2026). *Triadic Neurosymbolic Engine: Prime Factorization as a Neurosymbolic Bridge: Projecting Continuous Embeddings into Discrete Algebraic Space for Deterministic Verification*. Zenodo. https://doi.org/10.5281/zenodo.19205805
+
+**reptimeline** (training dynamics):
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19208672.svg)](https://doi.org/10.5281/zenodo.19208672) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19208628.svg)](https://doi.org/10.5281/zenodo.19208628)
+
+Ornelas Brand, J. A. (2026). *reptimeline: Tracking Discrete Representation Evolution During Neural Network Training*. Zenodo. https://doi.org/10.5281/zenodo.19208672
+
 ## Credits
 
 - **Initial scaffolding**: Inspired by [Andrej Karpathy's nanoGPT](https://github.com/karpathy/nanoGPT)
@@ -542,5 +572,7 @@ cd paper && pdflatex triadic_microgpt.tex && pdflatex triadic_microgpt.tex
 
 Individuals, academics, and non-profits: free. Companies: participation agreement required.
 **Change Date:** 2030-03-22 — auto-converts to AGPL-3.0.
+
+Copyright J. Arturo Ornelas Brand, 2026
 
 Contact: arturoornelas62@gmail.com

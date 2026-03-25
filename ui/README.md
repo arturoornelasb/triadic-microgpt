@@ -67,7 +67,7 @@ This loads a pre-trained GPT-2 with a triadic projection head fine-tuned on top 
 | Transfer .pt | Path to the transfer checkpoint (e.g. `experiment10/checkpoints_infonce/phase_2_(unfreeze_last_layers)_final.pt`) |
 | Bits | Editable (default 64) |
 
-**When to use:** You want the best triadic quality. The InfoNCE transfer model closes 72% of the gap to Engine PCA and has the strongest semantic signal.
+**When to use:** You want the best triadic quality. The InfoNCE transfer model closes 48% of the gap to Engine PCA and has the strongest semantic signal.
 
 > **Note:** This backend uses GPT-2's tokenizer (downloaded automatically from HuggingFace on first use). The text generation in the Chat tab will produce TinyStories-style output because GPT-2 was fine-tuned on that dataset.
 

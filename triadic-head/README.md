@@ -183,17 +183,21 @@ Works with any HuggingFace `AutoModelForCausalLM`:
 - **Zero language cost**: triadic head adds no measurable degradation to language quality
 - **49K params**: for GPT-2 (768D, 64 bits) — negligible overhead
 - **Semantic ordering emerges at scale**: related concepts become more similar than unrelated ones only above ~40M parameters
-- **InfoNCE + GPT-2 closes 72% of gap** to post-hoc projection (Triadic-Neurosymbolic-Engine)
+- **InfoNCE + GPT-2 closes 48% of gap** to post-hoc projection (Triadic-Neurosymbolic-Engine)
 - **Sharp Pareto cliff at alpha > 0.05**: do not exceed this value
 
 ## Citation
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19206545.svg)](https://doi.org/10.5281/zenodo.19206545)
 
 ```bibtex
 @article{ornelas2026triadic,
   title={End-to-End Prime Factorization in a Generative Language Model:
          Emergent Algebraic Semantics from Joint Training},
-  author={Ornelas Brand, Arturo},
-  year={2026}
+  author={Ornelas Brand, J. Arturo},
+  year={2026},
+  doi={10.5281/zenodo.19206545},
+  publisher={Zenodo}
 }
 ```
 

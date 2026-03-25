@@ -26,7 +26,7 @@ python -c "import torch; print(torch.cuda.get_device_name(0))"
 ```bash
 python src/torch_train.py --scale xl --steps 50000 --alpha 0.05 \
   --entropy-weight 1.0 --align-weight 5.0 --align-mode mse \
-  --triadic-warmup-pct 0.8 --batch-size 64 --no-distill
+  --triadic-warmup-pct 0.3 --no-distill
 ```
 
 ### Evaluation

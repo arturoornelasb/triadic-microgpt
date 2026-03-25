@@ -4,19 +4,6 @@ All notable changes to this project will be documented in this file.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/).
 
-## [0.1.1] - 2026-03-24
-
-### Fixed
-- Removed internal AI agent config files (.claude/, .agents/, CLAUDE.md) from repository
-- Fixed repo structure in README (removed duplicates and gitignored directories)
-
-### Added
-- Data download instructions (data/README.md)
-- Community files: CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md
-- Issue and PR templates
-- GitHub Discussions enabled
-- Zenodo DOI badge for repository
-
 ## [0.1.0] - 2026-03-24
 
 ### Added
@@ -25,6 +12,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 - CI workflow (tests on Python 3.10, 3.11, 3.12)
 - Full badge set: CI, PyPI, Python, License, HuggingFace, DOI
 - Zenodo integration for software archival
+- Data download instructions (data/README.md)
+- Community files: CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md
+- Issue and PR templates
+- GitHub Discussions enabled
+
+### Fixed
+- Removed internal AI agent config files (.claude/, .agents/, CLAUDE.md) from repository
+- Fixed repo structure in README (removed duplicates and gitignored directories)
 
 ### Research
 - 11 experiments documented (60+ runs)

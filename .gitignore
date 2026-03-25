@@ -1,6 +1,7 @@
 .claude/
 .agents/
 CLAUDE.md
+archive/
 __pycache__/
 *.py[cod]
 *$py.class
