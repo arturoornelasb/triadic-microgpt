@@ -231,9 +231,11 @@ class TriadicGPT(nn.Module):
         return logits, triadic_proj, loss
 
     def triadic_loss(self, triadic_proj, entropy_weight=0.0, input_ids=None,
-                     align_weight=0.0, align_mode='mse'):
+                     align_weight=0.0, align_mode='mse',
+                     sparsity_weight=0.0, target_active_bits=8,
+                     subsumption_weight=0.0, subsumption_pairs=None):
         """
-        Compute triadic loss with up to four objectives:
+        Compute triadic loss with up to six objectives:
           1. Diversity: bits should be diverse across the batch (not all same)
           2. Contrastive: different sequences should have different projections
           3. Entropy: each bit should have high entropy across the batch (prevent dead bits)
@@ -241,6 +243,12 @@ class TriadicGPT(nn.Module):
              - 'mse': MSE on absolute similarity values (original)
              - 'rank': Margin ranking loss — preserve similarity ordering
              - 'infonce': InfoNCE contrastive with embedding-mined positives
+          5. Sparsity: penalize deviation from target number of active bits.
+             Critical for subsumption — with k=30 active bits, P(divisibility)
+             is near zero. Target 6-10 active bits for functional subsumption.
+          6. Subsumption: for known hypernym pairs, penalize when hypernym bits
+             are not a subset of hyponym bits. Requires subsumption_pairs dict
+             mapping token_id -> list of token_ids that should subsume it.
 
         NOTE: Coherence loss (adjacent tokens agree) was REMOVED in Run 13.
         It caused triadic collapse by pushing all tokens toward the same projection.
@@ -251,6 +259,10 @@ class TriadicGPT(nn.Module):
             input_ids: (B, T) token IDs — needed for embedding alignment
             align_weight: weight for embedding alignment loss (0 = disabled)
             align_mode: 'mse' | 'rank' | 'infonce'
+            sparsity_weight: weight for sparsity loss (0 = disabled)
+            target_active_bits: target number of active bits per token (default 8)
+            subsumption_weight: weight for subsumption loss (0 = disabled)
+            subsumption_pairs: dict {hyper_token_id: [hypo_token_id, ...]}
 
         Returns:
             loss: scalar
@@ -260,9 +272,15 @@ class TriadicGPT(nn.Module):
 
         B, T, n_bits = triadic_proj.shape
 
-        # 1. Diversity: each bit should be active ~50% of the time across the batch
+        # 1. Diversity: each bit should be diverse across the batch
+        # NOTE: When sparsity loss is active, diversity loss is disabled
+        # because they are contradictory — diversity pushes toward 50%
+        # activation while sparsity targets ~12.5%.
         bit_means = triadic_proj.mean(dim=(0, 1))  # (n_bits,)
-        diversity_loss = (bit_means ** 2).mean()
+        if sparsity_weight > 0:
+            diversity_loss = torch.tensor(0.0, device=triadic_proj.device)
+        else:
+            diversity_loss = (bit_means ** 2).mean()
 
         # 2. Contrastive: different batch items should differ
         seq_proj = triadic_proj.mean(dim=1)  # (B, n_bits)
@@ -275,9 +293,10 @@ class TriadicGPT(nn.Module):
         else:
             contrastive_loss = torch.tensor(0.0, device=triadic_proj.device)
 
-        # 3. Entropy regularization
+        # 3. Entropy regularization (disabled when sparsity is active —
+        #    entropy pushes bits toward 50% activation, opposing sparsity)
         entropy_loss = torch.tensor(0.0, device=triadic_proj.device)
-        if entropy_weight > 0:
+        if entropy_weight > 0 and sparsity_weight == 0:
             flat_proj = triadic_proj.reshape(-1, n_bits)  # (B*T, n_bits)
             probs = (flat_proj.mean(dim=0) + 1.0) / 2.0  # (n_bits,)
             eps = 1e-7
@@ -298,13 +317,74 @@ class TriadicGPT(nn.Module):
             elif align_mode == 'infonce':
                 alignment_loss = self._align_infonce(triadic_proj, embeds, B, T, n_bits)
 
+        # 5. Sparsity: push activation rate toward target
+        sparsity_loss = torch.tensor(0.0, device=triadic_proj.device)
+        if sparsity_weight > 0:
+            # activation_rate = fraction of bits > 0 (tanh output)
+            activation_rate = (triadic_proj > 0).float().mean(dim=-1)  # (B, T)
+            target_rate = target_active_bits / n_bits
+            sparsity_loss = ((activation_rate - target_rate) ** 2).mean()
+
+        # 6. Subsumption: hypernym bits must be subset of hyponym bits
+        subsumption_loss = torch.tensor(0.0, device=triadic_proj.device)
+        if subsumption_weight > 0 and subsumption_pairs and input_ids is not None:
+            subsumption_loss = self._subsumption_loss(
+                triadic_proj, input_ids, subsumption_pairs)
+
         # Combined loss
         loss = diversity_loss + contrastive_loss
         if entropy_weight > 0:
             loss = loss + entropy_weight * entropy_loss
         if align_weight > 0:
             loss = loss + align_weight * alignment_loss
+        if sparsity_weight > 0:
+            loss = loss + sparsity_weight * sparsity_loss
+        if subsumption_weight > 0:
+            loss = loss + subsumption_weight * subsumption_loss
         return loss
+
+    def _subsumption_loss(self, triadic_proj, input_ids, subsumption_pairs):
+        """Penalize when hypernym bits are not a subset of hyponym bits.
+
+        For each (hyper, hypo) pair found in the batch:
+          For each bit where hyper is active (>0), hypo should also be active.
+          Loss = mean of ReLU(hyper_activation - hypo_activation) across those bits.
+        """
+        B, T, n_bits = triadic_proj.shape
+        device = triadic_proj.device
+        losses = []
+
+        # Build token_id -> mean projection lookup from this batch
+        token_projs = {}
+        for b in range(B):
+            for t in range(T):
+                tid = input_ids[b, t].item()
+                if tid not in token_projs:
+                    token_projs[tid] = []
+                token_projs[tid].append(triadic_proj[b, t])
+
+        # Average projections per token
+        token_mean_projs = {}
+        for tid, projs in token_projs.items():
+            token_mean_projs[tid] = torch.stack(projs).mean(dim=0)
+
+        # Evaluate subsumption pairs present in this batch
+        for hyper_tid, hypo_tids in subsumption_pairs.items():
+            if hyper_tid not in token_mean_projs:
+                continue
+            hyper_proj = token_mean_projs[hyper_tid]
+            for hypo_tid in hypo_tids:
+                if hypo_tid not in token_mean_projs:
+                    continue
+                hypo_proj = token_mean_projs[hypo_tid]
+                # Where hyper is active, hypo must also be active
+                # penalty = ReLU(hyper - hypo) — hyper active but hypo not
+                penalty = F.relu(hyper_proj - hypo_proj)
+                losses.append(penalty.mean())
+
+        if losses:
+            return torch.stack(losses).mean()
+        return torch.tensor(0.0, device=device)
 
     def _align_mse(self, triadic_proj, embeds, B, T, n_bits):
         """Original MSE alignment: match absolute similarity values."""

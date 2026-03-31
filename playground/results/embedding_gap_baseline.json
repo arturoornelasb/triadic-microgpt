@@ -7,9 +7,9 @@
   "n_words": 39,
   "embedding": {
     "semantic_gap": {
-      "gap": 0.014455620417228088,
+      "gap": 0.025724479326835026,
       "mean_related": 0.4810748604627756,
-      "mean_random": 0.4666192400455475,
+      "mean_random": 0.45535038113594056,
       "n_related": 13,
       "n_random": 200
     },
@@ -21,9 +21,9 @@
   },
   "triadic": {
     "semantic_gap": {
-      "gap": 0.037781255514575895,
+      "gap": 0.04590670754130066,
       "mean_related": 0.5454709965449113,
-      "mean_random": 0.5076897410303354,
+      "mean_random": 0.4995642890036106,
       "n_related": 13,
       "n_random": 200
     },
@@ -37,5 +37,8 @@
       "mean_entropy": 0.6951160723215735
     }
   },
-  "verdict": "TRIADIC ADDS VALUE \u2014 gap higher than embeddings"
+  "net_semantic_gap": 0.020182228214465636,
+  "gross_triadic_gap": 0.04590670754130066,
+  "gross_embedding_gap": 0.025724479326835026,
+  "verdict": "TRIADIC ADDS VALUE \u2014 net gap positive"
 }

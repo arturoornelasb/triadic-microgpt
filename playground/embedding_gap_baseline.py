@@ -248,12 +248,18 @@ def main():
     print(f"  {'Analogy verification':<30s} {emb_analogy['verification_rate']:>14.1%} {tri_analogy['verification_rate']:>14.1%}")
     print(f"  {'Dimensionality':<30s} {config.n_embd:>14d} {n_bits:>14d} {'(8x compression)':>14s}")
 
+    # Net gap
+    net_gap = tri_gap['gap'] - emb_gap['gap']
+    print()
+    print(f"  {'NET SEMANTIC GAP':<30s} {net_gap:>+14.4f}")
+    print(f"    (triadic gap {tri_gap['gap']:+.4f} minus embedding gap {emb_gap['gap']:+.4f})")
+
     # Verdict
     print()
-    if tri_gap['gap'] > emb_gap['gap'] + 0.005:
-        verdict = "TRIADIC ADDS VALUE — gap higher than embeddings"
-    elif abs(tri_gap['gap'] - emb_gap['gap']) <= 0.005:
-        verdict = "INCONCLUSIVE — gaps are similar (within noise)"
+    if net_gap > 0.005:
+        verdict = "TRIADIC ADDS VALUE — net gap positive"
+    elif abs(net_gap) <= 0.005:
+        verdict = "INCONCLUSIVE — net gap within noise"
     else:
         verdict = "WARNING — embeddings have HIGHER gap than triadic"
     print(f"  VERDICT: {verdict}")
@@ -278,6 +284,9 @@ def main():
             'analogy_verification': tri_analogy,
             'bit_stats': bit_stats,
         },
+        'net_semantic_gap': net_gap,
+        'gross_triadic_gap': tri_gap['gap'],
+        'gross_embedding_gap': emb_gap['gap'],
         'verdict': verdict,
     }
     results_path = os.path.join(results_dir, 'embedding_gap_baseline.json')
