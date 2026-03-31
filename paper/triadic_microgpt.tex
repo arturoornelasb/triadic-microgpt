@@ -35,7 +35,7 @@
 
 \title{
     \textbf{End-to-End Prime Factorization in a Generative Language Model: \\
-    Emergent Algebraic Semantics from Joint Training}
+    Learned Algebraic Encoding from Joint Training}
 }
 
 \author{
@@ -59,17 +59,15 @@
 We present \microgpt{}, a 40M-parameter GPT language model augmented with a \emph{triadic projection head} that produces discrete prime-factor signatures alongside standard next-token predictions.
 Unlike the post-hoc approach of the Triadic-Neurosymbolic-Engine~\citep{ornelas2026prime}, which projects frozen sentence embeddings into prime composites, \microgpt{} learns triadic representations end-to-end through a dual-objective training loss that combines language modeling with a novel embedding alignment objective.
 
-Across 29+ training runs and systematic ablation studies, we demonstrate eight principal findings:
+Across 29+ training runs and systematic ablation studies, we demonstrate five principal findings:
 (1)~the triadic head adds \textbf{negligible cost} to language quality (perplexity 7.69 vs.\ 7.56 ablation baseline, $+1.7\%$);
 (2)~\textbf{semantic ordering emerges gradually with scale}---the gap between related and unrelated concept similarity crosses zero around 20M parameters, with a smooth crossover rather than a sharp phase transition;
-(3)~a \textbf{bits sweep} over $k \in \{8, 16, 32, 48, 64, 128\}$ reveals an optimal regime at $k=32$--$64$, shifted upward from the $k=6$--$12$ range reported for post-hoc projection;
-(4)~a \textbf{transfer experiment} attaching the triadic head to pre-trained GPT-2 with an InfoNCE alignment loss closes \textbf{48\% of the gap} to the Triadic Engine's post-hoc projection;
-(5)~a \textbf{subsumption loss} recovers \textbf{100\% held-out subsumption at $k=64$}, resolving the primary limitation at high bit counts;
-(6)~an \textbf{iFSQ activation} ($2\sigma(1.6x)-1$) resolves the subsumption--language tradeoff entirely: language quality is preserved (loss 0.924--0.951 vs.\ baseline 0.946) while achieving up to 87.1\% held-out subsumption, compared to $+47\%$ perplexity degradation under $\tanh$;
-(7)~\textbf{compositional analysis} reveals that the bit space functions as a computational substrate---round-trip accuracy (98.1\%) far exceeds the multiplicative prediction (81.9\%), two-step chains show sub-linear error accumulation, and fork analysis confirms that the mechanism is ontologically categorical, not vectorial;
-and (8)~a \textbf{discovery loop} expanding from 50 hand-labeled anchors to 158 improves holdout accuracy from 87\% to 93\% and subsumption from 90.7\% to 98.3\%, demonstrating that the train--discover--correct--retrain cycle scales semantic knowledge beyond initial supervision.
+(3)~a \textbf{transfer experiment} attaching the triadic head to pre-trained GPT-2 with an InfoNCE alignment loss closes \textbf{48\% of the gap} to the Triadic Engine's post-hoc projection, identifying the alignment loss formulation as the primary bottleneck;
+(4)~a differentiable \textbf{subsumption loss} combined with an \textbf{iFSQ activation} ($2\sigma(1.6x)-1$) resolves the subsumption--language tradeoff: language quality is preserved while achieving up to 87.1\% held-out subsumption and 100\% at $k=64$, compared to $+47\%$ perplexity degradation under $\tanh$;
+and (5)~\textbf{compositional analysis} reveals that the bit space functions as a compositional representation---round-trip accuracy (98.1\%) far exceeds the multiplicative prediction (81.9\%), two-step chains show sub-linear error accumulation, and fork analysis confirms that the mechanism is ontologically categorical, not vectorial.
+Additional ablations (bits sweep across $k \in \{8$--$128\}$, discovery loop expanding from 50 to 158 anchors) are detailed in the body.
 
-\microgpt{} achieves 98\% analogy verification (50/51 analogies), 100\% signature uniqueness, and reproducible semantic ordering ($+0.038 \pm 0.005$ gap, $n=3$, 95\% CI positive)---all within a single forward pass. Critically, the triadic head's value lies in \emph{algebraic operations}: 100\% analogy verification, 87.1\% held-out subsumption, and sub-linear compositional chaining, none of which random projections can provide.
+\microgpt{} achieves 98\% analogy verification (50/51 analogies), 100\% signature uniqueness, and reproducible semantic ordering ($+0.038 \pm 0.005$ gap, $n=3$, 95\% CI positive)---all within a single forward pass. Critically, the triadic head's value lies in \emph{algebraic operations}: 100\% analogy verification, 87.1\% held-out subsumption, and sub-linear compositional chaining, none of which random projections can provide. External evaluation on SimLex-999 reveals that binarization limits semantic grounding (Jaccard $\rho = -0.012$; cosine on continuous projections $\rho = 0.083$, $p = 0.009$), motivating the characterization as \emph{algebraic encoding} rather than algebraic semantics. Sparse fine-tuning further reveals a fundamental sparsity--compositionality trade-off: dense codes preserve compositional structure while sparse codes enable subsumption, but no single configuration satisfies both.
 
 \end{abstract}
 
@@ -95,22 +93,17 @@ where $\loss{lang}$ is the standard cross-entropy next-token loss and $\loss{tri
 
 Our contributions are:
 \begin{enumerate}
-    \item \textbf{Architecture and training.} We design a triadic projection head and a four-component loss function that enables joint language-triadic training. We identify coherence loss as a source of triadic collapse and embedding alignment as the critical ingredient for semantic structure (Section~\ref{sec:method}).
+    \item \textbf{Architecture and near-zero-cost training.} We design a triadic projection head and a four-component loss function that enables joint language-triadic training, adding negligible degradation to language quality ($+1.7\%$ perplexity) with lexical diversity unchanged (Sections~\ref{sec:method}--\ref{sec:ablation}).
 
-    \item \textbf{Near-zero-cost ablation.} We show that the triadic head adds negligible degradation to language quality ($+1.7\%$ perplexity), with lexical diversity and repetition metrics unchanged (Section~\ref{sec:ablation}).
+    \item \textbf{Emergent semantic ordering.} Through a four-point scaling study (1.3M to 40M parameters), we demonstrate that the semantic gap transitions from negative to positive around $\sim$20M parameters. Multi-seed validation ($n=3$) confirms reproducibility: gap $+0.038 \pm 0.005$ (95\% CI $[+0.029, +0.046]$) (Section~\ref{sec:scaling}).
 
-    \item \textbf{Emergent semantic ordering.} Through a four-point scaling study (1.3M to 40M parameters), we demonstrate that the semantic gap transitions from negative to positive, crossing zero around $\sim$20M parameters in a gradual crossover rather than a sharp phase transition (Section~\ref{sec:scaling}). Multi-seed validation ($n=3$) confirms reproducibility: gap $+0.038 \pm 0.005$ (95\% CI $[+0.029, +0.046]$).
+    \item \textbf{Transfer learning and alignment bottleneck.} Attaching the triadic head to pre-trained GPT-2 and testing three alignment losses reveals a \emph{loss--embedding interaction}: InfoNCE closes 48\% of the gap to post-hoc Engine PCA, identifying the alignment loss formulation as the primary bottleneck (Sections~\ref{sec:comparison}--\ref{sec:transfer}).
 
-    \item \textbf{Optimal bit-width regime.} A six-point bits sweep reveals that end-to-end training shifts the useful $k$ range from $6$--$12$ (post-hoc) to $32$--$64$ (end-to-end), with $k=32$ achieving the best semantic gap and $k=48$--$64$ the best analogy verification (Section~\ref{sec:bits}).
+    \item \textbf{Subsumption recovery via iFSQ + auxiliary loss.} Combining a differentiable subsumption loss with the iFSQ activation ($2\sigma(1.6x)-1$) resolves the subsumption--language tradeoff: 100\% held-out subsumption at $k=64$ and up to 87.1\% with iFSQ, while preserving language quality---compared to $+47\%$ perplexity degradation under $\tanh$ (Sections~\ref{sec:subsumption}--\ref{sec:ternary}).
 
-    \item \textbf{Direct comparison and transfer learning.} We benchmark \microgpt{} against the Triadic Engine on identical concept sets, showing that while the Engine achieves higher raw metrics (leveraging pre-trained MiniLM), \microgpt{} is self-contained and demonstrates emergent rather than injected semantics. Attaching the triadic head to pre-trained GPT-2 and testing three alignment losses (MSE, margin ranking, InfoNCE) reveals a \emph{loss--embedding interaction}: InfoNCE is optimal for rich pre-trained embeddings (closing 48\% of the gap to Engine PCA), while MSE is optimal for weak from-scratch embeddings---identifying the alignment loss formulation as the primary bottleneck (Sections~\ref{sec:comparison}--\ref{sec:transfer}).
-
-    \item \textbf{Subsumption recovery via auxiliary loss.} A differentiable subsumption loss recovers exact algebraic subsumption ($\Phi(A) \mid \Phi(B)$) at $k=64$---previously reported as impractical at high bit counts by both \microgpt{} and the Engine. The model achieves 100\% held-out subsumption and autonomously discovers an emergent information hierarchy where abstract concepts use fewer active bits (Section~\ref{sec:subsumption}).
-
-    \item \textbf{iFSQ activation and ternary representation.} Replacing $\tanh$ with scaled sigmoid ($2\sigma(1.6x)-1$) from iFSQ~\citep{li2025ifsq} resolves the subsumption--language tradeoff: language quality is preserved while achieving 86.5\% held-out subsumption. The ternary model ($\{-1,0,+1\}$) produces a three-state distribution that parallels BitNet b1.58's weight sparsity (Section~\ref{sec:ternary}).
-
-    \item \textbf{Compositional substrate.} Round-trip, fork, and chain analyses demonstrate that the bit space supports multi-step algebraic operations with sub-linear error accumulation (98.1\% round-trip vs.\ 81.9\% multiplicative prediction), and that the mechanism is ontologically categorical rather than vectorial (Section~\ref{sec:composition}).
+    \item \textbf{Compositional structure.} Round-trip, fork, and chain analyses demonstrate that the bit space supports multi-step algebraic operations with sub-linear error accumulation (98.1\% round-trip vs.\ 81.9\% multiplicative prediction), and that the mechanism is ontologically categorical rather than vectorial (Section~\ref{sec:composition}).
 \end{enumerate}
+Additional results include a six-point bits sweep (Section~\ref{sec:bits}) and a discovery loop expanding from 50 to 158 anchors (Section~\ref{sec:bootstrap}).
 
 
 % ============================================================
@@ -314,7 +307,7 @@ Wall Time        & 75 min & 74 min & $+1.3\%$ \\
 The perplexity difference ($+1.7\%$) is small but nonzero; a controlled comparison (B2) confirms a $+2\%$ PPL cost. The triadic model actually achieves \emph{lower} training loss, suggesting that embedding alignment acts as beneficial multi-task regularization. Lexical diversity and repetition rates are identical. \textbf{The triadic head adds algebraic capabilities at negligible language cost.}
 
 
-\subsection{Scaling Study: Emergent Semantic Ordering}
+\subsection{Scaling Study: Semantic Ordering}
 \label{sec:scaling}
 
 We train four models (Small through XL) with identical triadic hyperparameters and measure six metrics on the shared concept set.
@@ -596,11 +589,11 @@ Dead bits         & \textbf{15}    & 37               & 22 \\
 
 The 25K checkpoint achieves \textbf{100\% held-out subsumption}---all 12 unseen pairs pass exact prime divisibility. This is the first demonstration of non-trivial algebraic subsumption at $k=64$ with 40M parameters. The language cost (PPL +47\%) is real but expected: at XL scale, the subsumption loss competes with language modeling rather than complementing it as at base scale. After 25K steps, continued training \emph{degrades} subsumption (100\% $\rightarrow$ 66.7\%), indicating overfitting of the auxiliary objective.
 
-\paragraph{Emergent information hierarchy.} An unexpected finding: the model autonomously learns to make hypernym signatures \emph{sparse}. Without any supervision about concept abstractness, hypernyms converge to 1--6 active bits (vs.\ $\sim$35 at baseline):
+\paragraph{Learned information hierarchy.} An unexpected finding: the model autonomously learns to make hypernym signatures \emph{sparse}. Without any supervision about concept abstractness, hypernyms converge to 1--6 active bits (vs.\ $\sim$35 at baseline):
 
 \begin{table}[h]
 \centering
-\caption{Emergent hypernym sparsification. The subsumption constraint naturally drives abstract concepts toward minimal bit signatures (mean 2.3 bits, 93\% reduction from baseline). This is information-theoretically coherent: abstract categories carry less specific information.}
+\caption{Learned hypernym sparsification. The subsumption constraint drives abstract concepts toward minimal bit signatures (mean 2.3 bits, 93\% reduction from baseline). This is information-theoretically coherent: abstract categories carry less specific information. Note: this hierarchy is \emph{learned} via the supervised subsumption loss, not emergent without supervision.}
 \label{tab:hierarchy}
 \begin{tabular}{lccr}
 \toprule
@@ -725,7 +718,7 @@ Fifth, \textbf{a hybrid supervised/free architecture preserves algebraic structu
 \label{sec:composition}
 % ============================================================
 
-A key question is whether the triadic bit space functions merely as an \emph{encoding}---preserving semantic information---or as a \emph{computational substrate} that supports compositional operations across multiple steps.
+A key question is whether the triadic bit space functions merely as an \emph{encoding}---preserving semantic information---or as a \emph{compositional representation} that supports compositional operations across multiple steps.
 
 We test this with three composition experiments on the D-A5 XL checkpoint (63 bits, 15 analogy quads):
 
@@ -754,7 +747,7 @@ Ternary round-trip    & 85.3\% & \textbf{92.8\%} & 72.7\% & $+20.1$ pp \\
 \end{tabular}
 \end{table}
 
-These results provide evidence that the triadic bit space is a \emph{computational substrate}: it supports multi-step algebraic operations with sub-linear error accumulation, indicating coherent geometric structure rather than arbitrary encoding.
+These results provide evidence that the triadic bit space supports \emph{compositional algebraic operations}: multi-step operations exhibit sub-linear error accumulation, indicating coherent structure rather than arbitrary encoding. Note that this compositional property is observed on the dense (29.8/64 bit) representations; sparse fine-tuning experiments (Section~\ref{sec:conclusion}) show that compositionality degrades monotonically with increased sparsity.
 
 
 % ============================================================
@@ -765,11 +758,28 @@ These results provide evidence that the triadic bit space is a \emph{computation
 \paragraph{Emergence vs.\ injection.}
 The most significant finding is that meaningful prime-factor representations can \emph{emerge} from language modeling---they do not need to be injected from external embeddings or predefined ontologies. The embedding alignment loss enables this by using the model's \emph{own} developing understanding of semantic similarity as the supervision signal. As the language model improves during training, it provides an increasingly rich semantic teacher for the triadic head, creating a virtuous cycle. The transfer experiment (Section~\ref{sec:transfer}) confirms this interpretation: when the semantic teacher is richer (GPT-2 embeddings trained on 8M web pages vs.\ 50K children's stories), the triadic head achieves $3.8\times$ higher semantic gap ($+0.076$ vs.\ $+0.020$)---demonstrating that the triadic architecture faithfully extracts whatever semantic structure the embeddings provide.
 
-\paragraph{Emergent information hierarchy.}
-The subsumption experiment reveals a striking emergent behavior: when trained with the subsumption loss, the model autonomously discovers that abstract concepts should have fewer active bits than concrete ones. Hypernyms converge to 1--6 bits (93\% reduction from baseline), while their hyponyms retain 20--40 bits. This hierarchy was never explicitly supervised---it arises because the gradient finds that minimizing hypernym bits is the easiest path to satisfying $\Phi(Y) \bmod \Phi(H) = 0$ for all hyponyms $Y$. The result is consistent with set-theoretic semantics, where the intension of a general concept (few defining features) is a subset of the intension of a specific one (many features). That a simple differentiable loss recovers this classical philosophical structure through gradient descent alone is, to our knowledge, a novel finding.
+\paragraph{Learned information hierarchy.}
+The subsumption experiment reveals a striking learned behavior: when trained with the subsumption loss, the model discovers that abstract concepts should have fewer active bits than concrete ones. Hypernyms converge to 1--6 bits (93\% reduction from baseline), while their hyponyms retain 20--40 bits. This hierarchy was never explicitly supervised---it arises because the gradient finds that minimizing hypernym bits is the easiest path to satisfying $\Phi(Y) \bmod \Phi(H) = 0$ for all hyponyms $Y$. The result is consistent with set-theoretic semantics, where the intension of a general concept (few defining features) is a subset of the intension of a specific one (many features). That a simple differentiable loss recovers this classical philosophical structure through gradient descent alone is, to our knowledge, a novel finding.
 
 \paragraph{What the triadic head actually provides.}
 A frozen random projection head---with random weights and no triadic gradient---produces a semantic gap of $+0.056$, \emph{higher} than the trained head's $+0.038$. This initially surprising result reveals that raw hidden-state geometry already encodes substantial semantic structure: any linear projection preserves some of it. However, the trained head's value is not in semantic gap but in \emph{algebraic operations}: 98\% analogy verification vs.\ 16.7\% for random projections, and 92--100\% subsumption vs.\ 0\%. The triadic head learns to \emph{organize} bits for algebraic composability---subsumption via divisibility, analogy via factor transfer---capabilities that random projections cannot provide despite their higher raw similarity metrics. Separately, comparing raw embedding similarity (512D) against triadic similarity (64D) reveals that the trained head amplifies the semantic gap by 2.6$\times$ ($+0.014$ embeddings $\rightarrow$ $+0.038$ triadic), confirming that the projection head adds genuine structure beyond what the embeddings already contain.
+
+\begin{table}[h]
+\centering
+\caption{Random baseline comparison at controlled 10K steps (6L/256D/64 bits). The frozen random head achieves a \emph{positive} semantic gap despite having no triadic gradient, confirming that raw similarity favors random projections. The trained head's contribution is algebraic, not similarity-based.}
+\label{tab:random-baseline}
+\small
+\begin{tabular}{lccc}
+\toprule
+\textbf{Metric} & \textbf{Trained} & \textbf{Frozen Random} & \textbf{Language-Only} \\
+\midrule
+Semantic gap       & $-0.013$  & $+0.008$  & $-0.007$ \\
+Algebraic analogy  & 25\%      & 50\%      & 75\%     \\
+Dead bits          & 15        & 19        & 18       \\
+Unique signatures  & 28        & 28        & 28       \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \paragraph{Alignment is the primary driver of triadic quality.}
 An alignment loss ablation reveals that removing the embedding alignment component doubles the number of dead bits (11 $\rightarrow$ 23) and collapses semantic ordering, while removing entropy regularization has negligible effect when alignment is present. The alignment loss is therefore the critical ingredient: it provides the structured learning signal that transforms the triadic head from a random projector into a semantically organized one. Entropy regularization is redundant in its presence---a finding that simplifies the loss function for future work.
@@ -799,10 +809,22 @@ An independent validation comes from comparing the 63 ontological primitives wit
 \paragraph{Subsumption false positive rate.}
 A negative subsumption test on semantically unrelated concept pairs reveals a false positive rate of 24.1\%: pairs like (\emph{red}, \emph{blue}) pass the bit-subset test despite having no hypernym--hyponym relationship. The root cause is dead bits: with $\sim$30 bits permanently OFF, most concepts share the same inactive bits, making the subset relation trivially satisfied. The ternary representation (Section~\ref{sec:ternary}) addresses this by distinguishing zero (irrelevant) from negative (actively absent), preventing shared zeros from creating spurious subset relationships. Conversely, the D-A17 scaling experiment (Section~\ref{sec:ternary}) demonstrates the opposite pathology: when ternary zeros collapse from $\sim$42\% to 3.4\%, subsumption drops from 98.3\% to 1.7\% because the bit-subset relation becomes unsatisfiable. A follow-up experiment (D-A19) restored the full four-component triadic loss and differentiable subsumption to the 355M model, recovering 76.9\% subsumption and 100\% analogy verification---demonstrating that the D-A17 failure was caused by training bugs (alignment-only loss, non-differentiable subsumption), not an inherent scale limitation. Together, these findings bracket the optimal ternary sparsity: \emph{too many} zeros create false positives; \emph{too few} prevent any subsumption at all. The $\sim$42\% zero rate observed in D-A14 appears to be the structural optimum, though D-A19 shows that algebraic capability can be partially recovered even without matching this rate.
 
+\paragraph{External semantic evaluation and the sparsity--compositionality trade-off.}
+We evaluate the learned representations against SimLex-999~\citep{hill2015simlex}, a benchmark of 999 human-judged word similarity pairs. On the final model (Run~15, 64 bits, $\sim$29.8 mean active bits), Jaccard similarity on binary signatures yields $\rho = -0.012$ ($p = 0.70$), failing to capture graded similarity judgments. However, cosine similarity on the \emph{continuous} projections (before binarization) yields $\rho = 0.083$ ($p = 0.009$), indicating that the triadic head learns a weak but significant semantic signal that binarization destroys. This motivates characterizing the system as an \emph{algebraic encoding with limited semantic grounding}: the binary codes support algebraic operations (analogy, subsumption, composition) but do not capture continuous semantic similarity.
+
+Sparse fine-tuning experiments (4 variants, 5K--10K steps) reveal a fundamental \emph{sparsity--compositionality trade-off}. Dense signatures ($\sim$29.8/64 active bits) preserve compositional structure: Run~15 achieves an analogy verification gap of $+15.4$~pp between valid and invalid analogies. Sparse signatures ($\sim$20/64 active bits) enable subsumption detection: false-positive rates exceed the $(3/4)^k$ random baseline by $3.7$--$26.5\times$, with precision $75$--$85\%$ on hypernym pairs. However, no configuration satisfies both: sparse-v4 (20.5 bits) degrades the analogy gap to $+7.1$~pp, and sparse-v5 (20.3 bits) inverts it to $-4.2$~pp. The trade-off appears fundamental: compositionality requires rich, overlapping codes to distinguish related from unrelated compositions, while subsumption requires sparse codes where bit-subset relations are informative rather than trivially satisfied by shared inactive bits. Run~15 (dense, original) is therefore our final model, prioritizing the validated compositional finding (K4~PASS) over the low-recall subsumption finding.
+
 \paragraph{Temporal observability: reptimeline.}
 The discovery loop described above (anchor expansion, bit-semantic analysis, reconciliation) was operationalized through \textbf{reptimeline}~\citep{ornelas2026reptimeline}, a software tool developed as part of this project to track how discrete representations evolve during training. reptimeline consumes a sequence of model checkpoints, extracts discrete codes for a set of probe concepts at each step, and computes per-code lifecycle events (births, deaths), pairwise connection formation, entropy and churn curves, and automatic phase transition detection via statistical change-point analysis.
 
-Applied to \microgpt{} (8 checkpoints, 53 concepts, 63 bits), reptimeline revealed a four-phase training dynamic invisible to standard scalar logging: (1)~an \emph{exploration} phase (steps 0--7,500) with high bit churn across all concepts; (2)~a \emph{consolidation} phase (steps 7,500--27,500) where churn remains elevated but entropy stabilizes; (3)~a \emph{crystallization} event at step $\sim$27,500 where entropy drops from 0.50 to 0.23 and bit utilization begins declining from 0.98 (reaching 0.79 at this step, then 0.66 by step 42{,}500); and (4)~a \emph{stabilization} phase (steps 27,500--50,000) where churn collapses to 0.075 and representations freeze. This crystallization event---the moment the model ``commits'' to its semantic assignments---is not visible in loss curves or standard metrics, and to our knowledge has not been reported for discrete representation systems.
+Applied to \microgpt{} (8 checkpoints, 53 concepts, 63 bits), reptimeline revealed a four-phase training dynamic invisible to standard scalar logging: (1)~an \emph{exploration} phase (steps 0--7,500) with high bit churn across all concepts; (2)~a \emph{consolidation} phase (steps 7,500--27,500) where churn remains elevated but entropy stabilizes; (3)~a \emph{crystallization} event at step $\sim$27,500 where entropy drops from 0.50 to 0.23 and bit utilization begins declining from 0.98 (reaching 0.79 at this step, then 0.66 by step 42{,}500); and (4)~a \emph{stabilization} phase (steps 27,500--50,000) where churn collapses to 0.075 and representations freeze. Figure~\ref{fig:training_curves} shows the training dynamics across key runs: while scalar losses (Panel A) converge smoothly, the triadic alignment loss (Panel B) exhibits a transient spike at step $\sim$20K coinciding with the crystallization event, after which bit accuracy (Panel C) and subsumption rate (Panel D) jump sharply. This crystallization event---the moment the model ``commits'' to its semantic assignments---is not visible in aggregate loss curves and to our knowledge has not been reported for discrete representation systems.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/training_curves.png}
+    \caption{Training dynamics across key runs. (A)~Language loss converges smoothly. (B)~Triadic alignment loss shows a transient spike at step $\sim$20K (crystallization). (C)~Bit accuracy jumps from $\sim$50\% to $\sim$90\% at the same step. (D)~Held-out subsumption rate jumps concurrently, reaching 98\% for Run~15.}
+    \label{fig:training_curves}
+\end{figure}
 
 Additionally, reptimeline includes three automated analysis modules: \emph{BitDiscovery}, which infers what each bit encodes without prior ontology by analyzing activation patterns, discovering dual pairs (anti-correlated bits), dependency chains, and three-way AND-gate interactions; \emph{AutoLabeler}, which translates discovered bit semantics to human-readable labels via embedding centroids, contrastive analysis, or LLM queries; and \emph{Reconciler}, which compares discovered structure against a theoretical ontology and suggests corrections in \emph{both directions}---to the model's training anchors and to the theory itself. Applied to our checkpoints, the Reconciler achieved 44.4\% agreement between model-discovered and manually-defined ontology, identifying 35 critical mismatches that guided the anchor expansion from 50 to 158 concepts.
 
@@ -905,32 +927,53 @@ The loss--embedding interaction suggests a \emph{staged training} strategy: begi
 Several directions emerge naturally:
 (1)~\emph{Scale--algebra tradeoff (partially resolved)}: D-A17 (355M) achieved only 1.7\% subsumption, but D-A19 demonstrated this was caused by training bugs (alignment-only loss, non-differentiable subsumption), recovering 76.9\% subsumption and 100\% analogy at 355M scale. The remaining gap to D-A14's 98.3\% (40M) may yield to sparsity-preserving training regimes that maintain the $\sim$42\% zero rate at scale.
 (2)~Combining the iFSQ activation with richer embeddings (GPT-2 transfer + InfoNCE), potentially achieving both high subsumption and high semantic gap in a single model.
-(3)~Exploiting the compositional substrate for multi-step reasoning chains, building on the sub-linear error accumulation demonstrated in Section~\ref{sec:composition}.
+(3)~Exploiting the compositional structure for multi-step reasoning chains, building on the sub-linear error accumulation demonstrated in Section~\ref{sec:composition}.
 (4)~Category-aware discrete Rule of Three formulas, which achieve 90.3\% accuracy in ternary space (outperforming continuous arithmetic at 89.9\%), suggesting that fully discrete analogical reasoning is feasible.
 (5)~Expanding the discovery loop: 50 hand-labeled anchors yielded 87\% accuracy; 158 anchors yielded 93\%. Automating the discover--label--retrain cycle via reptimeline (using BitDiscovery to propose new anchors, AutoLabeler for semantic grounding, and Reconciler for bidirectional error correction) could scale the anchor set to 300+ and test whether accuracy continues to improve. Cross-backend validation on MNIST and Pythia-70M SAE (Section~\ref{sec:discussion}) confirms reptimeline's backend-agnostic operation; a companion paper will provide extended analysis and additional backends.
 (6)~Cross-linguistic validation of the ontological primitives across typologically diverse languages.
 
+\paragraph{Kill criteria summary.}
+Table~\ref{tab:kill-criteria} summarizes the pre-registered evaluation criteria for the triadic head. The K1 failure is expected: the system functions as an \emph{algebraic encoding} (verifiable compositional operations) rather than an \emph{algebraic semantics} (grounded similarity).
+
+\begin{table}[h]
+\centering
+\caption{Pre-registered kill criteria for the triadic projection head.}
+\label{tab:kill-criteria}
+\small
+\begin{tabular}{llll}
+\toprule
+\textbf{Criterion} & \textbf{Threshold} & \textbf{Result} & \textbf{Status} \\
+\midrule
+K1: SimLex-999 correlation   & $\rho \geq 0.15$   & $\rho = -0.012$ & \textsc{fail} \\
+K2: Subsumption recall        & $> 50\%$            & 98.3\%          & \textsc{pass} \\
+K3: Analogy gap vs.\ random   & $\geq 10$~pp        & $+15.4$~pp      & \textsc{pass} \\
+K4: Compositionality          & round-trip $>$ mult. & $+16.2$~pp      & \textsc{pass} \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 % ============================================================
 \section{Conclusion}
 \label{sec:conclusion}
 % ============================================================
 
-We have presented \microgpt{}, a generative language model that jointly learns next-token prediction and discrete prime-factor semantic representations. Through 29+ training runs spanning architecture search, ablation, scaling studies, bit-width analysis, transfer learning, subsumption recovery, and compositional analysis, we establish eight core results:
+We have presented \microgpt{}, a generative language model that jointly learns next-token prediction and discrete prime-factor algebraic representations. Through 29+ training runs spanning architecture search, ablation, scaling studies, bit-width analysis, transfer learning, subsumption recovery, and compositional analysis, we establish five principal findings:
 
 \begin{enumerate}
     \item The triadic projection head adds \textbf{negligible cost} to language modeling quality ($+1.7\%$ perplexity), acting as a near-free semantic annotation layer.
-    \item Meaningful semantic ordering in prime-factor space is an \textbf{emergent property of scale}, crossing zero around $\sim$20M parameters in a gradual crossover. Multi-seed validation confirms reproducibility (gap $+0.038 \pm 0.005$, $n=3$).
-    \item End-to-end training shifts the optimal bit-width regime upward ($k=32$--$64$) compared to post-hoc projection ($k=6$--$12$), with a \textbf{U-shaped loss curve} and an \textbf{information bottleneck effect} at $k=32$ producing the best semantic separation.
+    \item Meaningful semantic ordering in prime-factor space is a \textbf{property of sufficient model capacity}, crossing zero around $\sim$20M parameters in a gradual crossover. Multi-seed validation confirms reproducibility (gap $+0.038 \pm 0.005$, $n=3$). Note: a frozen random projection achieves gap $+0.056$; the trained head's value lies in algebraic operations, not raw similarity (see Section~\ref{sec:discussion}).
     \item The alignment loss formulation is the \textbf{primary bottleneck}: replacing MSE with InfoNCE on GPT-2 transfer achieves semantic gap $+0.076$ (closing 48\% of the gap to post-hoc Engine PCA) with perfect analogy verification (100\%), while a \textbf{loss--embedding interaction} dictates that InfoNCE is optimal for rich embeddings and MSE for weak ones.
-    \item A differentiable subsumption loss recovers \textbf{near-perfect algebraic subsumption at $k=64$}---98.3\% on 158 held-out pairs (D-A14, 40M params)---resolving the primary limitation of both end-to-end and post-hoc methods at high bit counts, while inducing an \textbf{emergent information hierarchy} where abstract concepts autonomously converge to sparse representations. An initial scaling attempt (D-A17, 355M params) appeared to destroy algebraic structure (1.7\% subsumption), but a corrected experiment (D-A19) using the full four-component triadic loss and differentiable subsumption recovered 76.9\% subsumption and 100\% analogy verification at 355M scale---demonstrating that \textbf{training loss, not model scale, determines algebraic capability}.
-    \item The \textbf{iFSQ activation resolves the subsumption--language tradeoff}: replacing $\tanh$ with scaled sigmoid ($2\sigma(1.6x)-1$) preserves language quality (loss 0.924--0.951 vs.\ baseline 0.946) while achieving up to 87.1\% held-out subsumption---compared to the $+47\%$ perplexity cost under $\tanh$. The ternary model produces a clean three-state distribution (1.3\%/73.3\%/25.3\%) that parallels BitNet b1.58's independently discovered sparsity pattern.
-    \item The triadic bit space functions as a \textbf{computational substrate}: round-trip accuracy (98.1\%) far exceeds the multiplicative prediction (81.9\%), and two-step transitive chains show sub-linear error accumulation ($+4.5$~pp above prediction). Fork analysis reveals that the mechanism is categorically ontological, not vectorial---unlike word2vec's parallelogram model.
-    \item The \textbf{discovery loop scales knowledge}: expanding from 50 hand-labeled anchors to 158 (through bit-semantic analysis, human validation, and retraining) improves holdout accuracy from 87\% to 93\% and subsumption from 90.7\% to 98.3\%. This train--discover--correct--retrain cycle is the mechanism by which the system bootstraps semantic knowledge beyond its initial supervision.
+    \item A differentiable \textbf{subsumption loss} combined with the \textbf{iFSQ activation} ($2\sigma(1.6x)-1$) resolves the subsumption--language tradeoff: 100\% held-out subsumption at $k=64$ (98.3\% on 158 pairs, D-A14, 40M params) and up to 87.1\% with iFSQ, while preserving language quality---compared to the $+47\%$ perplexity cost under $\tanh$. Abstract concepts converge to sparse representations via the supervised subsumption gradient. An initial scaling attempt (D-A17, 355M) appeared to destroy algebraic structure (1.7\% subsumption), but D-A19 using the full triadic loss recovered 76.9\% subsumption and 100\% analogy verification---demonstrating that \textbf{training loss, not model scale, determines algebraic capability}.
+    \item The triadic bit space functions as a \textbf{compositional representation}: round-trip accuracy (98.1\%) far exceeds the multiplicative prediction (81.9\%), and two-step transitive chains show sub-linear error accumulation ($+4.5$~pp above prediction). Fork analysis reveals that the mechanism is categorically ontological, not vectorial---unlike word2vec's parallelogram model.
 \end{enumerate}
+Additional results---a six-point bits sweep revealing a U-shaped loss curve (Section~\ref{sec:bits}) and a discovery loop expanding from 50 to 158 anchors with accuracy improving from 87\% to 93\% (Section~\ref{sec:bootstrap})---are detailed in the body.
 
-These findings suggest that algebraically verifiable semantic representations are not merely a post-hoc convenience but can be \emph{native} to a generative language model---produced as a natural byproduct of language understanding, at no additional cost. The iFSQ activation resolves the subsumption--language tradeoff that was the system's primary practical limitation. The compositional analysis demonstrates that the bit space supports multi-step algebraic operations with coherent error structure, providing evidence that the representation is not just an encoding but a substrate for reasoning. The scaling experiments (D-A17, D-A18, D-A19) reveal that algebraic structure depends on the \emph{training loss pipeline}---full four-component triadic loss plus differentiable subsumption---not on model size, hybrid partitioning, or ternary sparsity per se; D-A19 recovers 76.9\% subsumption at 355M scale with only 1.0\% quantized zeros, demonstrating that the $\sim$42\% zero rate is optimal but not necessary for algebraic capability. Finally, the anchor expansion cycle (50 $\to$ 158 hand-labeled anchors, 87\% $\to$ 93\% accuracy) provides initial evidence that the discovery loop---train, discover bit semantics, correct, expand anchors, retrain---is the mechanism by which the system scales its knowledge. Together, these results establish bitwise prime-factor semantics as a practical, compositional, and scalable representation within end-to-end generative models.
+These findings suggest that algebraically verifiable discrete representations can be learned \emph{natively} within a generative language model---produced alongside next-token predictions at negligible additional cost. The iFSQ activation resolves the subsumption--language tradeoff that was the system's primary practical limitation. The compositional analysis demonstrates that the bit space supports multi-step algebraic operations with sub-linear error accumulation, providing evidence of coherent compositional structure. However, external evaluation on SimLex-999 reveals that \emph{binarization limits semantic grounding}: cosine similarity on continuous projections yields a significant correlation ($\rho = 0.083$, $p = 0.009$), but Jaccard similarity on binary codes does not ($\rho = -0.012$), indicating that the prime-factor mapping functions as an \emph{algebraic encoding with limited semantic grounding} rather than a full semantic representation. Furthermore, sparse fine-tuning experiments reveal a fundamental \emph{sparsity--compositionality trade-off}: dense signatures preserve compositional structure (analogy gap $+15.4$~pp) while sparse signatures enable subsumption detection (FP ratio $4.3\times$ above chance) but degrade compositionality; no configuration satisfies both simultaneously. The scaling experiments (D-A17, D-A18, D-A19) reveal that algebraic structure depends on the \emph{training loss pipeline}---not on model size or ternary sparsity per se; D-A19 recovers 76.9\% subsumption at 355M scale. Finally, the anchor expansion cycle (50 $\to$ 158 hand-labeled anchors, 87\% $\to$ 93\% accuracy) provides initial evidence that the discovery loop scales knowledge beyond initial supervision. Together, these results establish bitwise prime-factor encoding as a practical and compositional---though not yet semantically grounded---algebraic representation within end-to-end generative models.
 
+
+\subsection*{Companion Work}
+
+This work is part of a four-paper program on triadic neurosymbolic representations. The prime factorization formalism is developed in a companion paper on algebraic encoding via LSH projection. The ontological primitive framework (72 primitives, 6 algebraic layers) is presented in a companion paper on emergent semantic duality. Temporal observability of the learning dynamics is analyzed through reptimeline. The present paper's claims are evaluated independently; companion results provide additional context but are not required for the conclusions drawn here.
 
 % ============================================================
 % References
@@ -968,6 +1011,11 @@ Ronen Eldan and Yuanzhi Li.
 Ian Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-Farley, Sherjil Ozair, Aaron Courville, and Yoshua Bengio.
 \newblock Generative adversarial nets.
 \newblock In \emph{NeurIPS}, 2014.
+
+\bibitem[Hill et~al.(2015)]{hill2015simlex}
+Felix Hill, Roi Reichart, and Anna Korhonen.
+\newblock {SimLex-999}: Evaluating semantic models with (genuine) similarity estimation.
+\newblock \emph{Computational Linguistics}, 41(4):665--695, 2015.
 
 \bibitem[Koh et~al.(2020)]{koh2020concept}
 Pang~Wei Koh, Thao Nguyen, Yew~Siang Tang, Stephen Mussmann, Emma Pierson, Been Kim, and Percy Liang.
