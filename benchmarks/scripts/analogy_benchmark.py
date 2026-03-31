@@ -74,6 +74,38 @@ ANALOGIES = [
     ("jump", "fall", "climb", "sleep"),
 ]
 
+# Invalid analogies: semantically incoherent pairs (negative controls)
+# If the model scores these similarly to valid analogies, the algebraic
+# analogy mechanism is not capturing compositional structure.
+# Kill criterion K4: if gap(valid - invalid) < 10pp, degrade claim.
+INVALID_ANALOGIES = [
+    ("king", "dog", "queen", "cat"),
+    ("hot", "table", "cold", "chair"),
+    ("happy", "river", "sad", "mountain"),
+    ("mother", "blue", "father", "green"),
+    ("sun", "bread", "moon", "milk"),
+    ("fire", "school", "water", "hospital"),
+    ("bird", "lamp", "fish", "bed"),
+    ("love", "car", "hate", "tree"),
+    ("big", "church", "small", "garden"),
+    ("dog", "morning", "cat", "night"),
+    ("run", "cake", "walk", "apple"),
+    ("king", "rain", "queen", "snow"),
+    ("prince", "ocean", "princess", "forest"),
+    ("happy", "door", "sad", "window"),
+    ("doctor", "fish", "nurse", "bird"),
+    ("fast", "moon", "slow", "star"),
+    ("brother", "flower", "sister", "cloud"),
+    ("old", "swim", "young", "fly"),
+    ("friend", "lamp", "enemy", "chair"),
+    ("morning", "dog", "night", "cat"),
+    ("fire", "pen", "water", "book"),
+    ("love", "table", "hate", "door"),
+    ("summer", "judge", "winter", "doctor"),
+    ("big", "music", "small", "dance"),
+    ("king", "milk", "queen", "bread"),
+]
+
 # Vocabulary pool for retrieval (must include all D answers + distractors)
 VOCAB_POOL = [
     "king", "queen", "man", "woman", "boy", "girl", "prince", "princess",
@@ -256,16 +288,35 @@ def main(args):
     concept_data = compute_projections(model, tokenizer, all_concepts, device)
     print(f"  Encoded: {len(concept_data)}/{len(all_concepts)}")
 
-    # Evaluate analogies
+    # Evaluate valid analogies
     print()
-    print("[2/2] Evaluating analogies...")
+    print("[2/3] Evaluating valid analogies...")
     eval_result = evaluate_analogies(concept_data, ANALOGIES, VOCAB_POOL)
 
-    print(f"  Analogies tested: {eval_result['total']}")
+    print(f"  Valid analogies tested: {eval_result['total']}")
     print()
     print(f"  Top-1 Accuracy:        {eval_result['top1_accuracy']:.1%} ({eval_result['top1_correct']}/{eval_result['total']})")
     print(f"  Top-5 Accuracy:        {eval_result['top5_accuracy']:.1%} ({eval_result['top5_correct']}/{eval_result['total']})")
     print(f"  Verification (>median): {eval_result['verification_accuracy']:.1%} ({eval_result['verification_correct']}/{eval_result['total']})")
+
+    # Evaluate invalid analogies (negative controls)
+    print()
+    print("[3/3] Evaluating INVALID analogies (negative controls)...")
+    eval_invalid = evaluate_analogies(concept_data, INVALID_ANALOGIES, VOCAB_POOL)
+
+    print(f"  Invalid analogies tested: {eval_invalid['total']}")
+    print()
+    print(f"  Top-1 Accuracy:        {eval_invalid['top1_accuracy']:.1%} ({eval_invalid['top1_correct']}/{eval_invalid['total']})")
+    print(f"  Top-5 Accuracy:        {eval_invalid['top5_accuracy']:.1%} ({eval_invalid['top5_correct']}/{eval_invalid['total']})")
+    print(f"  Verification (>median): {eval_invalid['verification_accuracy']:.1%} ({eval_invalid['verification_correct']}/{eval_invalid['total']})")
+
+    # Compositionality gap (valid - invalid)
+    gap_verif = (eval_result['verification_accuracy'] - eval_invalid['verification_accuracy']) * 100
+    gap_top5 = (eval_result['top5_accuracy'] - eval_invalid['top5_accuracy']) * 100
+    print()
+    print(f"  COMPOSITIONALITY GAP:")
+    print(f"    Verification gap: {gap_verif:+.1f}pp  {'PASS' if gap_verif >= 10 else 'FAIL (kill K4)'}")
+    print(f"    Top-5 gap:        {gap_top5:+.1f}pp")
 
     # Show examples
     print()
@@ -288,16 +339,30 @@ def main(args):
         "date": today,
         "model_checkpoint": args.model,
         "model_config": f"{config.n_layer}L/{config.n_embd}D/{config.n_head}H/{config.n_triadic_bits}bits",
-        "n_analogies": eval_result['total'],
+        "n_valid_analogies": eval_result['total'],
+        "n_invalid_analogies": eval_invalid['total'],
         "n_vocab_pool": len(VOCAB_POOL),
-        "metrics": {
+        "valid_metrics": {
             "top1_accuracy": eval_result['top1_accuracy'],
             "top5_accuracy": eval_result['top5_accuracy'],
             "verification_accuracy": eval_result['verification_accuracy'],
             "top1_correct": eval_result['top1_correct'],
             "top5_correct": eval_result['top5_correct'],
         },
-        "details": eval_result['details'],
+        "invalid_metrics": {
+            "top1_accuracy": eval_invalid['top1_accuracy'],
+            "top5_accuracy": eval_invalid['top5_accuracy'],
+            "verification_accuracy": eval_invalid['verification_accuracy'],
+            "top1_correct": eval_invalid['top1_correct'],
+            "top5_correct": eval_invalid['top5_correct'],
+        },
+        "compositionality_gap_pp": {
+            "verification": gap_verif,
+            "top5": gap_top5,
+            "kill_k4": gap_verif < 10,
+        },
+        "valid_details": eval_result['details'],
+        "invalid_details": eval_invalid['details'],
     }
 
     result_path = os.path.join(results_dir, f"{version}_analogy_{today}.json")
@@ -308,9 +373,14 @@ def main(args):
     # Verdict
     print()
     print("=" * 68)
-    print(f"  Top-1:         {eval_result['top1_accuracy']:.1%}  (paper baseline: 2-10%)  {'PASS' if eval_result['top1_accuracy'] >= 0.02 else 'BELOW'}")
-    print(f"  Top-5:         {eval_result['top5_accuracy']:.1%}  (target: > 25%)  {'PASS' if eval_result['top5_accuracy'] >= 0.25 else 'BELOW'}")
-    print(f"  Verification:  {eval_result['verification_accuracy']:.1%}  (target: > 50%)  {'PASS' if eval_result['verification_accuracy'] >= 0.50 else 'BELOW'}")
+    print(f"  VALID ANALOGIES:")
+    print(f"    Top-1:         {eval_result['top1_accuracy']:.1%}  (paper baseline: 2-10%)  {'PASS' if eval_result['top1_accuracy'] >= 0.02 else 'BELOW'}")
+    print(f"    Top-5:         {eval_result['top5_accuracy']:.1%}  (target: > 25%)  {'PASS' if eval_result['top5_accuracy'] >= 0.25 else 'BELOW'}")
+    print(f"    Verification:  {eval_result['verification_accuracy']:.1%}  (target: > 50%)  {'PASS' if eval_result['verification_accuracy'] >= 0.50 else 'BELOW'}")
+    print(f"  NEGATIVE CONTROLS:")
+    print(f"    Invalid verif: {eval_invalid['verification_accuracy']:.1%}  (should be LOW)")
+    print(f"  KILL CRITERION K4:")
+    print(f"    Gap:           {gap_verif:+.1f}pp  (threshold: >= 10pp)  {'PASS' if gap_verif >= 10 else 'FAIL'}")
     print("=" * 68)
 
 

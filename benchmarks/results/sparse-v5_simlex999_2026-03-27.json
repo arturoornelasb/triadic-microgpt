@@ -1,0 +1,176 @@
+{
+  "benchmark": "simlex999",
+  "version": "sparse-v5",
+  "date": "2026-03-27",
+  "model_checkpoint": "checkpoints/sparse_sp15_tb14_sw5_10000s/model_sparse_best.pt",
+  "model_config": "12L/512D/8H/64bits",
+  "metrics": {
+    "coverage": 1.0,
+    "n_covered": 999,
+    "n_total": 999,
+    "rho_jaccard": -0.017751402328440823,
+    "p_jaccard": 0.5752000850146626,
+    "rho_cosine": 0.0893106826669956,
+    "p_cosine": 0.0047287693503395055,
+    "by_pos": {
+      "N": {
+        "rho": -0.0031586551286489303,
+        "p": 0.9351537401398113,
+        "n": 666
+      },
+      "V": {
+        "rho": -0.1866151184847577,
+        "p": 0.005281370497771462,
+        "n": 222
+      },
+      "A": {
+        "rho": 0.18809930346829276,
+        "p": 0.04804160852183386,
+        "n": 111
+      }
+    }
+  },
+  "kill_k1": true,
+  "sample_pairs": [
+    {
+      "word1": "old",
+      "word2": "new",
+      "human": 1.58,
+      "jaccard": 0.2727272727272727,
+      "cosine": 0.6059384942054749
+    },
+    {
+      "word1": "smart",
+      "word2": "intelligent",
+      "human": 9.2,
+      "jaccard": 0.4864864864864865,
+      "cosine": 0.6632819771766663
+    },
+    {
+      "word1": "hard",
+      "word2": "difficult",
+      "human": 8.77,
+      "jaccard": 0.4473684210526316,
+      "cosine": 0.602923572063446
+    },
+    {
+      "word1": "happy",
+      "word2": "cheerful",
+      "human": 9.55,
+      "jaccard": 0.35714285714285715,
+      "cosine": 0.298043817281723
+    },
+    {
+      "word1": "hard",
+      "word2": "easy",
+      "human": 0.95,
+      "jaccard": 0.34210526315789475,
+      "cosine": 0.6677960753440857
+    },
+    {
+      "word1": "fast",
+      "word2": "rapid",
+      "human": 8.75,
+      "jaccard": 0.15384615384615385,
+      "cosine": 0.6255144476890564
+    },
+    {
+      "word1": "happy",
+      "word2": "glad",
+      "human": 9.17,
+      "jaccard": 0.37209302325581395,
+      "cosine": 0.3618871867656708
+    },
+    {
+      "word1": "short",
+      "word2": "long",
+      "human": 1.23,
+      "jaccard": 0.28125,
+      "cosine": 0.7096381783485413
+    },
+    {
+      "word1": "stupid",
+      "word2": "dumb",
+      "human": 9.58,
+      "jaccard": 0.45454545454545453,
+      "cosine": 0.6250643730163574
+    },
+    {
+      "word1": "weird",
+      "word2": "strange",
+      "human": 8.93,
+      "jaccard": 0.59375,
+      "cosine": 0.688420295715332
+    },
+    {
+      "word1": "wide",
+      "word2": "narrow",
+      "human": 1.03,
+      "jaccard": 0.2,
+      "cosine": 0.5375750064849854
+    },
+    {
+      "word1": "bad",
+      "word2": "awful",
+      "human": 8.42,
+      "jaccard": 0.43478260869565216,
+      "cosine": 0.7008390426635742
+    },
+    {
+      "word1": "easy",
+      "word2": "difficult",
+      "human": 0.58,
+      "jaccard": 0.46153846153846156,
+      "cosine": 0.7375888228416443
+    },
+    {
+      "word1": "bad",
+      "word2": "terrible",
+      "human": 7.78,
+      "jaccard": 0.4090909090909091,
+      "cosine": 0.7387253046035767
+    },
+    {
+      "word1": "hard",
+      "word2": "simple",
+      "human": 1.38,
+      "jaccard": 0.39473684210526316,
+      "cosine": 0.6167183518409729
+    },
+    {
+      "word1": "smart",
+      "word2": "dumb",
+      "human": 0.55,
+      "jaccard": 0.5135135135135135,
+      "cosine": 0.6748810410499573
+    },
+    {
+      "word1": "insane",
+      "word2": "crazy",
+      "human": 9.57,
+      "jaccard": 0.5333333333333333,
+      "cosine": 0.7344426512718201
+    },
+    {
+      "word1": "happy",
+      "word2": "mad",
+      "human": 0.95,
+      "jaccard": 0.3170731707317073,
+      "cosine": 0.39399704337120056
+    },
+    {
+      "word1": "large",
+      "word2": "huge",
+      "human": 9.47,
+      "jaccard": 0.5862068965517241,
+      "cosine": 0.7237570285797119
+    },
+    {
+      "word1": "hard",
+      "word2": "tough",
+      "human": 8.05,
+      "jaccard": 0.5,
+      "cosine": 0.6779690384864807
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "total_steps": 49951,
+  "final_lang_loss": 1.072834,
+  "final_tri_loss": 0.101805,
+  "initial_lang_loss": 8.404474,
+  "loss_reduction": 0.8723496556714911,
+  "crystallization_step": 1551
+}

@@ -1,0 +1,176 @@
+{
+  "benchmark": "simlex999",
+  "version": "sparse-v1",
+  "date": "2026-03-27",
+  "model_checkpoint": "checkpoints/sparse_finetune/model_sparse_best.pt",
+  "model_config": "12L/512D/8H/64bits",
+  "metrics": {
+    "coverage": 1.0,
+    "n_covered": 999,
+    "n_total": 999,
+    "rho_jaccard": -0.0182109787275104,
+    "p_jaccard": 0.5653448977650164,
+    "rho_cosine": 0.08717483740386323,
+    "p_cosine": 0.005831073920300728,
+    "by_pos": {
+      "N": {
+        "rho": 0.024796989217863618,
+        "p": 0.5229326090469254,
+        "n": 666
+      },
+      "V": {
+        "rho": -0.13670598250701685,
+        "p": 0.04185711057928157,
+        "n": 222
+      },
+      "A": {
+        "rho": -0.007559267330598525,
+        "p": 0.9372383216155467,
+        "n": 111
+      }
+    }
+  },
+  "kill_k1": true,
+  "sample_pairs": [
+    {
+      "word1": "old",
+      "word2": "new",
+      "human": 1.58,
+      "jaccard": 0.3870967741935484,
+      "cosine": 0.4749830365180969
+    },
+    {
+      "word1": "smart",
+      "word2": "intelligent",
+      "human": 9.2,
+      "jaccard": 0.6216216216216216,
+      "cosine": 0.7530432939529419
+    },
+    {
+      "word1": "hard",
+      "word2": "difficult",
+      "human": 8.77,
+      "jaccard": 0.5348837209302325,
+      "cosine": 0.6164156198501587
+    },
+    {
+      "word1": "happy",
+      "word2": "cheerful",
+      "human": 9.55,
+      "jaccard": 0.3333333333333333,
+      "cosine": 0.3200272023677826
+    },
+    {
+      "word1": "hard",
+      "word2": "easy",
+      "human": 0.95,
+      "jaccard": 0.5641025641025641,
+      "cosine": 0.6511420011520386
+    },
+    {
+      "word1": "fast",
+      "word2": "rapid",
+      "human": 8.75,
+      "jaccard": 0.2777777777777778,
+      "cosine": 0.45353344082832336
+    },
+    {
+      "word1": "happy",
+      "word2": "glad",
+      "human": 9.17,
+      "jaccard": 0.4772727272727273,
+      "cosine": 0.38794758915901184
+    },
+    {
+      "word1": "short",
+      "word2": "long",
+      "human": 1.23,
+      "jaccard": 0.3870967741935484,
+      "cosine": 0.7486498355865479
+    },
+    {
+      "word1": "stupid",
+      "word2": "dumb",
+      "human": 9.58,
+      "jaccard": 0.6097560975609756,
+      "cosine": 0.6743265986442566
+    },
+    {
+      "word1": "weird",
+      "word2": "strange",
+      "human": 8.93,
+      "jaccard": 0.7105263157894737,
+      "cosine": 0.772314727306366
+    },
+    {
+      "word1": "wide",
+      "word2": "narrow",
+      "human": 1.03,
+      "jaccard": 0.4864864864864865,
+      "cosine": 0.6199569702148438
+    },
+    {
+      "word1": "bad",
+      "word2": "awful",
+      "human": 8.42,
+      "jaccard": 0.3333333333333333,
+      "cosine": 0.48516255617141724
+    },
+    {
+      "word1": "easy",
+      "word2": "difficult",
+      "human": 0.58,
+      "jaccard": 0.7096774193548387,
+      "cosine": 0.7770304679870605
+    },
+    {
+      "word1": "bad",
+      "word2": "terrible",
+      "human": 7.78,
+      "jaccard": 0.5294117647058824,
+      "cosine": 0.598186731338501
+    },
+    {
+      "word1": "hard",
+      "word2": "simple",
+      "human": 1.38,
+      "jaccard": 0.46153846153846156,
+      "cosine": 0.5987289547920227
+    },
+    {
+      "word1": "smart",
+      "word2": "dumb",
+      "human": 0.55,
+      "jaccard": 0.7368421052631579,
+      "cosine": 0.7999197244644165
+    },
+    {
+      "word1": "insane",
+      "word2": "crazy",
+      "human": 9.57,
+      "jaccard": 0.5882352941176471,
+      "cosine": 0.7379046082496643
+    },
+    {
+      "word1": "happy",
+      "word2": "mad",
+      "human": 0.95,
+      "jaccard": 0.4444444444444444,
+      "cosine": 0.37023457884788513
+    },
+    {
+      "word1": "large",
+      "word2": "huge",
+      "human": 9.47,
+      "jaccard": 0.5428571428571428,
+      "cosine": 0.7448605298995972
+    },
+    {
+      "word1": "hard",
+      "word2": "tough",
+      "human": 8.05,
+      "jaccard": 0.6363636363636364,
+      "cosine": 0.6893289685249329
+    }
+  ]
+}

@@ -200,6 +200,22 @@ def evaluate_subsumption(concept_data, hypernym_pairs, unrelated_pairs):
     precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
     f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
 
+    # Theoretical FP rate: (3/4)^k for k active bits
+    # Under random independent bits, P(A divides B) = product of P(bit_i(A)=1 implies bit_i(B)=1)
+    # For each active bit in A: P(that bit is also active in B) = activation_rate ~ 0.5
+    # But for subsumption: every factor of A must also be in B.
+    # Expected FP = (3/4)^k_mean where k_mean = mean active bits
+    active_bits_list = []
+    for d in true_pair_details + false_pair_details:
+        for key in ['hypernym', 'concept_a']:
+            if key in d and key.replace('hypernym', '').replace('concept_a', '') == '' :
+                concept_name = d.get('hypernym', d.get('concept_a', ''))
+                if concept_name in concept_data:
+                    active_bits_list.append(concept_data[concept_name].get('n_active', 0))
+    k_mean = float(np.mean(active_bits_list)) if active_bits_list else 0.0
+    fp_theoretical = (3.0 / 4.0) ** k_mean if k_mean > 0 else 1.0
+    fp_ratio = fpr / fp_theoretical if fp_theoretical > 0 else float('inf')
+
     # Similarity distributions
     true_sims = [d['similarity'] for d in true_pair_details]
     false_sims = [d['similarity'] for d in false_pair_details]
@@ -217,7 +233,10 @@ def evaluate_subsumption(concept_data, hypernym_pairs, unrelated_pairs):
         'f1': f1,
         'mean_related_similarity': float(np.mean(true_sims)) if true_sims else 0.0,
         'mean_unrelated_similarity': float(np.mean(false_sims)) if false_sims else 0.0,
-        'true_pair_details': true_pair_details[:20],  # save first 20 for inspection
+        'fp_theoretical': fp_theoretical,
+        'fp_ratio': fp_ratio,
+        'k_mean_active_bits': k_mean,
+        'true_pair_details': true_pair_details[:20],
         'false_pair_details': false_pair_details[:20],
     }
 
@@ -295,6 +314,8 @@ def main(args):
     print()
     print(f"  Subsumption Recall:    {subsumption['recall']:.1%} ({subsumption['true_positives']}/{subsumption['true_total']})")
     print(f"  Subsumption FPR:       {subsumption['fpr']:.1%} ({subsumption['false_positives']}/{subsumption['unrelated_total']})")
+    print(f"  FP theoretical (3/4)^k: {subsumption['fp_theoretical']:.3%} (k_mean={subsumption['k_mean_active_bits']:.1f})")
+    print(f"  FP ratio (obs/theo):   {subsumption['fp_ratio']:.2f}  {'ABOVE CHANCE' if subsumption['fp_ratio'] > 1.2 else 'AT CHANCE (kill K6)'}")
     print(f"  Precision:             {subsumption['precision']:.1%}")
     print(f"  Taxonomic F1:          {subsumption['f1']:.3f}")
     print()
@@ -349,6 +370,9 @@ def main(args):
             "true_negatives": subsumption['true_negatives'],
             "mean_related_similarity": subsumption['mean_related_similarity'],
             "mean_unrelated_similarity": subsumption['mean_unrelated_similarity'],
+            "fp_theoretical": subsumption['fp_theoretical'],
+            "fp_ratio_obs_over_theo": subsumption['fp_ratio'],
+            "k_mean_active_bits": subsumption['k_mean_active_bits'],
             "mean_related_jaccard": factors['mean_related_jaccard'],
             "mean_unrelated_jaccard": factors['mean_unrelated_jaccard'],
             "jaccard_gap": factors['jaccard_gap'],
