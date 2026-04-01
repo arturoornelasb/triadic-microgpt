@@ -563,9 +563,9 @@ Ornelas Brand, J. A. (2026). *reptimeline: Tracking Discrete Representation Evol
 
 **Triadic Emergent Duality** (ontological framework):
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19374914.svg)](https://doi.org/10.5281/zenodo.19374914)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19375167.svg)](https://doi.org/10.5281/zenodo.19375167) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19374914.svg)](https://doi.org/10.5281/zenodo.19374914)
 
-Ornelas Brand, J. A. (2026). *Triadic Emergent Duality: 14+ Candidate Dualities Across 6 Algebraic Layers*. Zenodo. https://doi.org/10.5281/zenodo.19374914
+Ornelas Brand, J. A. (2026). *Toward a Layered Ontology of Semantic Duality: 14 Candidate Dualities Across 6 Algebraic Layers with Preliminary Domain and Neural Evidence*. Zenodo. https://doi.org/10.5281/zenodo.19375167
 
 ## Credits
 
