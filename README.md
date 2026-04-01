@@ -561,6 +561,12 @@ Ornelas Brand, J. A. (2026). *Triadic Neurosymbolic Engine: Prime Factorization 
 
 Ornelas Brand, J. A. (2026). *reptimeline: Tracking Discrete Representation Evolution During Neural Network Training*. Zenodo. https://doi.org/10.5281/zenodo.19208672
 
+**Triadic Emergent Duality** (ontological framework):
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19374914.svg)](https://doi.org/10.5281/zenodo.19374914)
+
+Ornelas Brand, J. A. (2026). *Triadic Emergent Duality: 14+ Candidate Dualities Across 6 Algebraic Layers*. Zenodo. https://doi.org/10.5281/zenodo.19374914
+
 ## Credits
 
 - **Initial scaffolding**: Inspired by [Andrej Karpathy's nanoGPT](https://github.com/karpathy/nanoGPT)
