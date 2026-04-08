@@ -6,6 +6,8 @@
 [![License](https://img.shields.io/badge/license-BUSL--1.1-blue)](LICENSE)
 [![HF Model](https://img.shields.io/badge/%F0%9F%A4%97-triadic--gpt--40m-yellow)](https://huggingface.co/arturoornelasb/triadic-gpt-40m)
 [![HF Model](https://img.shields.io/badge/%F0%9F%A4%97-triadic--gpt2--medium-yellow)](https://huggingface.co/arturoornelasb/triadic-gpt2-medium)
+[![HF V8](https://img.shields.io/badge/%F0%9F%A4%97-triadic--gpt2--medium--v8-yellow)](https://huggingface.co/arturoornelasb/triadic-gpt2-medium-v8)
+[![HF V9](https://img.shields.io/badge/%F0%9F%A4%97-triadic--gptneo--125m--v9-yellow)](https://huggingface.co/arturoornelasb/triadic-gptneo-125m-v9)
 [![DOI Paper](https://zenodo.org/badge/DOI/10.5281/zenodo.19206545.svg)](https://doi.org/10.5281/zenodo.19206545)
 [![DOI Repo](https://zenodo.org/badge/DOI/10.5281/zenodo.19207845.svg)](https://doi.org/10.5281/zenodo.19207845)
 
