@@ -1,6 +1,6 @@
 {
     "title": "TriadicGPT: End-to-End Prime Factorization in a Generative Language Model",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "A 40M-parameter GPT language model augmented with a triadic projection head that produces discrete prime-factor signatures alongside standard next-token predictions. Learns triadic representations end-to-end through a dual-objective training loss. Includes triadic-head (standalone PyPI package), desktop UI (PySide6), and full training/evaluation pipeline.",
     "creators": [
         {
