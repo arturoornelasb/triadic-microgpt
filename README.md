@@ -13,6 +13,8 @@
 
 **End-to-end prime factorization in a generative language model.**
 
+> **This is paper P2 of a multi-paper research program.** For the full picture — Triadic Engine (P1), reptimeline (P3), Layered Duality Ontology (P4), and the formal Quaternionic Logic framework (P11–P13) — see [github.com/arturoornelasb](https://github.com/arturoornelasb).
+
 TriadicGPT is a 40M-parameter GPT that learns discrete prime-factor signatures alongside standard next-token prediction. A lightweight *triadic projection head* maps each token's hidden state to a binary vector, which encodes as a prime composite &Phi;(x) = &prod; p&#x1D62;. The result: algebraically verifiable representations learned jointly with language modeling at negligible language cost (+1.7% PPL). External SimLex-999 evaluation positions the system as *algebraic encoding* (analogy/subsumption/composition) rather than graded semantic similarity.
 
 ```
