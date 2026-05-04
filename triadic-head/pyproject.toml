@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "triadic-head"
-version = "0.1.0"
-description = "Drop-in triadic projection head for any HuggingFace transformer. Adds interpretable prime-factor semantic signatures at zero language cost."
+version = "0.1.1"
+description = "Drop-in triadic projection head for any HuggingFace transformer. Adds interpretable prime-factor algebraic signatures at negligible language cost (+1.7% PPL)."
 readme = "README.md"
 license = {text = "BUSL-1.1"}
 requires-python = ">=3.9"

@@ -6,6 +6,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## [0.3.0] - 2026-05-03
 
+### triadic-head package: bumped to v0.1.1
+- README BibTeX title corrected: "Emergent Algebraic Semantics" → "Learned Algebraic Encoding"
+- README "InfoNCE closes 72% of gap" → "48% of gap" (audit correction)
+- Added Zenodo DOI badge + `doi`/`publisher` fields in BibTeX entry
+- Description: "zero language cost" → "negligible language cost (+1.7% PPL)"
+- No source code changes (algebra.py, wrapper.py unchanged)
+
 ### Fixed (paper audit, commit dba2d54)
 - **SimLex cosine claim corrected**: Run 15 cosine ρ = 0.046 (p = 0.144, NS), not 0.083/0.009 — that value belonged to sparse-v1 fine-tuned variant. Reframed paper as *algebraic encoding without semantic grounding* across abstract, discussion, conclusion.
 - **`tab:ternary` D-A14 v2 lang loss**: 0.946 → 0.974 (training_log.csv)

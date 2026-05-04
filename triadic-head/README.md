@@ -193,7 +193,7 @@ Works with any HuggingFace `AutoModelForCausalLM`:
 ```bibtex
 @article{ornelas2026triadic,
   title={End-to-End Prime Factorization in a Generative Language Model:
-         Emergent Algebraic Semantics from Joint Training},
+         Learned Algebraic Encoding from Joint Training},
   author={Ornelas Brand, J. Arturo},
   year={2026},
   doi={10.5281/zenodo.19206545},
