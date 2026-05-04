@@ -67,7 +67,7 @@ Across 29+ training runs and systematic ablation studies, we demonstrate five pr
 and (5)~\textbf{compositional analysis} reveals that the bit space functions as a compositional representation---round-trip accuracy (98.1\%) far exceeds the multiplicative prediction (81.9\%), two-step chains show sub-linear error accumulation, and fork analysis confirms that the mechanism is ontologically categorical, not vectorial.
 Additional ablations (bits sweep across $k \in \{8$--$128\}$, discovery loop expanding from 50 to 158 anchors) are detailed in the body.
 
-\microgpt{} achieves 98\% analogy verification (50/51 analogies), 100\% signature uniqueness, and reproducible semantic ordering ($+0.038 \pm 0.005$ gap, $n=3$, 95\% CI positive)---all within a single forward pass. Critically, the triadic head's value lies in \emph{algebraic operations}: 100\% analogy verification, 87.1\% held-out subsumption, and sub-linear compositional chaining, none of which random projections can provide. External evaluation on SimLex-999 reveals that binarization limits semantic grounding (Jaccard $\rho = -0.012$; cosine on continuous projections $\rho = 0.083$, $p = 0.009$), motivating the characterization as \emph{algebraic encoding} rather than algebraic semantics. Sparse fine-tuning further reveals a fundamental sparsity--compositionality trade-off: dense codes preserve compositional structure while sparse codes enable subsumption, but no single configuration satisfies both.
+\microgpt{} achieves 98\% analogy verification (50/51 analogies), 100\% signature uniqueness, and reproducible semantic ordering ($+0.038 \pm 0.005$ gap, $n=3$, 95\% CI positive)---all within a single forward pass. Critically, the triadic head's value lies in \emph{algebraic operations}: 100\% analogy verification, 87.1\% held-out subsumption, and sub-linear compositional chaining, none of which random projections can provide. External evaluation on SimLex-999 reveals that the system does not capture graded semantic similarity (Jaccard $\rho = -0.012$, cosine $\rho = 0.046$; neither significant), motivating the characterization as \emph{algebraic encoding} rather than algebraic semantics. Sparse fine-tuning further reveals a fundamental sparsity--compositionality trade-off: dense codes preserve compositional structure while sparse codes enable subsumption, but no single configuration satisfies both.
 
 \end{abstract}
 
@@ -284,7 +284,7 @@ All operations require only integer arithmetic (GCD, LCM, trial division), avoid
 \subsection{Ablation: Near-Zero Language Cost}
 \label{sec:ablation}
 
-To isolate the effect of the triadic head, we compare Run~15 (full triadic training, $\alpha = 0.05$) against Run~18 (ablation: $\alpha = 0$, triadic head receives no gradient).
+To isolate the effect of the triadic head, we compare Run~15 (full triadic training, $\alpha = 0.05$) against Run~18 (ablation: $\alpha = 0$, triadic head receives no gradient). Table~\ref{tab:ablation} reports the results.
 
 \begin{table}[h]
 \centering
@@ -323,14 +323,17 @@ Scale & Params & Loss & Entropy & Unique\% & Gap & Probe & Verif \\
 Small (4L/128D)  & 1.3M  & 2.536 & 0.489 & 61.1\%  & $-0.076$ & 7.1\% & 61.5\% \\
 Medium (6L/256D) & 5.8M  & 1.863 & 0.688 & 100\%   & $-0.040$ & 4.8\% & 46.2\% \\
 Large (8L/384D)  & 15.9M & 1.512 & 0.652 & 100\%   & $-0.034$ & 6.0\% & 46.2\% \\
-\textbf{XL (12L/512D)} & \textbf{40.0M} & \textbf{0.946} & \textbf{0.679} & \textbf{100\%} & $\mathbf{+0.020}$ & \textbf{10.1\%}$^\dagger$ & \textbf{69.2\%} \\
+\textbf{XL (12L/512D)} & \textbf{40.0M} & \textbf{0.946} & \textbf{0.679}$^\ddagger$ & \textbf{100\%} & $\mathbf{+0.020}$ & \textbf{10.1\%}$^\dagger$ & \textbf{69.2\%} \\
 \bottomrule
 \end{tabular}
 \vspace{2pt}
+
 {\footnotesize $^\dagger$XL probe accuracy from dedicated interpretability benchmark (109 concepts, 13 categories). The scaling study's inline probe on 84 concepts yields 8.3\%.}
+
+{\footnotesize $^\ddagger$Entropy here uses hard binarization on 84 concepts (scaling-study inline method); a dedicated bit\_entropy benchmark using continuous probabilities on 112 concepts yields $0.749$ for the same model (Run~15). See Figure~\ref{fig:bit_entropy}. Table~\ref{tab:pareto} reports entropy via the dedicated benchmark.}
 \end{table}
 
-The semantic gap---defined as the difference between mean Jaccard similarity for related pairs and mean Jaccard similarity for unrelated pairs---improves \emph{monotonically} with scale: $-0.076 \rightarrow -0.040 \rightarrow -0.034 \rightarrow +0.020$. The gap crosses zero between the Large (15.9M) and XL (40M) scales; an interpolation study places the crossover at approximately 20M parameters, with a smooth gradual transition rather than an abrupt jump.
+The semantic gap---defined as the difference between mean Jaccard similarity for related pairs and mean Jaccard similarity for unrelated pairs---improves \emph{monotonically} with scale: $-0.076 \rightarrow -0.040 \rightarrow -0.034 \rightarrow +0.020$. The gap crosses zero between the Large (15.9M) and XL (40M) scales; an interpolation study places the crossover at approximately 20M parameters, with a smooth gradual transition rather than an abrupt jump (Figure~\ref{fig:scaling_gap}).
 
 \textbf{Confound note:} The scale presets co-vary bit count with model size (Small: $k=16$, Medium: $k=32$, Large: $k=48$, XL: $k=64$), following the design rationale that larger models warrant more expressive projections. This means the scaling trend reflects joint effects of capacity \emph{and} bit-width. The independent bits sweep (Section~\ref{sec:bits}, XL architecture held constant) isolates the bit-width effect and confirms that $k=32$--$64$ is optimal for a 40M-parameter model.
 
@@ -349,7 +352,7 @@ Notably, bit entropy and signature diversity saturate much earlier (at $\sim$6M 
 \subsection{Bits Sweep: Optimal Bit-Width}
 \label{sec:bits}
 
-Fixing the XL architecture, we vary the number of triadic bits $k \in \{8, 16, 32, 48, 64, 128\}$ while keeping all other hyperparameters constant.
+Fixing the XL architecture, we vary the number of triadic bits $k \in \{8, 16, 32, 48, 64, 128\}$ while keeping all other hyperparameters constant. Results are summarized in Table~\ref{tab:bits}.
 
 \begin{table}[h]
 \centering
@@ -363,7 +366,7 @@ $k$ & Loss & Entropy & Unique\% & Gap & Probe & Verif \\
 16  & 1.028 & 0.512 & 67.3\%  & $-0.016$ & 10.7\% & 38.5\% \\
 \textbf{32}  & \textbf{0.996} & \textbf{0.597} & \textbf{98.2\%}  & $\mathbf{+0.052}$ & \textbf{9.5\%}  & 46.2\% \\
 48  & 0.960 & 0.633 & 100\%   & $-0.059$ & 9.5\%  & \textbf{69.2\%} \\
-\textbf{64}  & \textbf{0.946} & 0.679 & 100\%   & $+0.020$ & 10.1\%  & \textbf{69.2\%} \\
+\textbf{64}  & \textbf{0.946} & 0.679 & 100\%   & $+0.020$ & 8.3\%   & \textbf{69.2\%} \\
 128 & 1.067 & 0.684 & 100\%   & $-0.012$ & 9.5\%  & 53.8\% \\
 \bottomrule
 \end{tabular}
@@ -371,11 +374,18 @@ $k$ & Loss & Entropy & Unique\% & Gap & Probe & Verif \\
 
 Several findings emerge:
 
-\paragraph{U-shaped language loss.} The language loss is minimized at $k=64$ (0.946) and increases on both sides: $k=8$ (1.046) and $k=128$ (1.067). Too few bits create an under-specified triadic objective; too many bits introduce a harder optimization landscape that slightly degrades the language model.
+\paragraph{U-shaped language loss.} The language loss is minimized at $k=64$ (0.946) and increases on both sides: $k=8$ (1.046) and $k=128$ (1.067). Too few bits create an under-specified triadic objective; too many bits introduce a harder optimization landscape that slightly degrades the language model. Figure~\ref{fig:bits_loss} visualizes the U-shape with all six datapoints.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/bits_sweep_loss.png}
+    \caption{Language loss vs.\ triadic bit width (XL architecture fixed). Loss exhibits a clear U-shape with minimum at $k=64$ ($0.946$); both ends degrade---under-specification at $k=8$ ($1.046$) and harder optimization at $k=128$ ($1.067$).}
+    \label{fig:bits_loss}
+\end{figure}
 
 \paragraph{Best semantic gap at $k=32$.} Despite having fewer bits, $k=32$ achieves the highest semantic gap ($+0.052$), exceeding $k=64$ ($+0.020$). The information bottleneck appears to \emph{improve} semantic compression: with fewer bits, the model is forced to allocate them to the most semantically discriminative features.
 
-\paragraph{Analogy verification peaks at $k=48$--$64$.} Both achieve 69.2\% on the original 13-quad evaluation (expanded to 98\% on 51 quads at $k=64$; see Section~\ref{sec:benchmarks}). Analogy requires sufficient bit resolution to capture the fine-grained ``transform'' between concept pairs, favoring moderate-to-high bit counts.
+\paragraph{Analogy verification peaks at $k=48$--$64$.} Both achieve 69.2\% on the original 13-quad evaluation (expanded to 98\% on 51 quads at $k=64$; see Section~\ref{sec:benchmarks}). Analogy requires sufficient bit resolution to capture the fine-grained ``transform'' between concept pairs, favoring moderate-to-high bit counts. Figure~\ref{fig:bits_panel} visualizes all four supplementary metrics jointly.
 
 \paragraph{Shift from post-hoc regime.} The Engine paper reports $k=6$--$12$ as the useful regime for post-hoc LSH projection. End-to-end training shifts this to $k=32$--$64$: the model learns to \emph{use} more bits effectively when they are jointly optimized.
 
@@ -384,6 +394,13 @@ Several findings emerge:
     \includegraphics[width=0.85\textwidth]{figures/bits_sweep_semantic_gap.png}
     \caption{Semantic gap vs.\ bit width. $k=32$ achieves the best gap ($+0.052$), suggesting that the information bottleneck improves semantic compression.}
     \label{fig:bits_gap}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/bits_sweep_panel.png}
+    \caption{Comprehensive bits sweep at XL scale: bit entropy saturates at $k \geq 32$, signature diversity reaches 100\% by $k=48$, linear probe accuracy stays near random ($\sim$8--11\%, dotted) across all $k$, and analogy verification peaks at $k=48$--$64$ ($69.2\%$). Together with Figures~\ref{fig:bits_loss} and~\ref{fig:bits_gap}, these panels show that $k=32$--$64$ is the practical sweet spot for end-to-end triadic training.}
+    \label{fig:bits_panel}
 \end{figure}
 
 
@@ -402,7 +419,7 @@ We evaluate the XL model (Run~15) on three triadic-specific benchmarks.
 \subsection{Full Projection Comparison (Experiment 9)}
 \label{sec:comparison}
 
-We benchmark \microgpt{} against all four projection modes of the Triadic-Neurosymbolic-Engine on identical concept sets (111 concepts, 12 related/unrelated pairs, 12 analogies). All Engine modes use \texttt{all-MiniLM-L6-v2} (22M parameters, pre-trained on 1B sentence pairs) as the embedding backbone with $k=64$ bits.
+We benchmark \microgpt{} against all four projection modes of the Triadic-Neurosymbolic-Engine on identical concept sets (111 concepts, 12 related/unrelated pairs, 12 analogies). All Engine modes use \texttt{all-MiniLM-L6-v2} (22M parameters, pre-trained on 1B sentence pairs) as the embedding backbone with $k=64$ bits. Table~\ref{tab:comparison} reports the full comparison.
 
 \begin{table}[h]
 \centering
@@ -448,7 +465,7 @@ Through three runs at different triadic strengths, we identify a narrow optimal 
 
 \begin{table}[h]
 \centering
-\caption{Pareto frontier: there is a cliff between $\alpha = 0.05$ and $\alpha = 0.10$.}
+\caption{Pareto frontier: there is a cliff between $\alpha = 0.05$ and $\alpha = 0.10$. Entropy values from the dedicated bit\_entropy benchmark (continuous probabilities on 112 concepts); the scaling-study inline method (hard binarization on 84 concepts) yields $0.679$ for Run~15---see Table~\ref{tab:scaling} and Figure~\ref{fig:bit_entropy}.}
 \label{tab:pareto}
 \begin{tabular}{cccccl}
 \toprule
@@ -469,7 +486,7 @@ Entropy \emph{increases} slightly with stronger triadic pressure (0.749 $\righta
 
 The comparison in Section~\ref{sec:comparison} identified the gap between \microgpt{} and the Engine as primarily embedding-driven. To test whether richer embeddings can close this gap, we attach the triadic projection head (49K new parameters) to pre-trained GPT-2 Small (124M parameters, 768D, 12 layers trained on WebText)~\citep{radford2019gpt2}. Training proceeds in two phases: (1)~backbone frozen, only triadic head trainable (5K steps); (2)~unfreeze last 2 transformer layers plus final layer norm (10K steps).
 
-We test all three alignment loss formulations on this transfer setup, with identical hyperparameters ($\alpha=0.05$, $\lambda_{\text{ent}}=1.0$, $\lambda_{\text{align}}=5.0$).
+We test all three alignment loss formulations on this transfer setup, with identical hyperparameters ($\alpha=0.05$, $\lambda_{\text{ent}}=1.0$, $\lambda_{\text{align}}=5.0$). Table~\ref{tab:transfer} reports the results.
 
 \begin{table}[h]
 \centering
@@ -482,7 +499,7 @@ Metric & MSE & Rank & \textbf{InfoNCE} & From-scratch & Engine PCA \\
 Semantic Gap    & $+0.011$ & $+0.047$ & $\mathbf{+0.076}$ & $+0.020$ & $+0.136$ \\
 Bit Entropy     & 0.601    & 0.542    & 0.534             & 0.680    & 0.947 \\
 Analogy Verif   & 75.0\%   & \textbf{83.3\%} & \textbf{100.0\%} & 66.7\%   & 91.7\% \\
-Unique Sigs     & 100\%    & 100\%    & 100\%             & 100\%    & 100\% \\
+Unique Sigs     & 100\%    & 100\%    & 99.1\%            & 100\%    & 100\% \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -495,7 +512,7 @@ Unique Sigs     & 100\%    & 100\%    & 100\%             & 100\%    & 100\% \\
 
 \subsubsection{Loss--Embedding Interaction}
 
-To test whether InfoNCE universally dominates, we apply all three losses to the from-scratch \microgpt{} (40M parameters, 512D embeddings trained on TinyStories).
+To test whether InfoNCE universally dominates, we apply all three losses to the from-scratch \microgpt{} (40M parameters, 512D embeddings trained on TinyStories). Table~\ref{tab:interaction} contrasts both regimes.
 
 \begin{table}[h]
 \centering
@@ -545,7 +562,7 @@ This penalizes only the bits where the hypernym is more active than the hyponym,
 
 \paragraph{Training data.} We train on 45 hypernym--hyponym pairs across 7 categories (animal, person, feeling, food, color, place, time) and evaluate on 12 held-out pairs from 4 categories (e.g., animal$\rightarrow$tiger, person$\rightarrow$man, food$\rightarrow$pizza, place$\rightarrow$castle).
 
-\paragraph{Base-scale results.} At 6L/256D (5.8M parameters, 10K steps):
+\paragraph{Base-scale results.} At 6L/256D (5.8M parameters, 10K steps), Table~\ref{tab:sub_base} reports the effect of two subsumption-loss weights:
 
 \begin{table}[h]
 \centering
@@ -566,7 +583,7 @@ Inheritance (test)    & 71.5\% & 96.7\% & \textbf{97.9\%} \\
 
 Remarkably, the subsumption loss \emph{improves} language modeling (1.810 $\rightarrow$ 1.707). This suggests that hierarchical semantic structure provides a beneficial inductive bias, acting as implicit regularization. At base scale, subsumption is a free lunch.
 
-\paragraph{XL-scale validation.} At 12L/512D (40M parameters), training with $\loss{sub}$ ($\lambda=5$) for 50K steps reveals a clear overfitting dynamic. We evaluate at two checkpoints:
+\paragraph{XL-scale validation.} At 12L/512D (40M parameters), training with $\loss{sub}$ ($\lambda=5$) for 50K steps reveals a clear overfitting dynamic. We evaluate at two checkpoints (Table~\ref{tab:sub_xl}):
 
 \begin{table}[h]
 \centering
@@ -589,7 +606,7 @@ Dead bits         & \textbf{15}    & 37               & 22 \\
 
 The 25K checkpoint achieves \textbf{100\% held-out subsumption}---all 12 unseen pairs pass exact prime divisibility. This is the first demonstration of non-trivial algebraic subsumption at $k=64$ with 40M parameters. The language cost (PPL +47\%) is real but expected: at XL scale, the subsumption loss competes with language modeling rather than complementing it as at base scale. After 25K steps, continued training \emph{degrades} subsumption (100\% $\rightarrow$ 66.7\%), indicating overfitting of the auxiliary objective.
 
-\paragraph{Learned information hierarchy.} An unexpected finding: the model autonomously learns to make hypernym signatures \emph{sparse}. Without any supervision about concept abstractness, hypernyms converge to 1--6 active bits (vs.\ $\sim$35 at baseline):
+\paragraph{Learned information hierarchy.} An unexpected finding: the model autonomously learns to make hypernym signatures \emph{sparse}. Without any supervision about concept abstractness, hypernyms converge to 1--6 active bits (vs.\ $\sim$35 at baseline; see Table~\ref{tab:hierarchy}):
 
 \begin{table}[h]
 \centering
@@ -633,7 +650,7 @@ The preceding experiments demonstrate that \microgpt{} learns algebraic structur
 A stronger test asks: \emph{can algebraic composition generalize to concepts the model has never directly encoded?}
 
 We train an XL model (40M parameters, 50K steps) with supervised triadic targets on 24 anchor concepts drawn from the 63-primitive inventory, then evaluate 23 held-out concepts partitioned into two groups: 14 \emph{R3-reachable} concepts, each derivable via at least one analogy quad (e.g., \texttt{king:queen::man:?} $\rightarrow$ \texttt{woman}), and 9 \emph{control} concepts with no algebraic path.
-The per-bit majority-class baseline for this inventory is 90.2\%.
+The per-bit majority-class baseline for this inventory is 90.2\%. Table~\ref{tab:bootstrap} contrasts direct encoding against the algebraic-transfer pathway.
 
 \begin{table}[h]
 \centering
@@ -668,7 +685,7 @@ The analogy \emph{man{:}woman{::}king{:}?} recovers all 63~bits perfectly---\tex
 
 The original $\tanh$-based triadic head suffers from two related problems: (1)~$\sim$42\% of bits become ``dead'' (entropy $< 0.3$), and (2)~adding a subsumption loss to encourage algebraic structure destroys language quality (+47\% perplexity; see Section~\ref{sec:subsumption}). Both problems trace to $\tanh$ saturation, which freezes gradients and prevents the model from adjusting bit assignments without damaging shared representations.
 
-We test two fixes: replacing the activation function (iFSQ: $2\sigma(1.6x)-1$), and switching from binary to ternary quantization ($\{-1, 0, +1\}$ via rounding + STE). Three models are trained at XL scale (40M params, 50K steps), plus a scaling test on GPT-2 Medium (355M):
+We test two fixes: replacing the activation function (iFSQ: $2\sigma(1.6x)-1$), and switching from binary to ternary quantization ($\{-1, 0, +1\}$ via rounding + STE). Three models are trained at XL scale (40M params, 50K steps), plus a scaling test on GPT-2 Medium (355M); Table~\ref{tab:ternary} reports all variants:
 
 \begin{table}[h]
 \centering
@@ -679,17 +696,17 @@ We test two fixes: replacing the activation function (iFSQ: $2\sigma(1.6x)-1$), 
 \toprule
 Model & Activation & States & Lang loss & Sub train & Sub test & Ternary ($-$/$0$/$+$) \\
 \midrule
-D-A5 (baseline) & $\tanh$ & binary & 0.946 & 0\% & 0\% & --- \\
+Run 15 (baseline) & $\tanh$ & binary & 0.946 & 0\% & 0\% & --- \\
 D-A10 iFSQ binary & iFSQ & binary & \textbf{0.924} & 100\% & \textbf{87.1\%} & --- \\
 D-A8 FSQ ternary & iFSQ & ternary & 0.951 & 100\% & 86.5\% & 1.3/73.3/25.3 \\
 \midrule
 D-A13 GPT-2 Med. (v1) & iFSQ & ternary & 2.73$^\dagger$ & 100\% & 100\%$^\ddagger$ & 74.1/0.0/25.9 \\
-D-A17 GPT-2 Med. (v2) & tanh & ternary & 2.73$^\dagger$ & 2.0\% & 1.7\% & 69.3/3.4/27.3 \\
+D-A17 GPT-2 Med. (v2) & tanh & ternary & 3.10$^\dagger$ & 2.0\% & 1.7\% & 69.3/3.4/27.3 \\
 D-A19 GPT-2 Med. (fix) & iFSQ & ternary & 2.63$^\dagger$ & 100\% & 76.9\% & 70.8/1.0/28.2 \\
 \midrule
 \multicolumn{7}{c}{\textbf{Supervised 63-bit models (40M, custom BPE)}} \\
 \midrule
-D-A14 v2 (158 anchors) & tanh & ternary & 0.946 & 100\% & \textbf{98.3\%} & 28.6/41.3/30.1 \\
+D-A14 v2 (158 anchors) & tanh & ternary & 0.974 & 100\% & \textbf{98.3\%} & 28.6/41.3/30.1 \\
 D-A18 hybrid (30s+33f) & iFSQ & ternary$^*$ & \textbf{0.923} & 99.4\% & 96.5\% & 0.0/61.4/38.6 \\
 \bottomrule
 \multicolumn{7}{l}{\footnotesize $^\dagger$Not comparable: GPT-2 tokenizer (50K vocab) vs.\ custom BPE (4K vocab).} \\
@@ -704,7 +721,7 @@ Second, \textbf{the activation function is the critical variable, not ternary qu
 
 Third, \textbf{the ternary model produces a clean three-state distribution}: 1.3\% negative (present), 73.3\% zero (irrelevant), 25.3\% positive (absent). The 73\% zero rate is consistent with BitNet b1.58's independently discovered $\sim$42\% weight zeros~\citep{ma2024bitnet}, adjusted for the difference between network weights (distributed symmetrically) and concept activations (where ``irrelevant'' is the dominant state). This three-state structure maps directly to the ontological framework from which the triadic system originates: \emph{presence} ($+1$), \emph{absence} ($-1$), and \emph{void/irrelevance} ($0$).
 
-Fourth, \textbf{scaling the backbone improves bit accuracy but destroys algebraic structure}. D-A13 attaches the same iFSQ ternary head to GPT-2 Medium (355M params, two-phase training: frozen backbone for 5K steps, then unfreeze last 4 layers for 45K steps). Holdout bit accuracy reaches 89.4\%, and subsumption appeared perfect on the initial 13-pair test set ($n=13$). However, when evaluated with the expanded v2 anchor set ($n=158$, 179 holdout subsumption pairs), the picture reverses dramatically. D-A17 (same 355M backbone, v2 anchors) achieves \emph{higher} bit accuracy (97.7\%) but \emph{catastrophically lower} subsumption: 1.7\% on 179 test pairs, compared to 98.3\% for the 40M model (D-A14 v2). The ternary distribution collapses to near-binary: 69.3\%/3.4\%/27.3\% (vs.\ 28.6\%/41.3\%/30.1\% for D-A14).
+Fourth, \textbf{scaling the backbone improves bit accuracy but destroys algebraic structure}. D-A13 attaches the same iFSQ ternary head to GPT-2 Medium (355M params, two-phase training: frozen backbone for 5K steps, then unfreeze last 4 layers for 45K steps). Holdout bit accuracy reaches 88.0\%, and subsumption appeared perfect on the initial 13-pair test set ($n=13$). However, when evaluated with the expanded v2 anchor set ($n=158$, 179 holdout subsumption pairs), the picture reverses dramatically. D-A17 (same 355M backbone, v2 anchors) achieves \emph{higher} bit accuracy (97.7\%) but \emph{catastrophically lower} subsumption: 1.7\% on 179 test pairs, compared to 98.3\% for the 40M model (D-A14 v2). The ternary distribution collapses to near-binary: 69.3\%/3.4\%/27.3\% (vs.\ 28.6\%/41.3\%/30.1\% for D-A14).
 
 The mechanism is clear: without the zero state ($\sim$42\% in D-A14), subsumption via $(A \mathbin{\&} B) = B$ is rarely satisfiable---when all bits are $\pm 1$, the bit-subset relation becomes combinatorially unlikely.
 
@@ -730,7 +747,7 @@ This means the errors in $D_{\text{pred}}$ are \emph{coherent} with the transfor
 
 This reveals that the Rule of Three does \textbf{not} operate like word2vec's parallelogram model, where $\vec{king} - \vec{man} \approx \vec{queen} - \vec{woman}$ as parallel vectors. Instead, each concept pair activates different bits: the transformation is \emph{concept-specific}, operating through categorical bit-pattern logic rather than shared directional geometry. This is consistent with the underlying 7-layer ontological structure, where each layer governs different semantic primitives.
 
-\paragraph{Transitive chains.} We construct 30 two-step chains: apply relationship $R_1$ to get an intermediate $D_{\text{pred}}$, then apply a different relationship $R_2$ to $D_{\text{pred}}$. If errors compounded multiplicatively, 2-step accuracy should be $\sim$82.8\%. Actual: \textbf{87.4\%} ($+4.5$~pp above multiplicative prediction). The predicted outputs carry sufficient structural information to support a second transformation.
+\paragraph{Transitive chains.} We construct 30 two-step chains: apply relationship $R_1$ to get an intermediate $D_{\text{pred}}$, then apply a different relationship $R_2$ to $D_{\text{pred}}$. If errors compounded multiplicatively, 2-step accuracy should be $\sim$82.8\%. Actual: \textbf{87.4\%} ($+4.5$~pp above multiplicative prediction). The predicted outputs carry sufficient structural information to support a second transformation. Table~\ref{tab:composition} summarizes all three composition tests.
 
 \begin{table}[h]
 \centering
@@ -762,7 +779,7 @@ The most significant finding is that meaningful prime-factor representations can
 The subsumption experiment reveals a striking learned behavior: when trained with the subsumption loss, the model discovers that abstract concepts should have fewer active bits than concrete ones. Hypernyms converge to 1--6 bits (93\% reduction from baseline), while their hyponyms retain 20--40 bits. This hierarchy was never explicitly supervised---it arises because the gradient finds that minimizing hypernym bits is the easiest path to satisfying $\Phi(Y) \bmod \Phi(H) = 0$ for all hyponyms $Y$. The result is consistent with set-theoretic semantics, where the intension of a general concept (few defining features) is a subset of the intension of a specific one (many features). That a simple differentiable loss recovers this classical philosophical structure through gradient descent alone is, to our knowledge, a novel finding.
 
 \paragraph{What the triadic head actually provides.}
-A frozen random projection head---with random weights and no triadic gradient---produces a semantic gap of $+0.056$, \emph{higher} than the trained head's $+0.038$. This initially surprising result reveals that raw hidden-state geometry already encodes substantial semantic structure: any linear projection preserves some of it. However, the trained head's value is not in semantic gap but in \emph{algebraic operations}: 98\% analogy verification vs.\ 16.7\% for random projections, and 92--100\% subsumption vs.\ 0\%. The triadic head learns to \emph{organize} bits for algebraic composability---subsumption via divisibility, analogy via factor transfer---capabilities that random projections cannot provide despite their higher raw similarity metrics. Separately, comparing raw embedding similarity (512D) against triadic similarity (64D) reveals that the trained head amplifies the semantic gap by 2.6$\times$ ($+0.014$ embeddings $\rightarrow$ $+0.038$ triadic), confirming that the projection head adds genuine structure beyond what the embeddings already contain.
+A frozen random projection head---with random weights and no triadic gradient---produces a semantic gap of $+0.056$, \emph{higher} than the trained head's $+0.038$. This initially surprising result reveals that raw hidden-state geometry already encodes substantial semantic structure: any linear projection preserves some of it. However, the trained head's value is not in semantic gap but in \emph{algebraic operations}: 98\% analogy verification vs.\ 16.7\% for random projections, and 92--100\% subsumption vs.\ 0\%. The triadic head learns to \emph{organize} bits for algebraic composability---subsumption via divisibility, analogy via factor transfer---capabilities that random projections cannot provide despite their higher raw similarity metrics. Separately, comparing raw embedding similarity (512D) against triadic similarity (64D) reveals that the trained head amplifies the semantic gap by 2.6$\times$ ($+0.014$ embeddings $\rightarrow$ $+0.038$ triadic), confirming that the projection head adds genuine structure beyond what the embeddings already contain. Table~\ref{tab:random-baseline} reports the controlled 10K-step comparison.
 
 \begin{table}[h]
 \centering
@@ -810,9 +827,9 @@ An independent validation comes from comparing the 63 ontological primitives wit
 A negative subsumption test on semantically unrelated concept pairs reveals a false positive rate of 24.1\%: pairs like (\emph{red}, \emph{blue}) pass the bit-subset test despite having no hypernym--hyponym relationship. The root cause is dead bits: with $\sim$30 bits permanently OFF, most concepts share the same inactive bits, making the subset relation trivially satisfied. The ternary representation (Section~\ref{sec:ternary}) addresses this by distinguishing zero (irrelevant) from negative (actively absent), preventing shared zeros from creating spurious subset relationships. Conversely, the D-A17 scaling experiment (Section~\ref{sec:ternary}) demonstrates the opposite pathology: when ternary zeros collapse from $\sim$42\% to 3.4\%, subsumption drops from 98.3\% to 1.7\% because the bit-subset relation becomes unsatisfiable. A follow-up experiment (D-A19) restored the full four-component triadic loss and differentiable subsumption to the 355M model, recovering 76.9\% subsumption and 100\% analogy verification---demonstrating that the D-A17 failure was caused by training bugs (alignment-only loss, non-differentiable subsumption), not an inherent scale limitation. Together, these findings bracket the optimal ternary sparsity: \emph{too many} zeros create false positives; \emph{too few} prevent any subsumption at all. The $\sim$42\% zero rate observed in D-A14 appears to be the structural optimum, though D-A19 shows that algebraic capability can be partially recovered even without matching this rate.
 
 \paragraph{External semantic evaluation and the sparsity--compositionality trade-off.}
-We evaluate the learned representations against SimLex-999~\citep{hill2015simlex}, a benchmark of 999 human-judged word similarity pairs. On the final model (Run~15, 64 bits, $\sim$29.8 mean active bits), Jaccard similarity on binary signatures yields $\rho = -0.012$ ($p = 0.70$), failing to capture graded similarity judgments. However, cosine similarity on the \emph{continuous} projections (before binarization) yields $\rho = 0.083$ ($p = 0.009$), indicating that the triadic head learns a weak but significant semantic signal that binarization destroys. This motivates characterizing the system as an \emph{algebraic encoding with limited semantic grounding}: the binary codes support algebraic operations (analogy, subsumption, composition) but do not capture continuous semantic similarity.
+We evaluate the learned representations against SimLex-999~\citep{hill2015simlex}, a benchmark of 999 human-judged word similarity pairs. On the final model (Run~15, 64 bits, $\sim$29.8 mean active bits), Jaccard similarity on binary signatures yields $\rho = -0.012$ ($p = 0.71$), failing to capture graded similarity judgments. Cosine similarity on the \emph{continuous} projections (before binarization) is also not significant ($\rho = 0.046$, $p = 0.14$), indicating that the model itself does not encode SimLex-style graded similarity at this scale---the limitation is not solely caused by binarization but reflects the absence of continuous semantic structure in the triadic head's outputs. This motivates characterizing the system as an \emph{algebraic encoding without semantic grounding}: the prime-factor codes support algebraic operations (analogy, subsumption, composition) but do not capture continuous semantic similarity. A sparse fine-tuning variant (sparse-v1, $\sim$22.7 active bits) does show a weak but significant cosine correlation ($\rho = 0.087$, $p = 0.006$), suggesting that more compact codes retain a small continuous semantic signal that 64-bit dense representations do not.
 
-Sparse fine-tuning experiments (4 variants, 5K--10K steps) reveal a fundamental \emph{sparsity--compositionality trade-off}. Dense signatures ($\sim$29.8/64 active bits) preserve compositional structure: Run~15 achieves an analogy verification gap of $+15.4$~pp between valid and invalid analogies. Sparse signatures ($\sim$20/64 active bits) enable subsumption detection: false-positive rates exceed the $(3/4)^k$ random baseline by $3.7$--$26.5\times$, with precision $75$--$85\%$ on hypernym pairs. However, no configuration satisfies both: sparse-v4 (20.5 bits) degrades the analogy gap to $+7.1$~pp, and sparse-v5 (20.3 bits) inverts it to $-4.2$~pp. The trade-off appears fundamental: compositionality requires rich, overlapping codes to distinguish related from unrelated compositions, while subsumption requires sparse codes where bit-subset relations are informative rather than trivially satisfied by shared inactive bits. Run~15 (dense, original) is therefore our final model, prioritizing the validated compositional finding (K4~PASS) over the low-recall subsumption finding.
+Sparse fine-tuning experiments (4 variants, 5K--10K steps) reveal a fundamental \emph{sparsity--compositionality trade-off}. Dense signatures ($\sim$29.8/64 active bits) preserve compositional structure: Run~15 achieves an analogy verification gap of $+15.4$~pp between valid and invalid analogies. Sparse signatures ($\sim$16--23/64 active bits) enable subsumption detection: false-positive rates exceed the $(3/4)^k$ random baseline by $3.7$--$26.5\times$, with precision $75$--$85\%$ on hypernym pairs. However, no configuration satisfies both: sparse-v4 (16.4 bits) degrades the analogy gap to $+7.1$~pp, and sparse-v5 (15.9 bits) inverts it to $-4.2$~pp. The trade-off appears fundamental: compositionality requires rich, overlapping codes to distinguish related from unrelated compositions, while subsumption requires sparse codes where bit-subset relations are informative rather than trivially satisfied by shared inactive bits. Run~15 (dense, original) is therefore our final model, prioritizing the validated compositional finding (K4~PASS) over the low-recall subsumption finding.
 
 \paragraph{Temporal observability: reptimeline.}
 The discovery loop described above (anchor expansion, bit-semantic analysis, reconciliation) was operationalized through \textbf{reptimeline}~\citep{ornelas2026reptimeline}, a software tool developed as part of this project to track how discrete representations evolve during training. reptimeline consumes a sequence of model checkpoints, extracts discrete codes for a set of probe concepts at each step, and computes per-code lifecycle events (births, deaths), pairwise connection formation, entropy and churn curves, and automatic phase transition detection via statistical change-point analysis.
@@ -860,14 +877,12 @@ Our results have several limitations:
         \centering
         \includegraphics[width=\textwidth]{figures/bit_entropy_heatmap.png}
         \caption{Per-bit entropy heatmap. Darker cells indicate lower entropy (dead bits that fire infrequently).}
-        \label{fig:entropy_heatmap}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{figures/per_bit_entropy.png}
         \caption{Entropy distribution across 64 bits. Most bits reach $H \approx 0.7$--$0.9$; $\sim$15 bits remain below $0.3$.}
-        \label{fig:entropy_dist}
     \end{subfigure}
     \caption{Bit entropy analysis for the XL model (Run~15). Mean entropy $\bar{H} = 0.679$ (computed via hard binarization over 84 evaluation concepts). A dedicated per-bit entropy benchmark using continuous probabilities on 112 concepts yields $\bar{H} = 0.749$ with only 2 bits below the 0.3 threshold. The difference reflects the binarization method, not the model. Entropy regularization ($\lambda_{\text{ent}} = 1.0$) mitigates dead bits but does not eliminate them.}
     \label{fig:bit_entropy}
@@ -968,7 +983,7 @@ We have presented \microgpt{}, a generative language model that jointly learns n
 \end{enumerate}
 Additional results---a six-point bits sweep revealing a U-shaped loss curve (Section~\ref{sec:bits}) and a discovery loop expanding from 50 to 158 anchors with accuracy improving from 87\% to 93\% (Section~\ref{sec:bootstrap})---are detailed in the body.
 
-These findings suggest that algebraically verifiable discrete representations can be learned \emph{natively} within a generative language model---produced alongside next-token predictions at negligible additional cost. The iFSQ activation resolves the subsumption--language tradeoff that was the system's primary practical limitation. The compositional analysis demonstrates that the bit space supports multi-step algebraic operations with sub-linear error accumulation, providing evidence of coherent compositional structure. However, external evaluation on SimLex-999 reveals that \emph{binarization limits semantic grounding}: cosine similarity on continuous projections yields a significant correlation ($\rho = 0.083$, $p = 0.009$), but Jaccard similarity on binary codes does not ($\rho = -0.012$), indicating that the prime-factor mapping functions as an \emph{algebraic encoding with limited semantic grounding} rather than a full semantic representation. Furthermore, sparse fine-tuning experiments reveal a fundamental \emph{sparsity--compositionality trade-off}: dense signatures preserve compositional structure (analogy gap $+15.4$~pp) while sparse signatures enable subsumption detection (FP ratio $4.3\times$ above chance) but degrade compositionality; no configuration satisfies both simultaneously. The scaling experiments (D-A17, D-A18, D-A19) reveal that algebraic structure depends on the \emph{training loss pipeline}---not on model size or ternary sparsity per se; D-A19 recovers 76.9\% subsumption at 355M scale. Finally, the anchor expansion cycle (50 $\to$ 158 hand-labeled anchors, 87\% $\to$ 93\% accuracy) provides initial evidence that the discovery loop scales knowledge beyond initial supervision. Together, these results establish bitwise prime-factor encoding as a practical and compositional---though not yet semantically grounded---algebraic representation within end-to-end generative models.
+These findings suggest that algebraically verifiable discrete representations can be learned \emph{natively} within a generative language model---produced alongside next-token predictions at negligible additional cost. The iFSQ activation resolves the subsumption--language tradeoff that was the system's primary practical limitation. The compositional analysis demonstrates that the bit space supports multi-step algebraic operations with sub-linear error accumulation, providing evidence of coherent compositional structure. However, external evaluation on SimLex-999 reveals that the system does not capture graded semantic similarity: neither Jaccard on binary signatures ($\rho = -0.012$) nor cosine on continuous projections ($\rho = 0.046$, $p = 0.14$) achieves significance, indicating that the prime-factor mapping functions as an \emph{algebraic encoding without semantic grounding} rather than a full semantic representation. A sparse fine-tuning variant ($\sim$22.7 active bits) does raise cosine to $\rho = 0.087$ ($p = 0.006$), suggesting that more compact codes preserve a small continuous signal that 64-bit dense codes do not. Furthermore, sparse fine-tuning experiments reveal a fundamental \emph{sparsity--compositionality trade-off}: dense signatures preserve compositional structure (analogy gap $+15.4$~pp) while sparse signatures enable subsumption detection (FP ratio $4.3\times$ above chance) but degrade compositionality; no configuration satisfies both simultaneously. The scaling experiments (D-A17, D-A18, D-A19) reveal that algebraic structure depends on the \emph{training loss pipeline}---not on model size or ternary sparsity per se; D-A19 recovers 76.9\% subsumption at 355M scale. Finally, the anchor expansion cycle (50 $\to$ 158 hand-labeled anchors, 87\% $\to$ 93\% accuracy) provides initial evidence that the discovery loop scales knowledge beyond initial supervision. Together, these results establish bitwise prime-factor encoding as a practical and compositional---though not yet semantically grounded---algebraic representation within end-to-end generative models.
 
 
 \subsection*{Companion Work}
