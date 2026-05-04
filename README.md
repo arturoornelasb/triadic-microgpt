@@ -13,7 +13,7 @@
 
 **End-to-end prime factorization in a generative language model.**
 
-TriadicGPT is a 40M-parameter GPT that learns discrete prime-factor signatures alongside standard next-token prediction. A lightweight *triadic projection head* maps each token's hidden state to a binary vector, which encodes as a prime composite &Phi;(x) = &prod; p&#x1D62;. The result: algebraically verifiable semantic representations that emerge as a side effect of language modeling, at zero cost to language quality.
+TriadicGPT is a 40M-parameter GPT that learns discrete prime-factor signatures alongside standard next-token prediction. A lightweight *triadic projection head* maps each token's hidden state to a binary vector, which encodes as a prime composite &Phi;(x) = &prod; p&#x1D62;. The result: algebraically verifiable representations learned jointly with language modeling at negligible language cost (+1.7% PPL). External SimLex-999 evaluation positions the system as *algebraic encoding* (analogy/subsumption/composition) rather than graded semantic similarity.
 
 ```
 King  = 2 x 3 x 5        (Royalty x Male x Authority)
@@ -28,7 +28,7 @@ Analogy:    factor transfer   king:queen :: man:woman
 
 | Metric | Value |
 |--------|-------|
-| Language cost | **Zero** (PPL 7.69 vs 7.56 ablation, +1.7%) |
+| Language cost | **Negligible** (+1.7% PPL: 7.69 vs 7.56 ablation) |
 | Analogy verification | **98%** (51 analogies) |
 | Subsumption accuracy | **98.3%** held-out (158 supervised anchors) |
 | Domain separation | **1.21** mean (12 domains, sentence-level) |
@@ -526,10 +526,10 @@ python benchmarks/scripts/engine_comparison.py \
 
 ## Paper
 
-> **End-to-End Prime Factorization in a Generative Language Model: Emergent Algebraic Semantics from Joint Training**
+> **End-to-End Prime Factorization in a Generative Language Model: Learned Algebraic Encoding from Joint Training**
 > J. Arturo Ornelas Brand, 2026
 
-27-page paper covering 11 experiments across 29 training runs: scaling study, bits sweep, transfer learning, subsumption recovery, compositionality, ternary representations, and domain separation.
+30-page paper covering 11 experiments across 29+ training runs: scaling study, bits sweep, transfer learning, subsumption recovery, compositionality, ternary representations, domain separation, and reptimeline temporal observability (with MNIST/Pythia-70M backend validation).
 
 ```bash
 cd paper && pdflatex triadic_microgpt.tex && pdflatex triadic_microgpt.tex
@@ -541,13 +541,13 @@ cd paper && pdflatex triadic_microgpt.tex && pdflatex triadic_microgpt.tex
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19206545.svg)](https://doi.org/10.5281/zenodo.19206545)
 
-Ornelas Brand, J. A. (2026). *End-to-End Prime Factorization in a Generative Language Model: Emergent Algebraic Semantics from Joint Training*. Zenodo. https://doi.org/10.5281/zenodo.19206545
+Ornelas Brand, J. A. (2026). *End-to-End Prime Factorization in a Generative Language Model: Learned Algebraic Encoding from Joint Training*. Zenodo. https://doi.org/10.5281/zenodo.19206545
 
 **Repository:**
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19207845.svg)](https://doi.org/10.5281/zenodo.19207845)
 
-Ornelas Brand, J. A. (2026). *End-to-End Prime Factorization in a Generative Language Model: Emergent Algebraic Semantics from Joint Training (triadic-microgpt)* (Repository) (0.1.0). Zenodo. https://doi.org/10.5281/zenodo.19207845
+Ornelas Brand, J. A. (2026). *End-to-End Prime Factorization in a Generative Language Model: Learned Algebraic Encoding from Joint Training (triadic-microgpt)* (Repository) (0.3.0). Zenodo. https://doi.org/10.5281/zenodo.19207845
 
 ### Companion Repos
 

@@ -1,7 +1,7 @@
 {
-    "title": "TriadicGPT: End-to-End Prime Factorization in a Generative Language Model",
-    "version": "0.2.0",
-    "description": "A 40M-parameter GPT language model augmented with a triadic projection head that produces discrete prime-factor signatures alongside standard next-token predictions. Learns triadic representations end-to-end through a dual-objective training loss. Includes triadic-head (standalone PyPI package), desktop UI (PySide6), and full training/evaluation pipeline.",
+    "title": "TriadicGPT: End-to-End Prime Factorization in a Generative Language Model — Learned Algebraic Encoding from Joint Training",
+    "version": "0.3.0",
+    "description": "A 40M-parameter GPT language model augmented with a triadic projection head that produces discrete prime-factor signatures alongside standard next-token predictions. Learns triadic representations end-to-end through a dual-objective training loss combining language modeling with embedding alignment. Across 29+ training runs we demonstrate five principal findings: negligible language cost (+1.7% PPL), emergent semantic ordering at ~20M params, GPT-2 transfer closing 48% of gap to Engine PCA, iFSQ activation resolving the subsumption-language tradeoff (87.1% held-out at k=64), and compositional structure with sub-linear error accumulation (98.1% round-trip > 81.9% multiplicative). External SimLex-999 evaluation positions the system as algebraic encoding without semantic grounding; sparse fine-tuning reveals a sparsity-compositionality trade-off. Includes triadic-head (standalone PyPI package), desktop UI (PySide6), reptimeline (training-dynamics tool with MNIST/Pythia-70M backend validation), and full training/evaluation pipeline.",
     "creators": [
         {
             "name": "Ornelas Brand, J. Arturo",
@@ -16,12 +16,19 @@
         "neurosymbolic AI",
         "prime factorization",
         "language model",
-        "algebraic semantics",
+        "algebraic encoding",
         "discrete representations",
         "triadic projection",
         "GPT",
         "embedding alignment",
-        "iFSQ"
+        "iFSQ",
+        "subsumption",
+        "analogy verification",
+        "compositional generalization",
+        "ternary quantization",
+        "reptimeline",
+        "sparse autoencoder",
+        "causal verification"
     ],
     "related_identifiers": [
         {
@@ -37,6 +44,18 @@
         },
         {
             "identifier": "10.5281/zenodo.19205805",
+            "relation": "references",
+            "resource_type": "publication-preprint",
+            "scheme": "doi"
+        },
+        {
+            "identifier": "10.5281/zenodo.19375167",
+            "relation": "references",
+            "resource_type": "publication-preprint",
+            "scheme": "doi"
+        },
+        {
+            "identifier": "10.5281/zenodo.19208672",
             "relation": "references",
             "resource_type": "publication-preprint",
             "scheme": "doi"
